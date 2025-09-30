@@ -1,0 +1,5 @@
+build/
+.vscode/
+.zed/
+tmp/
+.cache/
