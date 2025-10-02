@@ -1,20 +1,42 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(fractalio VERSION 0.1.0 LANGUAGES CXX)
+project(fractalio VERSION 0.1.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    glad
+    GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+    GIT_TAG        v2.0.8
+    GIT_PROGRESS   TRUE
+    GIT_SHALLOW    TRUE
+    SOURCE_SUBDIR  cmake
+)
+FetchContent_MakeAvailable(glad)
 
 add_executable(fractalio)
 
 file(GLOB fractalio_files CONFIGURE_DEPENDS "src/**/*.cpp" "src/*.cpp")
 target_sources(fractalio PRIVATE ${fractalio_files})
 
-# Uncomment to add link library
-# target_link_libraries(fractalio PRIVATE #[[ link library here ]])
+find_package(glfw3 REQUIRED)
+find_package(OpenGL)
+
+glad_add_library(glad_gl_core_46 REPRODUCIBLE API gl:core=4.6)
+
+target_link_libraries(fractalio PRIVATE
+    glad_gl_core_46
+    ${glfw3_LIBRARIES}
+    ${OpenGL_LIBRARIES}
+)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -fsanitize=address")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+        -Wall -Wextra -Werror -fsanitize=address"
+    )
     target_link_libraries(fractalio PRIVATE -fsanitize=address)
 endif()
