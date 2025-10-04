@@ -64,4 +64,7 @@ CheckOptions:
     value: True
   - key:   readability-magic-numbers.IgnorePowersOf2IntegerValues
     value: True
+
+  - key:   misc-include-cleaner.IgnoreHeaders
+    value: gl.hpp|glad/gl.h|GLFW/glfw3.h
 ...

@@ -12,6 +12,8 @@
 #include "../make_deleter.hpp"
 #include "err.hpp"
 
+#include <glm/glm.hpp>
+
 namespace fio::glfw {
 
 MAKE_DELETER(GLFWwindow, glfwDestroyWindow)
@@ -36,7 +38,7 @@ public:
 
     void make_context_current() { glfwMakeContextCurrent(get()); }
 
-    void set_size_callback(std::function<void(Window &, int, int)> f) {
+    void set_size_callback(std::function<void(int, int)> f) {
         _size_callback = std::move(f);
     }
 
@@ -44,9 +46,15 @@ public:
 
     void swap_buffers() { glfwSwapBuffers(get()); }
 
+    glm::ivec2 get_size() {
+        glm::ivec2 res;
+        glfwGetWindowSize(get(), &res.x, &res.y);
+        return res;
+    }
+
 private:
     std::unique_ptr<GLFWwindow, del::GLFWwindow> _window;
-    std::optional<std::function<void(Window &, int, int)>> _size_callback;
+    std::optional<std::function<void(int, int)>> _size_callback;
 
     static void size_callback_inner(
         GLFWwindow *window, int width, int height
@@ -55,7 +63,7 @@ private:
             reinterpret_cast<Window *>(glfwGetWindowUserPointer(window));
         if (win->_size_callback) {
             try {
-                (*win->_size_callback)(*win, width, height);
+                (*win->_size_callback)(width, height);
             } catch (std::exception &ex) {
                 std::println(std::cerr, "size_callback_error: {}", ex.what());
             } catch (...) {

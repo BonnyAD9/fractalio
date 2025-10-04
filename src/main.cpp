@@ -4,9 +4,9 @@
 #include <memory>
 #include <print>
 
+#include "fractalio.hpp"
 #include "gl.hpp"
 #include "glad.hpp"
-#include "glad/gl.h"
 #include "glfw/runner.hpp"
 #include "glfw/window.hpp"
 
@@ -48,15 +48,9 @@ static void run() {
     );
     window->make_context_current();
     glad::load_gl();
-    glViewport(0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-    window->set_size_callback([](glfw::Window &, int w, int h) {
-        glViewport(0, 0, w, h);
-    });
 
-    while (!window->should_close()) {
-        window->swap_buffers();
-        glfwPollEvents();
-    }
+    Fractalio app(std::move(window));
+    app.mainloop();
 }
 
 } // namespace fio

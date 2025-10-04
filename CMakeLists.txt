@@ -25,6 +25,7 @@ target_sources(fractalio PRIVATE ${fractalio_files})
 
 find_package(glfw3 REQUIRED)
 find_package(OpenGL)
+find_package(glm CONFIG REQUIRED)
 
 glad_add_library(glad_gl_core_46 REPRODUCIBLE API gl:core=4.6)
 
@@ -32,6 +33,7 @@ target_link_libraries(fractalio PRIVATE
     glad_gl_core_46
     glfw
     ${OpenGL_LIBRARIES}
+    glm::glm
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
