@@ -1,7 +1,6 @@
 #pragma once
-
-#include <print>
 #include <vector>
+
 #include "gl.hpp"
 #include "shader.hpp"
 
@@ -12,8 +11,15 @@ public:
     ShaderProgram(const ShaderProgram &) = delete;
     ShaderProgram &operator=(const ShaderProgram &) = delete;
 
-    ShaderProgram(ShaderProgram &&) = default;
-    ShaderProgram &operator=(ShaderProgram &&) = default;
+    ShaderProgram(ShaderProgram &&other) noexcept {
+        _id = other._id;
+        other._id = 0;
+    }
+
+    ShaderProgram &operator=(ShaderProgram &&other) noexcept {
+        std::swap(other._id, _id);
+        return *this;
+    }
 
     ShaderProgram() : _id(glCreateProgram()) { }
 
@@ -45,7 +51,7 @@ public:
     }
 
 private:
-    GLuint _id;
+    GLuint _id = 0;
 };
 
 } // namespace fio::gl

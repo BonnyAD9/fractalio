@@ -4,7 +4,9 @@
     namespace del {                                                           \
     struct name {                                                             \
         void operator()(::name *ptr) {                                        \
-            fun(ptr);                                                         \
+            if (ptr) {                                                        \
+                fun(ptr);                                                     \
+            }                                                                 \
         }                                                                     \
     };                                                                        \
     }

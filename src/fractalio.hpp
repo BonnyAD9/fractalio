@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "gl/buffer.hpp"
+#include "gl/gl.hpp"
 #include "gl/shader_program.hpp"
 #include "gl/vertex_array.hpp"
 #include "glfw/window.hpp"

@@ -1,9 +1,5 @@
 #pragma once
-
-#include <array>
 #include <format>
-#include <iostream>
-#include <print>
 #include <stdexcept>
 #include <vector>
 
@@ -24,19 +20,14 @@ public:
 
         GLint success;
         glGetShaderiv(_id, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            std::array<char, 512> msg;
-            glGetShaderInfoLog(_id, msg.size(), nullptr, msg.data());
-            throw std::runtime_error(
-                std::format("Failed to compile shader: {}", msg.data())
-            );
-        }
-        GLint len;
-        glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &len);
-        if (len != 0) {
+        if (success == GL_FALSE) {
+            GLint len;
+            glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &len);
             std::vector<char> msg(len + 1, 0);
             glGetShaderInfoLog(_id, GLsizei(msg.size()), nullptr, msg.data());
-            std::println(std::cerr, "shader warning: {}", msg.data());
+            throw std::runtime_error(
+                std::format("Failed to link shader: {}", msg.data())
+            );
         }
     }
 
@@ -53,7 +44,7 @@ public:
     }
 
 private:
-    GLuint _id;
+    GLuint _id = 0;
 };
 
 } // namespace fio::gl

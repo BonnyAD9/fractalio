@@ -1,5 +1,4 @@
 #pragma once
-
 #include <stdexcept>
 
 #include "gl.hpp"
@@ -11,7 +10,7 @@ public:
     Buffer(const Buffer &) = delete;
     Buffer &operator=(Buffer &) = delete;
 
-    Buffer() : _id(0) { }
+    Buffer() = default;
 
     void init() {
         if (_id != 0) {
@@ -19,10 +18,8 @@ public:
         }
         glGenBuffers(1, &_id);
     }
-    
-    void bind(GLenum type) const {
-        glBindBuffer(type, _id);
-    }
+
+    void bind(GLenum type) const { glBindBuffer(type, _id); }
 
     [[nodiscard]]
     GLuint get() const {
@@ -37,7 +34,7 @@ public:
     }
 
 private:
-    GLuint _id;
+    GLuint _id = 0;
 };
 
 } // namespace fio::gl

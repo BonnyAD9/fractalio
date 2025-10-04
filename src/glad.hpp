@@ -1,5 +1,4 @@
 #pragma once
-
 #include <stdexcept>
 
 #include "gl/gl.hpp"
