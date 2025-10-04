@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "gl.hpp"
+#include "gl/gl.hpp"
 
 namespace fio::glad {
 

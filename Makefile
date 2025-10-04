@@ -1,5 +1,5 @@
 TARGET=fractalio
-BUILD_TYPE?=Release
+BUILD_TYPE?=Debug
 PARALLEL?=-j $(shell nproc)
 SOURCES=$(shell find src/ -name '*.cpp')
 HEADERS=$(shell find src/ -name '*.hpp')
@@ -40,4 +40,5 @@ tidy: debug
 check: fmt cppcheck tidy
 
 .PHONY: clean
-	-rm -rf target
+clean:
+	-rm -rf build

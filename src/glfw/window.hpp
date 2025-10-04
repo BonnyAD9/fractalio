@@ -8,7 +8,7 @@
 #include <optional>
 #include <print>
 
-#include "../gl.hpp"
+#include "../gl/gl.hpp"
 #include "../make_deleter.hpp"
 #include "err.hpp"
 

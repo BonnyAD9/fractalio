@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "../gl.hpp"
+#include "../gl/gl.hpp"
 
 namespace fio::glfw {
 

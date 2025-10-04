@@ -1,7 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
+#include "gl/buffer.hpp"
+#include "gl/shader_program.hpp"
+#include "gl/vertex_array.hpp"
 #include "glfw/window.hpp"
 namespace fio {
 
@@ -16,6 +20,9 @@ public:
 
 private:
     std::unique_ptr<glfw::Window> _window;
+    gl::Buffer _vbo;
+    gl::VertexArray _vao;
+    std::optional<gl::ShaderProgram> _program;
 
     static void size_callback(int width, int height);
     void process_input();
