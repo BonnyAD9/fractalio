@@ -30,7 +30,7 @@ glad_add_library(glad_gl_core_46 REPRODUCIBLE API gl:core=4.6)
 
 target_link_libraries(fractalio PRIVATE
     glad_gl_core_46
-    ${glfw3_LIBRARIES}
+    glfw
     ${OpenGL_LIBRARIES}
 )
 
