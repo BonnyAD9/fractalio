@@ -42,7 +42,7 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
         vert.compile(VERTEX_SHADER);
         gl::Shader frag(GL_FRAGMENT_SHADER);
         frag.compile(FRAGMENT_SHADER);
-        _program = gl::ShaderProgram();
+        _program.emplace();
         _program->construct(vert, frag);
     }
 
