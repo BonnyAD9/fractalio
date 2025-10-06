@@ -11,17 +11,16 @@ void main() {
 
     int i = LIM;
     for (; i > 0; --i) {
-        float x2 = x.x * x.x;
-        float y2 = x.y * x.y;
+        vec2 x2 = x * x;
 
         // |x| > 2
-        if (x2 + y2 > 4) {
+        if (x2.x + x2.y > 4) {
             break;
         }
 
         // (x, y)^2 == (x * x - y * y, 2 * x * y)
         x.y = 2 * x.x * x.y;
-        x.x = x2 - y2;
+        x.x = x2.x - x2.y;
 
         x += c;
     }
