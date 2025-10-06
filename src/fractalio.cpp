@@ -6,7 +6,6 @@
 #include "gl/gl.hpp"
 #include "gl/shader.hpp"
 #include "gl/shader_program.hpp"
-#include "glad/gl.h"
 
 namespace fio {
 
