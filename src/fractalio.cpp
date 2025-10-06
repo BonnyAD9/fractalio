@@ -12,10 +12,10 @@ namespace fio {
 constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0, 0, 0, 1 };
 
 constexpr std::array VERTICES{
-    -1.F, 1.F,  0.F, 1.F, 0.F, 0.F, // TR
-    -1.F, -1.F, 0.F, 0.F, 1.F, 0.F, // BL
-    1.F,  -1.F, 0.F, 0.F, 0.F, 1.F, // BR
-    1.F,  1.F,  0.F, 0.F, 1.F, 0.F, // TR
+    -1.F, 1.F,  0.F, /* */ 1.F, 0.F, 0.F, // TR
+    -1.F, -1.F, 0.F, /* */ 0.F, 1.F, 0.F, // BL
+    1.F,  -1.F, 0.F, /* */ 0.F, 0.F, 1.F, // BR
+    1.F,  1.F,  0.F, /* */ 0.F, 1.F, 0.F, // TR
 };
 
 constexpr std::array<GLuint, 6> INDICES{
