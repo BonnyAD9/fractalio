@@ -3,11 +3,8 @@
 #include <memory>
 #include <optional>
 
-#include "gl/buffer.hpp"
-#include "gl/gl.hpp"
-#include "gl/shader_program.hpp"
-#include "gl/vertex_array.hpp"
 #include "glfw/window.hpp"
+#include "mandelbrot/mandelbrot.hpp"
 namespace fio {
 
 class Fractalio {
@@ -21,12 +18,9 @@ public:
 
 private:
     std::unique_ptr<glfw::Window> _window;
-    gl::Buffer _vbo;
-    gl::Buffer _ebo;
-    gl::VertexArray _vao;
-    std::optional<gl::ShaderProgram> _program;
+    std::optional<Mandelbrot> _active;
 
-    static void size_callback(int width, int height);
+    void size_callback(int width, int height);
     void process_input();
 };
 

@@ -10,7 +10,7 @@ public:
     Buffer(const Buffer &) = delete;
     Buffer &operator=(Buffer &) = delete;
 
-    Buffer() = default;
+    Buffer() { glGenBuffers(1, &_id); }
 
     void init() {
         if (_id != 0) {

@@ -6,24 +6,24 @@
 
 namespace fio::gl {
 
-class ShaderProgram {
+class Program {
 public:
-    ShaderProgram(const ShaderProgram &) = delete;
-    ShaderProgram &operator=(const ShaderProgram &) = delete;
+    Program(const Program &) = delete;
+    Program &operator=(const Program &) = delete;
 
-    ShaderProgram(ShaderProgram &&other) noexcept {
+    Program(Program &&other) noexcept {
         _id = other._id;
         other._id = 0;
     }
 
-    ShaderProgram &operator=(ShaderProgram &&other) noexcept {
+    Program &operator=(Program &&other) noexcept {
         std::swap(other._id, _id);
         return *this;
     }
 
-    ShaderProgram() : _id(glCreateProgram()) { }
+    Program() : _id(glCreateProgram()) { }
 
-    void construct(Shader &vert, Shader &frag) const {
+    void link(Shader &vert, Shader &frag) const {
         glAttachShader(_id, vert.get());
         glAttachShader(_id, frag.get());
         glLinkProgram(_id);
@@ -43,7 +43,7 @@ public:
 
     void use() const { glUseProgram(_id); }
 
-    ~ShaderProgram() {
+    ~Program() {
         if (_id != 0) {
             glDeleteProgram(_id);
             _id = 0;

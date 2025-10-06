@@ -10,14 +10,7 @@ public:
     VertexArray(const VertexArray &) = delete;
     VertexArray &operator=(VertexArray &) = delete;
 
-    VertexArray() = default;
-
-    void init() {
-        if (_id != 0) {
-            throw std::runtime_error("Double initialization of VAO.");
-        }
-        glGenVertexArrays(1, &_id);
-    }
+    VertexArray() { glGenVertexArrays(1, &_id); }
 
     [[nodiscard]]
     GLuint get() const {
