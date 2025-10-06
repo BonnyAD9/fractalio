@@ -12,10 +12,10 @@ namespace fio {
 constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0, 0, 0, 1 };
 
 constexpr std::array VERTICES{
-    -1.F, 1.F,  0.F, // TR
-    -1.F, -1.F, 0.F, // BL
-    1.F,  -1.F, 0.F, // BR
-    1.F,  1.F,  0.F, // TR
+    -1.F, 1.F,  0.F, 1.F, 0.F, 0.F, // TR
+    -1.F, -1.F, 0.F, 0.F, 1.F, 0.F, // BL
+    1.F,  -1.F, 0.F, 0.F, 0.F, 1.F, // BR
+    1.F,  1.F,  0.F, 0.F, 1.F, 0.F, // TR
 };
 
 constexpr std::array<GLuint, 6> INDICES{
@@ -55,6 +55,7 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
     }
 
     constexpr GLuint LOCATION = 0;
+    constexpr GLuint LOC_COLOR = 1;
     _vao.init();
     _vbo.init();
     _ebo.init();
@@ -64,9 +65,18 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
     gl::buffer_data(GL_ARRAY_BUFFER, VERTICES);
     gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, INDICES);
     gl::vertex_attrib_pointer(
-        LOCATION, 3, GL_FLOAT, false, 3 * sizeof(*VERTICES.data()), 0
+        LOCATION, 3, GL_FLOAT, false, 6 * sizeof(*VERTICES.data()), 0
     );
     glEnableVertexAttribArray(LOCATION);
+    gl::vertex_attrib_pointer(
+        LOC_COLOR,
+        3,
+        GL_FLOAT,
+        false,
+        6 * sizeof(*VERTICES.data()),
+        3 * sizeof(*VERTICES.data())
+    );
+    glEnableVertexAttribArray(LOC_COLOR);
 }
 
 void Fractalio::mainloop() {
