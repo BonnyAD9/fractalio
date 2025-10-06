@@ -22,6 +22,7 @@ public:
 private:
     std::unique_ptr<glfw::Window> _window;
     gl::Buffer _vbo;
+    gl::Buffer _ebo;
     gl::VertexArray _vao;
     std::optional<gl::ShaderProgram> _program;
 

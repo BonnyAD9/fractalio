@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include <glad/gl.h>
 
 // make sure that the includes are not reordered
@@ -45,6 +47,17 @@ static inline void buffer_data(
     );
 }
 
+static inline void buffer_data(
+    GLenum type, std::span<const GLuint> data, GLenum usage = GL_STATIC_DRAW
+) {
+    buffer_data(
+        type,
+        { reinterpret_cast<const char *>(data.data()),
+          data.size() * sizeof(*data.data()) },
+        usage
+    );
+}
+
 static inline void vertex_attrib_pointer(
     GLuint location,
     GLint st_size,
@@ -59,6 +72,18 @@ static inline void vertex_attrib_pointer(
         type,
         normalize ? GL_TRUE : GL_FALSE,
         stride,
+        // NOLINTNEXTLINE(performance-no-int-to-ptr)
+        reinterpret_cast<void *>(offset)
+    );
+}
+
+static inline void draw_elements(
+    GLenum el_type, GLsizei count, GLenum type, std::ptrdiff_t offset
+) {
+    glDrawElements(
+        el_type,
+        count,
+        type,
         // NOLINTNEXTLINE(performance-no-int-to-ptr)
         reinterpret_cast<void *>(offset)
     );

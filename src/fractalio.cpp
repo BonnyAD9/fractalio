@@ -6,13 +6,22 @@
 #include "gl/gl.hpp"
 #include "gl/shader.hpp"
 #include "gl/shader_program.hpp"
+#include "glad/gl.h"
 
 namespace fio {
 
 constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0, 0, 0, 1 };
 
 constexpr std::array VERTICES{
-    -0.5F, -0.5F, 0.0F, 0.5F, -0.5F, 0.0F, 0.0F, 0.5F, 0.0F,
+    -1.F, 1.F,  0.F, // TR
+    -1.F, -1.F, 0.F, // BL
+    1.F,  -1.F, 0.F, // BR
+    1.F,  1.F,  0.F, // TR
+};
+
+constexpr std::array<GLuint, 6> INDICES{
+    0, 1, 2, //
+    0, 2, 3, //
 };
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
@@ -49,9 +58,12 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
     constexpr GLuint LOCATION = 0;
     _vao.init();
     _vbo.init();
+    _ebo.init();
     _vao.bind();
     _vbo.bind(GL_ARRAY_BUFFER);
+    _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
     gl::buffer_data(GL_ARRAY_BUFFER, VERTICES);
+    gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, INDICES);
     gl::vertex_attrib_pointer(
         LOCATION, 3, GL_FLOAT, false, 3 * sizeof(*VERTICES.data()), 0
     );
@@ -68,7 +80,7 @@ void Fractalio::mainloop() {
         process_input();
 
         glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, VERTICES.size());
+        gl::draw_elements(GL_TRIANGLES, INDICES.size(), GL_UNSIGNED_INT, 0);
 
         _window->swap_buffers();
         glfwPollEvents();
