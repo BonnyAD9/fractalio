@@ -3,8 +3,11 @@
 out vec4 frag_color;
 in vec2 cor;
 
+uniform sampler1D gradient;
+
 void main() {
     const int LIM = 100;
+    const int COLOR_COUNT = 128;
 
     vec2 c = cor;
     vec2 x = cor;
@@ -24,7 +27,10 @@ void main() {
 
         x += c;
     }
-
-    float res = float(i) / LIM;
-    frag_color = vec4(res, res, res, 1);
+    
+    if (i <= 0) {
+        frag_color = vec4(0, 0, 0, 1);
+    } else {
+        frag_color = texture(gradient, float(LIM - i) / COLOR_COUNT);
+    }
 }

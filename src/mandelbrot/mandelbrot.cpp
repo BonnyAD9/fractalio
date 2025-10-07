@@ -1,5 +1,7 @@
 #include "mandelbrot.hpp"
 
+#include "../gradient.hpp"
+
 namespace fio {
 
 static constexpr std::array<GLuint, 6> INDICES{
@@ -40,6 +42,18 @@ Mandelbrot::Mandelbrot() {
 
     _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
     gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, INDICES);
+
+    _texture.bind(GL_TEXTURE_1D);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    gl::tex_image_1d(
+        GL_TEXTURE_1D,
+        GL_RGB,
+        GL_RGB,
+        sizeof(gradient::rgb_data) / 3,
+        gradient::rgb_data
+    );
 }
 
 void Mandelbrot::resize(glm::vec2 size) {

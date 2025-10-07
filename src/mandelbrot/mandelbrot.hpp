@@ -5,6 +5,7 @@
 #include "../gl/buffer.hpp"
 #include "../gl/gl.hpp"
 #include "../gl/program.hpp"
+#include "../gl/texture.hpp"
 #include "../gl/vertex_array.hpp"
 
 #include <glm/glm.hpp>
@@ -22,6 +23,7 @@ public:
     void use() {
         _program.use();
         _vao.bind();
+        _texture.bind(GL_TEXTURE_1D);
     }
 
 private:
@@ -29,6 +31,7 @@ private:
     gl::VertexArray _vao;
     gl::Buffer _vbo;
     gl::Buffer _ebo;
+    gl::Texture _texture;
 
     std::array<float, 16> _vertices{
         -1, 1,  /* */ -2, 2,  // TL
