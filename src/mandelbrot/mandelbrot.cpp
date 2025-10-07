@@ -47,13 +47,9 @@ Mandelbrot::Mandelbrot() {
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    gl::tex_image_1d(
-        GL_TEXTURE_1D,
-        GL_RGB,
-        GL_RGB,
-        sizeof(gradient::rgb_data) / 3,
-        gradient::rgb_data
-    );
+    std::vector<glm::u8vec3> grad(256);
+    gradient::ultra_fractal(grad);
+    gl::tex_image_1d(grad);
 }
 
 void Mandelbrot::resize(glm::vec2 size) {

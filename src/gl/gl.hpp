@@ -95,4 +95,14 @@ static inline void tex_image_1d(
     glTexImage1D(t_type, 0, ifmt, width, 0, fmt, GL_UNSIGNED_BYTE, data);
 }
 
+static inline void tex_image_1d(std::span<const glm::u8vec3> data) {
+    tex_image_1d(
+        GL_TEXTURE_1D,
+        GL_RGB,
+        GL_RGB,
+        GLsizei(data.size()),
+        reinterpret_cast<const char *>(data.data())
+    );
+}
+
 } // namespace fio::gl
