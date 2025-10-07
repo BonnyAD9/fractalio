@@ -32,8 +32,12 @@ Mandelbrot::Mandelbrot() {
     frag.compile(FRAGMENT_SHADER);
 
     _program.link(vert, frag);
+    _program.use();
+
     _loc_center = _program.uniform_location("center");
     gl::uniform(_loc_center, _center);
+    _loc_scale = _program.uniform_location("scale");
+    gl::uniform(_loc_scale, _scale);
 
     _vao.bind();
 
@@ -75,8 +79,13 @@ void Mandelbrot::draw() {
 
 void Mandelbrot::drag(glm::dvec2 delta) {
     delta.y = -delta.y;
-    _center -= delta / _wsizex * 4.;
+    _center -= delta / _wsizex * 4. * _scale;
     gl::uniform(_loc_center, _center);
+}
+
+void Mandelbrot::scale(double delta) {
+    _scale *= pow(0.99, -delta);
+    gl::uniform(_loc_scale, _scale);
 }
 
 } // namespace fio

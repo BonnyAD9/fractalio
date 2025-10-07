@@ -109,4 +109,8 @@ static inline void uniform(GLint location, glm::dvec2 value) {
     glUniform2d(location, value.x, value.y);
 }
 
+static inline void uniform(GLint location, double value) {
+    glUniform1d(location, value);
+}
+
 } // namespace fio::gl

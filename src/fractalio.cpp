@@ -55,11 +55,18 @@ void Fractalio::size_callback(int width, int height) {
 void Fractalio::mouse_move_callback(double x, double y) {
     const glm::dvec2 mouse_pos{ x, y };
 
-    if (_active &&
-        glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_LEFT) ==
-            GLFW_PRESS) {
+    if (!_active) {
+        _last_mouse_pos = mouse_pos;
+        return;
+    }
+
+    if (glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_LEFT) ==
+        GLFW_PRESS) {
         auto delta = mouse_pos - _last_mouse_pos;
         _active->drag(delta);
+    } else if (glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_RIGHT) ==
+               GLFW_PRESS) {
+        _active->scale(mouse_pos.y - _last_mouse_pos.y);
     }
 
     _last_mouse_pos = mouse_pos;

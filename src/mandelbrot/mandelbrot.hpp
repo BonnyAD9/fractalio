@@ -27,6 +27,7 @@ public:
     }
 
     void drag(glm::dvec2 delta);
+    void scale(double delta);
 
 private:
     gl::Program _program;
@@ -34,9 +35,13 @@ private:
     gl::Buffer _vbo;
     gl::Buffer _ebo;
     gl::Texture _texture;
-    glm::dvec2 _center{ 0, 0 };
+
     double _wsizex = 0;
+
+    glm::dvec2 _center{ 0, 0 };
     GLint _loc_center;
+    double _scale = 1.;
+    GLint _loc_scale;
 
     std::array<float, 16> _vertices{
         -1, 1,  /* */ -2, 2,  // TL

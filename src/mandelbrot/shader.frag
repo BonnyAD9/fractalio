@@ -6,13 +6,14 @@ in vec2 cor;
 uniform sampler1D gradient;
 
 uniform dvec2 center;
+uniform double scale;
 
 void main() {
-    const int LIM = 100;
-    const int COLOR_COUNT = 128;
+    const int LIM = 256;
+    const int COLOR_COUNT = 256;
 
-    vec2 c = vec2(cor + center);
-    vec2 x = c;
+    vec2 c = vec2(cor * scale + center);
+    lowp vec2 x = c;
 
     int i = LIM;
     for (; i > 0; --i) {
