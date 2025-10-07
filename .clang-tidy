@@ -22,7 +22,7 @@ Checks: '
   -readability-qualified-auto,
   -readability-implicit-bool-conversion,
   -readability-named-parameter,
-  -readability-magic-numbers
+  -readability-magic-numbers,
   -readability-math-missing-parentheses'
 FormatStyle: file
 

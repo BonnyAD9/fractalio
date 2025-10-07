@@ -89,4 +89,10 @@ static inline void draw_elements(
     );
 }
 
+static inline void tex_image_1d(
+    GLuint t_type, GLint ifmt, GLenum fmt, GLsizei width, const char *data
+) {
+    glTexImage1D(t_type, 0, ifmt, width, 0, fmt, GL_UNSIGNED_BYTE, data);
+}
+
 } // namespace fio::gl
