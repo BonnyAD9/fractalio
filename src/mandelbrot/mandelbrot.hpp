@@ -26,12 +26,17 @@ public:
         _texture.bind(GL_TEXTURE_1D);
     }
 
+    void drag(glm::dvec2 delta);
+
 private:
     gl::Program _program;
     gl::VertexArray _vao;
     gl::Buffer _vbo;
     gl::Buffer _ebo;
     gl::Texture _texture;
+    glm::dvec2 _center{ 0, 0 };
+    double _wsizex = 0;
+    GLint _loc_center;
 
     std::array<float, 16> _vertices{
         -1, 1,  /* */ -2, 2,  // TL

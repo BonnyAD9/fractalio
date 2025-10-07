@@ -2,6 +2,8 @@
 
 #include "../gradient.hpp"
 
+#include <glm/fwd.hpp>
+
 namespace fio {
 
 static constexpr std::array<GLuint, 6> INDICES{
@@ -30,6 +32,8 @@ Mandelbrot::Mandelbrot() {
     frag.compile(FRAGMENT_SHADER);
 
     _program.link(vert, frag);
+    _loc_center = _program.uniform_location("center");
+    gl::uniform(_loc_center, _center);
 
     _vao.bind();
 
@@ -53,6 +57,8 @@ Mandelbrot::Mandelbrot() {
 }
 
 void Mandelbrot::resize(glm::vec2 size) {
+    _wsizex = size.x;
+
     const float h = size.y / size.x * 2;
     _vertices[3] = h;
     _vertices[7] = -h;
@@ -65,6 +71,12 @@ void Mandelbrot::resize(glm::vec2 size) {
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void Mandelbrot::draw() {
     gl::draw_elements(GL_TRIANGLES, INDICES.size(), GL_UNSIGNED_INT, 0);
+}
+
+void Mandelbrot::drag(glm::dvec2 delta) {
+    delta.y = -delta.y;
+    _center -= delta / _wsizex * 4.;
+    gl::uniform(_loc_center, _center);
 }
 
 } // namespace fio

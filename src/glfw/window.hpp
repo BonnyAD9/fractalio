@@ -29,6 +29,7 @@ public:
         }
         glfwSetWindowUserPointer(get(), reinterpret_cast<void *>(this));
         glfwSetFramebufferSizeCallback(get(), size_callback_inner);
+        glfwSetCursorPosCallback(get(), mouse_move_callback_inner);
     }
 
     GLFWwindow *get() { return _window.get(); }
@@ -39,6 +40,10 @@ public:
 
     void set_size_callback(std::function<void(int, int)> f) {
         _size_callback = std::move(f);
+    }
+
+    void set_mouse_move_callback(std::function<void(double, double)> f) {
+        _mouse_move_callback = std::move(f);
     }
 
     bool should_close() { return glfwWindowShouldClose(get()); }
@@ -54,6 +59,7 @@ public:
 private:
     std::unique_ptr<GLFWwindow, del::GLFWwindow> _window;
     std::optional<std::function<void(int, int)>> _size_callback;
+    std::optional<std::function<void(double, double)>> _mouse_move_callback;
 
     static void size_callback_inner(
         GLFWwindow *window, int width, int height
@@ -63,6 +69,22 @@ private:
         if (win->_size_callback) {
             try {
                 (*win->_size_callback)(width, height);
+            } catch (std::exception &ex) {
+                std::println(std::cerr, "size_callback_error: {}", ex.what());
+            } catch (...) {
+                std::println(std::cerr, "unknown size_callback_error");
+            }
+        }
+    }
+
+    static void mouse_move_callback_inner(
+        GLFWwindow *window, double x, double y
+    ) {
+        auto win =
+            reinterpret_cast<Window *>(glfwGetWindowUserPointer(window));
+        if (win->_mouse_move_callback) {
+            try {
+                (*win->_mouse_move_callback)(x, y);
             } catch (std::exception &ex) {
                 std::println(std::cerr, "size_callback_error: {}", ex.what());
             } catch (...) {

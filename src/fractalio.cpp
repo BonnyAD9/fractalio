@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <GLFW/glfw3.h>
+
 #include "gl/gl.hpp"
 
 namespace fio {
@@ -15,6 +17,9 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
     glViewport(0, 0, size.x, size.y);
     gl::clear_color(DEFAULT_CLEAR_COLOR);
     _window->set_size_callback([&](int w, int h) { size_callback(w, h); });
+    _window->set_mouse_move_callback([&](double x, double y) {
+        mouse_move_callback(x, y);
+    });
 
     _active.emplace();
     _active->resize(size);
@@ -45,6 +50,19 @@ void Fractalio::size_callback(int width, int height) {
         _active->use();
         _active->resize({ width, height });
     }
+}
+
+void Fractalio::mouse_move_callback(double x, double y) {
+    const glm::dvec2 mouse_pos{ x, y };
+
+    if (_active &&
+        glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_LEFT) ==
+            GLFW_PRESS) {
+        auto delta = mouse_pos - _last_mouse_pos;
+        _active->drag(delta);
+    }
+
+    _last_mouse_pos = mouse_pos;
 }
 
 void Fractalio::process_input() { }

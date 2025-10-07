@@ -41,6 +41,10 @@ public:
         }
     }
 
+    GLint uniform_location(const char *name) const {
+        return glGetUniformLocation(_id, name);
+    }
+
     void use() const { glUseProgram(_id); }
 
     ~Program() {

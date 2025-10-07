@@ -5,12 +5,14 @@ in vec2 cor;
 
 uniform sampler1D gradient;
 
+uniform dvec2 center;
+
 void main() {
     const int LIM = 100;
     const int COLOR_COUNT = 128;
 
-    vec2 c = cor;
-    vec2 x = cor;
+    vec2 c = vec2(cor + center);
+    vec2 x = c;
 
     int i = LIM;
     for (; i > 0; --i) {

@@ -19,8 +19,10 @@ public:
 private:
     std::unique_ptr<glfw::Window> _window;
     std::optional<Mandelbrot> _active;
+    glm::dvec2 _last_mouse_pos;
 
     void size_callback(int width, int height);
+    void mouse_move_callback(double x, double y);
     void process_input();
 };
 

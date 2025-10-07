@@ -105,4 +105,8 @@ static inline void tex_image_1d(std::span<const glm::u8vec3> data) {
     );
 }
 
+static inline void uniform(GLint location, glm::dvec2 value) {
+    glUniform2d(location, value.x, value.y);
+}
+
 } // namespace fio::gl
