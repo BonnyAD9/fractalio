@@ -20,6 +20,9 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
     _window->set_mouse_move_callback([&](double x, double y) {
         mouse_move_callback(x, y);
     });
+    _window->set_scroll_callback([&](double dx, double dy) {
+        scroll_callback(dx, dy);
+    });
 
     _active.emplace();
     _active->resize(size);
@@ -70,6 +73,14 @@ void Fractalio::mouse_move_callback(double x, double y) {
     }
 
     _last_mouse_pos = mouse_pos;
+}
+
+void Fractalio::scroll_callback(double, double dy) {
+    if (!_active) {
+        return;
+    }
+
+    _active->scale(dy * 8);
 }
 
 void Fractalio::process_input() { }

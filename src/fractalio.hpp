@@ -23,6 +23,7 @@ private:
 
     void size_callback(int width, int height);
     void mouse_move_callback(double x, double y);
+    void scroll_callback(double dx, double dy);
     void process_input();
 };
 

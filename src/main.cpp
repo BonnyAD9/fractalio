@@ -11,26 +11,16 @@
 #include "glad/gl.h"
 #include "glfw/runner.hpp"
 #include "glfw/window.hpp"
+#include "log_err.hpp"
 
 namespace fio {
 static void main();
 }
 
 int main() {
-    try {
-        try {
-            fio::main();
-            return EXIT_SUCCESS;
-        } catch (std::exception &ex) {
-            std::println(std::cerr, "error: {}", ex.what());
-        } catch (...) {
-            std::println(std::cerr, "unknown error");
-        }
-        // NOLINTNEXTLINE(bugprone-empty-catch)
-    } catch (...) {
-        // In case the print functions also throw. Nothing can be done now.
+    if (!fio::log_err(fio::main)) {
+        return EXIT_FAILURE;
     }
-    return EXIT_FAILURE;
 }
 
 namespace fio {
