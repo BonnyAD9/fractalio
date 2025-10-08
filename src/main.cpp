@@ -5,6 +5,7 @@
 #include <print>
 #include <string_view>
 
+#include "font.hpp"
 #include "fractalio.hpp"
 #include "gl/gl.hpp"
 #include "glad.hpp"
