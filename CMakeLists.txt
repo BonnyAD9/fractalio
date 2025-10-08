@@ -27,6 +27,7 @@ target_sources(fractalio PRIVATE ${fractalio_files})
 find_package(glfw3 REQUIRED)
 find_package(OpenGL)
 find_package(glm CONFIG REQUIRED)
+find_package(Fontconfig REQUIRED)
 
 glad_add_library(glad_gl_core_46 REPRODUCIBLE API gl:core=4.6)
 
@@ -35,6 +36,7 @@ target_link_libraries(fractalio PRIVATE
     glfw
     ${OpenGL_LIBRARIES}
     glm::glm
+    Fontconfig::Fontconfig
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
