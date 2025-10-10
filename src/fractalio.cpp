@@ -21,7 +21,7 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _fps_text(_font, 0) {
 
     _window->make_context_current();
-    glfwSwapInterval(0); // to disable vsync
+    // glfwSwapInterval(0); // to disable vsync
     auto size = _window->get_size();
     _width = float(size.x);
     glViewport(0, 0, size.x, size.y);

@@ -110,7 +110,7 @@ Mandelbrot set
 ).",
         _center.x,
         _center.y,
-        _scale
+        1 / _scale
     );
 }
 

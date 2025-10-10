@@ -30,6 +30,9 @@ public:
         glfwSetFramebufferSizeCallback(get(), size_callback_inner);
         glfwSetCursorPosCallback(get(), mouse_move_callback_inner);
         glfwSetScrollCallback(get(), scroll_callback_inner);
+        glfwSetWindowSizeLimits(
+            get(), 300, 100, GLFW_DONT_CARE, GLFW_DONT_CARE
+        );
     }
 
     GLFWwindow *get() { return _window.get(); }
