@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <glm/glm.hpp>
+
 namespace fio::gradient {
 
 void linear_gradient(

@@ -1,7 +1,5 @@
 #include "text_renderer.hpp"
 
-#include "glad/gl.h"
-
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -57,6 +55,7 @@ TextRenderer::TextRenderer(Font &font, float line_height) :
 
     _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
     gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, _indices);
+    glEnableVertexAttribArray(LOCATION);
 }
 
 void TextRenderer::resize(glm::vec2 size) const {
@@ -81,7 +80,10 @@ void TextRenderer::add_text(std::string_view text, glm::vec2 pos) {
 }
 
 void TextRenderer::prepare() {
+    _vbo.bind(GL_ARRAY_BUFFER);
     gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
+    glEnableVertexAttribArray(LOCATION);
+    _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
     gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, _indices);
 }
 

@@ -1,11 +1,9 @@
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 #include <memory>
 #include <print>
 #include <string_view>
 
-#include "font.hpp"
 #include "fractalio.hpp"
 #include "gl/gl.hpp"
 #include "glad.hpp"
@@ -26,7 +24,7 @@ int main() {
 
 namespace fio {
 
-constexpr int DEFAULT_WINDOW_WIDTH = 800;
+constexpr int DEFAULT_WINDOW_WIDTH = 900;
 constexpr int DEFAULT_WINDOW_HEIGHT = 600;
 
 static void run();

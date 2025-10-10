@@ -1,11 +1,9 @@
 #pragma once
+
 #include <cstdint>
-#include <exception>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <optional>
-#include <print>
 
 #include "../gl/gl.hpp"
 #include "../log_err.hpp"

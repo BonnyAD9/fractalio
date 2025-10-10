@@ -26,6 +26,9 @@ private:
     glm::dvec2 _last_mouse_pos;
     Font _font;
     TextRenderer _text_renderer;
+    TextRenderer _fps_text;
+    bool _new_text = true;
+    float _width = 0;
 
     void size_callback(int width, int height);
     void mouse_move_callback(double x, double y);

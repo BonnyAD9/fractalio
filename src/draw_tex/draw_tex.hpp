@@ -25,7 +25,9 @@ public:
 
     void drag(glm::dvec2) override { }
     void scale(double) override { }
-    void resize(glm::vec2) override { }
+    void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) override;
+
+    std::string describe() override { return "Texture view"; }
 
 private:
     gl::Program _program;
@@ -33,6 +35,15 @@ private:
     gl::Buffer _vbo;
     gl::Buffer _ebo;
     gl::Texture _texture;
+
+    GLint _loc_proj;
+
+    std::array<float, 16> _vertices{
+        0,   0,   /* */ 0, 0, // TL
+        0,   600, /* */ 0, 1, // BL
+        800, 600, /* */ 1, 1, // BR,
+        800, 0,   /* */ 1, 0, // TR
+    };
 };
 
 } // namespace fio

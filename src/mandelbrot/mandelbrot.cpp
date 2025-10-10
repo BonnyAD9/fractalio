@@ -1,8 +1,11 @@
 #include "mandelbrot.hpp"
 
+#include <format>
+
 #include "../gradient.hpp"
 
-#include <glm/fwd.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace fio {
 
@@ -34,6 +37,8 @@ Mandelbrot::Mandelbrot() {
     _program.link(vert, frag);
     _program.use();
 
+    _loc_proj = _program.uniform_location("proj");
+    gl::uniform(_loc_proj, glm::ortho(0.F, 800.F, 600.F, 0.F));
     _loc_center = _program.uniform_location("center");
     gl::uniform(_loc_center, _center);
     _loc_scale = _program.uniform_location("scale");
@@ -60,16 +65,23 @@ Mandelbrot::Mandelbrot() {
     gl::tex_image_1d(grad);
 }
 
-void Mandelbrot::resize(glm::vec2 size) {
+void Mandelbrot::resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) {
     _wsizex = size.x;
 
-    const float h = size.y / size.x * 2;
-    _vertices[3] = h;
-    _vertices[7] = -h;
-    _vertices[11] = -h;
-    _vertices[15] = h;
+    auto end = pos + size;
 
+    const float h = size.y / size.x * 2;
+    _vertices = {
+        pos.x, pos.y, /* */ -2, h,  // TL
+        pos.x, end.y, /* */ -2, -h, // BL
+        end.x, end.y, /* */ 2,  -h, // BR
+        end.x, pos.y, /* */ 2,  h,  // TR
+    };
+
+    gl::uniform(_loc_proj, glm::ortho(0.F, of.x, of.y, 0.F));
+    _vbo.bind(GL_ARRAY_BUFFER);
     gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
+    glEnableVertexAttribArray(LOCATION);
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
@@ -86,6 +98,20 @@ void Mandelbrot::drag(glm::dvec2 delta) {
 void Mandelbrot::scale(double delta) {
     _scale *= pow(0.99, -delta);
     gl::uniform(_loc_scale, _scale);
+}
+
+std::string Mandelbrot::describe() {
+    return std::format(
+        R".(
+Mandelbrot set
+  center:
+    {:.6} + {:.6}i
+  scale: {:.10}
+).",
+        _center.x,
+        _center.y,
+        _scale
+    );
 }
 
 } // namespace fio

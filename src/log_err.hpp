@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 #include <print>
+
 namespace fio {
 
 static inline bool log_err(const std::function<void(void)> &f) noexcept {

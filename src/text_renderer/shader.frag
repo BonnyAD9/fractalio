@@ -10,5 +10,5 @@ uniform vec3 color;
 
 void main() {
     vec4 col = texture(bitmap, cor);
-    frag_color = vec4(col.rrr * color, 1);
+    frag_color = vec4(color, col.r);
 }

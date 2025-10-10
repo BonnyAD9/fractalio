@@ -17,7 +17,7 @@ class Mandelbrot : public Fractal {
 public:
     Mandelbrot();
 
-    void resize(glm::vec2 size) override;
+    void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) override;
 
     void draw() override;
 
@@ -30,6 +30,8 @@ public:
     void drag(glm::dvec2 delta) override;
     void scale(double delta) override;
 
+    std::string describe() override;
+
 private:
     gl::Program _program;
     gl::VertexArray _vao;
@@ -39,16 +41,17 @@ private:
 
     double _wsizex = 0;
 
+    GLint _loc_proj;
     glm::dvec2 _center{ 0, 0 };
     GLint _loc_center;
     double _scale = 1.;
     GLint _loc_scale;
 
     std::array<float, 16> _vertices{
-        -1, 1,  /* */ -2, 2,  // TL
-        -1, -1, /* */ -2, -2, // BL
-        1,  -1, /* */ 2,  -2, // BR,
-        1,  1,  /* */ 2,  2,  // TR
+        0,   0,   /* */ -2, 2,  // TL
+        0,   600, /* */ -2, -2, // BL
+        800, 600, /* */ 2,  -2, // BR,
+        800, 0,   /* */ 2,  2,  // TR
     };
 };
 

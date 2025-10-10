@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstddef>
-
 #include <glad/gl.h>
 
 // make sure that the includes are not reordered
@@ -9,6 +7,8 @@
 #if true
 #include <GLFW/glfw3.h>
 #endif
+
+#include <cstddef>
 #include <span>
 
 #include <glm/glm.hpp>
@@ -119,6 +119,10 @@ static inline void uniform(GLint location, glm::dvec2 value) {
 
 static inline void uniform(GLint location, glm::vec3 value) {
     glUniform3f(location, value.x, value.y, value.z);
+}
+
+static inline void uniform(GLint location, glm::vec4 value) {
+    glUniform4f(location, value.x, value.y, value.z, value.w);
 }
 
 static inline void uniform(GLint location, double value) {
