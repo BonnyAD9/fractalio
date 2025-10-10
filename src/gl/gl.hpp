@@ -106,7 +106,7 @@ static inline void tex_image_1d(std::span<const glm::u8vec3> data) {
 }
 
 static inline void tex_image_2d(
-    const char *data, GLsizei w, GLsizei h, GLenum typ
+    const std::uint8_t *data, GLsizei w, GLsizei h, GLenum typ
 ) {
     glTexImage2D(
         GL_TEXTURE_2D, 0, GLint(typ), w, h, 0, typ, GL_UNSIGNED_BYTE, data
@@ -117,12 +117,16 @@ static inline void uniform(GLint location, glm::dvec2 value) {
     glUniform2d(location, value.x, value.y);
 }
 
+static inline void uniform(GLint location, glm::vec3 value) {
+    glUniform3f(location, value.x, value.y, value.z);
+}
+
 static inline void uniform(GLint location, double value) {
     glUniform1d(location, value);
 }
 
 static inline void uniform(GLint location, glm::mat4 value) {
-    glUniformMatrix4fv(location, glm::mat4::length(), false, &value[0][0]);
+    glUniformMatrix4fv(location, 1, false, &value[0][0]);
 }
 
 } // namespace fio::gl

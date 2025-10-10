@@ -24,18 +24,24 @@ Font::Font(const char *name, FT_UInt size) {
     auto face = lib.new_face(path.c_str());
     face.set_pixel_sizes(size);
 
+    face.load_char(0xfffd);
+    _unknown = make_glyph(face->glyph);
+
     for (char c = ' '; c < 0x7f; ++c) {
         face.load_char(c);
-        const glm::uvec2 tsize{ face->glyph->bitmap.width,
-                                face->glyph->bitmap.rows };
-        const glm::uvec2 tpos = add_render(face->glyph->bitmap.buffer, tsize);
-        _gliphs[c] = {
-            .tpos = tpos,
-            .tsize = tsize,
-            .bearing{ face->glyph->bitmap_left, face->glyph->bitmap_top },
-            .advance = unsigned(face->glyph->advance.x),
-        };
+        _glyphs[c] = make_glyph(face->glyph);
     }
+}
+
+Font::Glyph Font::make_glyph(FT_GlyphSlot glyph) {
+    const glm::uvec2 tsize{ glyph->bitmap.width, glyph->bitmap.rows };
+    const glm::uvec2 tpos = add_render(glyph->bitmap.buffer, tsize);
+    return {
+        .tpos = tpos,
+        .tsize = tsize,
+        .bearing{ glyph->bitmap_left, glyph->bitmap_top },
+        .advance = unsigned(glyph->advance.x),
+    };
 }
 
 glm::uvec2 Font::add_render(std::uint8_t *data, glm::uvec2 size) {

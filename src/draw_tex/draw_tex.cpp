@@ -33,7 +33,7 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-DrawTex::DrawTex(const char *data, GLsizei w, GLsizei h, GLenum typ) {
+DrawTex::DrawTex(const std::uint8_t *data, GLsizei w, GLsizei h, GLenum typ) {
     gl::Shader vert(GL_VERTEX_SHADER);
     vert.compile(VERTEX_SHADER);
     gl::Shader frag(GL_FRAGMENT_SHADER);

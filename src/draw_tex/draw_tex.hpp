@@ -13,7 +13,7 @@ namespace fio {
 
 class DrawTex : public Fractal {
 public:
-    DrawTex(const char *data, GLsizei w, GLsizei h, GLenum typ);
+    DrawTex(const std::uint8_t *data, GLsizei w, GLsizei h, GLenum typ);
 
     void draw() override;
 

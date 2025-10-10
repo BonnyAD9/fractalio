@@ -5,13 +5,14 @@
 #include "draw_tex/draw_tex.hpp"
 #include "font.hpp"
 #include "gl/gl.hpp"
+#include "mandelbrot/mandelbrot.hpp"
 
 namespace fio {
 
 constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0, 0, 0, 1 };
 
-Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
-    _window(std::move(window)) {
+Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
+    _window(std::move(window)), _font(font, 20), _text_renderer(_font, 24) {
     _window->make_context_current();
     auto size = _window->get_size();
     glViewport(0, 0, size.x, size.y);
@@ -24,13 +25,7 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
         scroll_callback(dx, dy);
     });
 
-    Font font("monospace", 32);
-    _active = std::make_unique<DrawTex>(
-        reinterpret_cast<const char *>(font.data()),
-        GLsizei(font.width()),
-        GLsizei(font.height()),
-        GL_RED
-    );
+    _active = std::make_unique<Mandelbrot>();
     _active->resize(size);
 }
 
@@ -45,8 +40,12 @@ void Fractalio::mainloop() {
 
         glClear(GL_COLOR_BUFFER_BIT);
         if (_active) {
+            _active->use();
             _active->draw();
         }
+
+        _text_renderer.use();
+        _text_renderer.draw();
 
         _window->swap_buffers();
         glfwPollEvents();
@@ -59,6 +58,7 @@ void Fractalio::size_callback(int width, int height) {
         _active->use();
         _active->resize({ width, height });
     }
+    _text_renderer.resize({ width, height });
 }
 
 void Fractalio::mouse_move_callback(double x, double y) {
@@ -68,6 +68,8 @@ void Fractalio::mouse_move_callback(double x, double y) {
         _last_mouse_pos = mouse_pos;
         return;
     }
+
+    _active->use();
 
     if (glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_LEFT) ==
         GLFW_PRESS) {

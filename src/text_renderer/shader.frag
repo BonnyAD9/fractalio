@@ -2,7 +2,7 @@
 
 out vec4 frag_color;
 
-in vec2 cor;
+in highp vec2 cor;
 
 uniform sampler2D bitmap;
 

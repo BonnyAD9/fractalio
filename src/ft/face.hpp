@@ -31,7 +31,7 @@ public:
 
     void set_pixel_sizes(FT_UInt h) { set_pixel_sizes(0, h); }
 
-    void load_char(char c, FT_Int32 flags = FT_LOAD_RENDER) {
+    void load_char(FT_ULong c, FT_Int32 flags = FT_LOAD_RENDER) {
         check_error(FT_Load_Char(get(), c, flags));
     }
 
