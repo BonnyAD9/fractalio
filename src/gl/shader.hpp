@@ -1,4 +1,5 @@
 #pragma once
+
 #include <format>
 #include <stdexcept>
 #include <vector>
@@ -26,7 +27,7 @@ public:
             std::vector<char> msg(len + 1, 0);
             glGetShaderInfoLog(_id, GLsizei(msg.size()), nullptr, msg.data());
             throw std::runtime_error(
-                std::format("Failed to link shader: {}", msg.data())
+                std::format("Failed to compile shader: {}", msg.data())
             );
         }
     }

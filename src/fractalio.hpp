@@ -1,10 +1,12 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 
+#include "font.hpp"
+#include "fractal.hpp"
 #include "glfw/window.hpp"
-#include "mandelbrot/mandelbrot.hpp"
+#include "text_renderer/text_renderer.hpp"
+
 namespace fio {
 
 class Fractalio {
@@ -12,14 +14,18 @@ public:
     Fractalio(Fractalio &&) = delete;
     Fractalio &operator=(Fractalio &&) = delete;
 
-    Fractalio(std::unique_ptr<glfw::Window> window);
+    Fractalio(
+        std::unique_ptr<glfw::Window> window, const char *font = "monospace"
+    );
 
     void mainloop();
 
 private:
     std::unique_ptr<glfw::Window> _window;
-    std::optional<Mandelbrot> _active;
+    std::unique_ptr<Fractal> _active;
     glm::dvec2 _last_mouse_pos;
+    Font _font;
+    TextRenderer _text_renderer;
 
     void size_callback(int width, int height);
     void mouse_move_callback(double x, double y);
