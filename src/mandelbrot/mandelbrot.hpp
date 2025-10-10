@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "../fractal.hpp"
 #include "../gl/buffer.hpp"
 #include "../gl/gl.hpp"
 #include "../gl/program.hpp"
@@ -12,22 +13,22 @@
 
 namespace fio {
 
-class Mandelbrot {
+class Mandelbrot : public Fractal {
 public:
     Mandelbrot();
 
-    void resize(glm::vec2 size);
+    void resize(glm::vec2 size) override;
 
-    void draw();
+    void draw() override;
 
-    void use() {
+    void use() override {
         _program.use();
         _vao.bind();
         _texture.bind(GL_TEXTURE_1D);
     }
 
-    void drag(glm::dvec2 delta);
-    void scale(double delta);
+    void drag(glm::dvec2 delta) override;
+    void scale(double delta) override;
 
 private:
     gl::Program _program;

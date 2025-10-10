@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <GLFW/glfw3.h>
-
+#include "draw_tex/draw_tex.hpp"
+#include "font.hpp"
 #include "gl/gl.hpp"
 
 namespace fio {
@@ -24,7 +24,13 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window) :
         scroll_callback(dx, dy);
     });
 
-    _active.emplace();
+    Font font("monospace", 32);
+    _active = std::make_unique<DrawTex>(
+        reinterpret_cast<const char *>(font.data()),
+        GLsizei(font.width()),
+        GLsizei(font.height()),
+        GL_RED
+    );
     _active->resize(size);
 }
 

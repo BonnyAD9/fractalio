@@ -105,6 +105,14 @@ static inline void tex_image_1d(std::span<const glm::u8vec3> data) {
     );
 }
 
+static inline void tex_image_2d(
+    const char *data, GLsizei w, GLsizei h, GLenum typ
+) {
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GLint(typ), w, h, 0, typ, GL_UNSIGNED_BYTE, data
+    );
+}
+
 static inline void uniform(GLint location, glm::dvec2 value) {
     glUniform2d(location, value.x, value.y);
 }

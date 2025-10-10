@@ -1,10 +1,10 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 
+#include "fractal.hpp"
 #include "glfw/window.hpp"
-#include "mandelbrot/mandelbrot.hpp"
+
 namespace fio {
 
 class Fractalio {
@@ -18,7 +18,7 @@ public:
 
 private:
     std::unique_ptr<glfw::Window> _window;
-    std::optional<Mandelbrot> _active;
+    std::unique_ptr<Fractal> _active;
     glm::dvec2 _last_mouse_pos;
 
     void size_callback(int width, int height);
