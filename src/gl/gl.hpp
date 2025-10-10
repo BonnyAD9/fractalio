@@ -121,4 +121,8 @@ static inline void uniform(GLint location, double value) {
     glUniform1d(location, value);
 }
 
+static inline void uniform(GLint location, glm::mat4 value) {
+    glUniformMatrix4fv(location, glm::mat4::length(), false, &value[0][0]);
+}
+
 } // namespace fio::gl
