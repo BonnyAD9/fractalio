@@ -111,8 +111,8 @@ Mandelbrot set
   color count: {}
 ).",
         _program.use_double() ? "double" : "single",
-        -_center.x,
-        -_center.y,
+        _center.x,
+        _center.y,
         1 / _scale,
         _iterations,
         _color_count

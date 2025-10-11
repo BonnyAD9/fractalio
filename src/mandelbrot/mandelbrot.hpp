@@ -37,6 +37,8 @@ public:
     void drag(glm::dvec2 delta) override;
     void scale(double delta) override;
 
+    double scale() override { return _scale; }
+
     void map_iterations(const std::function<float(float)> &map) override {
         auto it = map(float(_iterations));
         _iterations =
@@ -64,6 +66,24 @@ public:
 
     void map_use_double(const std::function<bool(bool)> &map) override {
         _program.use_double(map(_program.use_double()));
+    }
+
+    void map_scale(const std::function<double(double)> &map) override {
+        auto s = map(_scale);
+        _scale = s == 0 || std::isnan(s) ? 1 : s;
+        _program.uniform(_loc_scale, _scale);
+    }
+
+    void map_x(const std::function<double(double)> &map) override {
+        auto x = map(_center.x);
+        _center.x = std::isnan(x) ? 0 : x;
+        _program.uniform(_loc_center, _center);
+    }
+
+    void map_y(const std::function<double(double)> &map) override {
+        auto y = map(_center.y);
+        _center.y = std::isnan(y) ? 0 : y;
+        _program.uniform(_loc_center, _center);
     }
 
     std::string describe() override;

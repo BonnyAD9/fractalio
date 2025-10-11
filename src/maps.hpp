@@ -6,27 +6,27 @@
 
 namespace fio::maps {
 
-static inline std::function<float(float)> value(float v) {
-    return [=](float) { return v; };
+template<typename T> static inline std::function<T(T)> value(T v) {
+    return [=](T) { return v; };
 }
 
-static inline float dble(float v) {
-    return std::max(v * 2.F, 1.F);
+template<typename T> static inline T dble(T v) {
+    return std::max(T(v * 2), T(1));
 }
 
-static inline float half(float v) {
+template<typename T> static inline T half(T v) {
     return v / 2;
 }
 
-static inline std::function<float(float)> add(float v) {
-    return [=](float p) { return p + v; };
+template<typename T> static inline std::function<T(T)> add(T v) {
+    return [=](T p) { return p + v; };
 }
 
-static inline std::function<float(float)> mul(float v) {
-    return [=](float p) { return std::max(p * v, 1.F); };
+template<typename T> static inline std::function<T(T)> mul(T v) {
+    return [=](T p) { return std::max(p * v, T(1)); };
 }
 
-static inline float reset(float) {
+template<typename T> static inline T reset(T) {
     return NAN;
 }
 
@@ -34,8 +34,14 @@ static inline bool negate(bool v) {
     return !v;
 }
 
-static inline std::function<float(float)> modified(
-    char modifier, std::optional<float> num, std::function<float(float)> def
+template<typename T>
+static inline std::function<T(T)> inverse(const std::function<T(T)> &f) {
+    return [&](T v) { return 1 / f(v == 0 ? 0 : 1 / v); };
+}
+
+template<typename T>
+static inline std::function<T(T)> modified(
+    char modifier, std::optional<T> num, std::function<T(T)> def
 ) {
     switch (modifier) {
     case '+':
@@ -50,7 +56,7 @@ static inline std::function<float(float)> modified(
         if (num) {
             return value(*num);
         }
-        return reset;
+        return reset<T>;
     default:
         if (num) {
             return value(*num);

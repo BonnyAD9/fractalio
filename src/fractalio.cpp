@@ -131,7 +131,7 @@ void Fractalio::mainloop() {
                 glm::translate(glm::identity<glm::mat4>(), { pos, 0 })
             );
             if (_input_text.empty()) {
-                _command_input.add_text("Press `h` to show help.", { 0, 0 });
+                _command_input.add_text("Type `?` to show help.", { 0, 0 });
                 _command_input.set_color({ .5, .5, .5 });
             } else {
                 _command_input.add_text(_input_text, { 0, 0 });
@@ -200,7 +200,14 @@ void Fractalio::size_callback(int width, int height) {
     _input_bg.resize({ 0, _wsize.y - 25 }, { _wsize.x, 25 }, _wsize);
 
     _command_input.use();
+    auto pos = _input_text.contains(':')
+                   ? glm::vec2{ 5, _wsize.y - FONT_SIZE + 10 }
+                   : glm::vec2{ _wsize.x - SIDE_WIDTH + 10,
+                                _wsize.y - FONT_SIZE + 10 };
     _command_input.resize(_wsize);
+    _command_input.set_transform(
+        glm::translate(glm::identity<glm::mat4>(), { pos, 0 })
+    );
 }
 
 void Fractalio::mouse_move_callback(double x, double y) {
@@ -232,6 +239,7 @@ void Fractalio::scroll_callback(double, double dy) {
         return;
     }
 
+    _active->use();
     _active->scale(dy * 8);
 }
 
@@ -351,13 +359,14 @@ void Fractalio::long_command(std::string_view cmd) {
     }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void Fractalio::execute_command(std::string_view whole_cmd) {
     if (whole_cmd.empty()) {
         return;
     }
     auto [mod, num_str, cmd] = split_short_cmd(whole_cmd);
 
-    std::optional<float> num;
+    std::optional<double> num;
     if (!num_str.empty()) {
         num = 0;
         auto res = std::from_chars(num_str.begin(), num_str.end(), *num);
@@ -371,7 +380,7 @@ void Fractalio::execute_command(std::string_view whole_cmd) {
 
     if (cmd == "gm") {
         activate(Fractal::Type::MANDELBROT);
-    } else if (cmd == "gh" || cmd == "h") {
+    } else if (cmd == "gh" || cmd == "?") {
         activate(Fractal::Type::HELP);
     } else if (!_active) {
         std::println(std::cerr, "Unused command `{}`", cmd);
@@ -379,32 +388,126 @@ void Fractalio::execute_command(std::string_view whole_cmd) {
         return;
     } else if (cmd == "i") {
         _active->use();
-        _active->map_iterations(maps::modified(mod, num, maps::dble));
+        _active->map_iterations(
+            maps::modified<float>(mod, num, maps::dble<float>)
+        );
         _new_info = true;
     } else if (cmd == "I") {
         _active->use();
-        _active->map_iterations(maps::modified(mod, num, maps::half));
+        _active->map_iterations(
+            maps::modified<float>(mod, num, maps::half<float>)
+        );
         _new_info = true;
     } else if (cmd == "c") {
         _active->use();
-        _active->map_color_count(maps::modified(mod, num, maps::dble));
+        _active->map_color_count(
+            maps::modified<float>(mod, num, maps::dble<float>)
+        );
         _new_info = true;
     } else if (cmd == "C") {
         _active->use();
-        _active->map_color_count(maps::modified(mod, num, maps::half));
+        _active->map_color_count(
+            maps::modified<float>(mod, num, maps::half<float>)
+        );
+        _new_info = true;
+    } else if (cmd == "z") {
+        _active->use();
+        _active->map_scale(
+            maps::inverse(maps::modified<double>(mod, num, maps::dble<double>))
+        );
+        _new_info = true;
+    } else if (cmd == "Z") {
+        _active->use();
+        _active->map_scale(
+            maps::inverse(maps::modified<double>(mod, num, maps::half<double>))
+        );
+        _new_info = true;
+    } else if (cmd == "x" || cmd == "L") {
+        _active->use();
+        _active->map_x(maps::modified<double>(mod, num, [&](double p) {
+            return p + _active->scale();
+        }));
+        _new_info = true;
+    } else if (cmd == "X" || cmd == "H") {
+        _active->use();
+        _active->map_x(maps::modified<double>(mod, num, [&](double p) {
+            return p - _active->scale();
+        }));
+        _new_info = true;
+    } else if (cmd == "y" || cmd == "K") {
+        _active->use();
+        _active->map_y(maps::modified<double>(mod, num, [&](double p) {
+            return p + _active->scale();
+        }));
+        _new_info = true;
+    } else if (cmd == "Y" || cmd == "J") {
+        _active->use();
+        _active->map_y(maps::modified<double>(mod, num, [&](double p) {
+            return p - _active->scale();
+        }));
+        _new_info = true;
+    } else if (cmd == "l") {
+        _active->use();
+        _active->map_x(maps::modified<double>(mod, num, [&](double p) {
+            return p + _active->scale() * 0.1;
+        }));
+        _new_info = true;
+    } else if (cmd == "h") {
+        _active->use();
+        _active->map_x(maps::modified<double>(mod, num, [&](double p) {
+            return p - _active->scale() * 0.1;
+        }));
+        _new_info = true;
+    } else if (cmd == "k") {
+        _active->use();
+        _active->map_y(maps::modified<double>(mod, num, [&](double p) {
+            return p + _active->scale() * 0.1;
+        }));
+        _new_info = true;
+    } else if (cmd == "j") {
+        _active->use();
+        _active->map_y(maps::modified<double>(mod, num, [&](double p) {
+            return p - _active->scale() * 0.1;
+        }));
         _new_info = true;
     } else if (cmd == "ri") {
         _active->use();
-        _active->map_iterations(maps::reset);
+        _active->map_iterations(maps::reset<float>);
         _new_info = true;
     } else if (cmd == "rc") {
         _active->use();
-        _active->map_color_count(maps::reset);
+        _active->map_color_count(maps::reset<float>);
+        _new_info = true;
+    } else if (cmd == "rz") {
+        _active->use();
+        _active->map_scale(maps::reset<double>);
+        _new_info = true;
+    } else if (cmd == "rx") {
+        _active->use();
+        _active->map_x(maps::reset<double>);
+        _new_info = true;
+    } else if (cmd == "ry") {
+        _active->use();
+        _active->map_y(maps::reset<double>);
+        _new_info = true;
+    } else if (cmd == "rp") {
+        _active->use();
+        _active->map_scale(maps::reset<double>);
+        _active->map_x(maps::reset<double>);
+        _active->map_y(maps::reset<double>);
         _new_info = true;
     } else if (cmd == "rr") {
         _active->use();
-        _active->map_iterations(maps::reset);
-        _active->map_color_count(maps::reset);
+        _active->map_iterations(maps::reset<float>);
+        _active->map_color_count(maps::reset<float>);
+        _new_info = true;
+    } else if (cmd == "R") {
+        _active->use();
+        _active->map_iterations(maps::reset<float>);
+        _active->map_color_count(maps::reset<float>);
+        _active->map_scale(maps::reset<double>);
+        _active->map_x(maps::reset<double>);
+        _active->map_y(maps::reset<double>);
         _new_info = true;
     } else if (cmd == ";") {
         if (_no_recurse) {

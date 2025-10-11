@@ -20,6 +20,7 @@ public:
 
     virtual void drag(glm::dvec2 delta) { (void)delta; };
     virtual void scale(double delta) { (void)delta; };
+    virtual double scale() { return 1; }
 
     virtual void map_iterations(const std::function<float(float)> &map) {
         (void)map;
@@ -32,6 +33,14 @@ public:
     virtual void map_use_double(const std::function<bool(bool)> &map) {
         (void)map;
     }
+
+    virtual void map_scale(const std::function<double(double)> &map) {
+        (void)map;
+    }
+
+    virtual void map_x(const std::function<double(double)> &map) { (void)map; }
+
+    virtual void map_y(const std::function<double(double)> &map) { (void)map; }
 
     virtual std::string describe() = 0;
 
