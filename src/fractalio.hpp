@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "font.hpp"
 #include "fractal.hpp"
@@ -24,7 +25,8 @@ public:
 
 private:
     std::unique_ptr<glfw::Window> _window;
-    std::unique_ptr<Fractal> _active;
+    std::unordered_map<Fractal::Type, std::unique_ptr<Fractal>> _fractals;
+    Fractal *_active = nullptr;
     glm::dvec2 _last_mouse_pos;
     Font _font;
 
@@ -34,12 +36,13 @@ private:
     TextRenderer _command_input;
     Quad _input_bg;
     std::string _input_text;
-    bool _new_input;
+    bool _new_input = true;
     std::string _last_command;
-    bool _no_recurse;
+    bool _no_recurse = false;
 
     glm::vec2 _wsize;
 
+    void init_fractals();
     void size_callback(int width, int height);
     void mouse_move_callback(double x, double y);
     void scroll_callback(double dx, double dy);
@@ -49,6 +52,7 @@ private:
     void consume_input();
     void execute_command(std::string_view cmd);
     void long_command(std::string_view cmd);
+    void activate(Fractal::Type typ);
 };
 
 } // namespace fio

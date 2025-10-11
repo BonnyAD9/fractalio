@@ -33,6 +33,12 @@ public:
 
     void resize(glm::vec2 size) const;
 
+    void set_transform(glm::mat4 trans) const {
+        gl::uniform(_loc_trans, trans);
+    }
+
+    void set_color(glm::vec3 color) const { gl::uniform(_loc_color, color); }
+
     void add_text(std::string_view text);
 
     void add_text(std::string_view text, glm::vec2 pos);
@@ -62,6 +68,7 @@ private:
     gl::Texture _texture;
     GLint _loc_proj;
     GLint _loc_color;
+    GLint _loc_trans;
 
     void add_glyph(Font::Glyph &glyph);
 };

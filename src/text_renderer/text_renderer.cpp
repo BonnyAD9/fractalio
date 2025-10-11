@@ -1,6 +1,7 @@
 #include "text_renderer.hpp"
 
 #include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -34,6 +35,8 @@ TextRenderer::TextRenderer(Font &font, float line_height) :
     gl::uniform(_loc_proj, glm::mat4());
     _loc_color = _program.uniform_location("color");
     gl::uniform(_loc_color, glm::vec3{ 1, 1, 1 });
+    _loc_trans = _program.uniform_location("trans");
+    gl::uniform(_loc_trans, glm::identity<glm::mat4>());
 
     _texture.bind(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

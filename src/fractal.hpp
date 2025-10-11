@@ -9,9 +9,15 @@ namespace fio {
 
 class Fractal {
 public:
+    enum class Type : std::size_t {
+        HELP,
+        MANDELBROT,
+    };
+
     virtual void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) = 0;
     virtual void draw() = 0;
     virtual void use() = 0;
+
     virtual void drag(glm::dvec2 delta) { (void)delta; };
     virtual void scale(double delta) { (void)delta; };
 

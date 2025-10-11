@@ -14,12 +14,17 @@
 
 #include "font.hpp"
 #include "gl/gl.hpp"
+#include "help.hpp"
 #include "mandelbrot/mandelbrot.hpp"
 #include "maps.hpp"
+
+#include <glm/ext/matrix_transform.hpp>
 
 namespace fio {
 
 using std::string_view_literals::operator""sv;
+
+constexpr double FPS_INTERVAL = 0.1;
 
 static constexpr std::size_t SIDE_WIDTH = 300;
 static constexpr std::size_t FONT_SIZE = 16;
@@ -29,7 +34,7 @@ constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0.1, 0.1, 0.1, 1 };
 Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _window(std::move(window)),
     _font(font, FONT_SIZE),
-    _info(_font, std::size_t(FONT_SIZE * 3 / 2)),
+    _info(_font, std::size_t(FONT_SIZE * 5 / 4)),
     _fps_text(_info),
     _command_input(_info),
     _input_bg({ 0.1, 0.1, 0.1, 1 }) {
@@ -56,14 +61,25 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
         key_callback(k, s, a, m);
     });
 
-    _active = std::make_unique<Mandelbrot>();
-    _active->resize({ 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size);
+    init_fractals();
+
+    if (_active) {
+        _active->resize({ 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size);
+    }
+
+    const glm::vec2 side_start{ _wsize.x - SIDE_WIDTH + 10, 20 };
 
     _info.use();
     _info.resize(size);
+    _info.set_transform(
+        glm::translate(glm::identity<glm::mat4>(), { side_start, 0 })
+    );
 
     _fps_text.use();
     _fps_text.resize(size);
+    _fps_text.set_transform(
+        glm::translate(glm::identity<glm::mat4>(), { side_start, 0 })
+    );
 
     _input_bg.use();
     _input_bg.resize({ 0, size.y - 25 }, { size.x, 25 }, size);
@@ -74,8 +90,6 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
 
 void Fractalio::mainloop() {
     _window->make_context_current();
-
-    constexpr double FPS_INTERVAL = 0.1;
 
     double last_time = glfwGetTime();
     double next_fps = 0;
@@ -90,9 +104,7 @@ void Fractalio::mainloop() {
             _info.clear_text();
             if (_active) {
                 auto text = _active->describe();
-                _info.add_text(
-                    text, { _wsize.x - SIDE_WIDTH + 10, FONT_SIZE + 10 }
-                );
+                _info.add_text(text, { 0, 0 });
             }
             _info.use();
             _info.prepare();
@@ -102,22 +114,29 @@ void Fractalio::mainloop() {
         if (last_time > next_fps) {
             _fps_text.clear_text();
             auto fps = std::format("FPS: {}", std::size_t(1 / delta_time));
-            _fps_text.add_text(
-                fps, { _wsize.x - SIDE_WIDTH + 10, FONT_SIZE + 10 }
-            );
+            _fps_text.add_text(fps, { 0, 0 });
             _fps_text.use();
             _fps_text.prepare();
-            next_fps += FPS_INTERVAL;
+            next_fps = last_time + FPS_INTERVAL;
         }
 
-        if (!_input_text.empty() && _new_input) {
+        if (_new_input) {
             _command_input.clear_text();
             auto pos = _input_text.contains(':')
                            ? glm::vec2{ 5, _wsize.y - FONT_SIZE + 10 }
                            : glm::vec2{ _wsize.x - SIDE_WIDTH + 10,
                                         _wsize.y - FONT_SIZE + 10 };
-            _command_input.add_text(_input_text, pos);
             _command_input.use();
+            _command_input.set_transform(
+                glm::translate(glm::identity<glm::mat4>(), { pos, 0 })
+            );
+            if (_input_text.empty()) {
+                _command_input.add_text("Press `h` to show help.", { 0, 0 });
+                _command_input.set_color({ .5, .5, .5 });
+            } else {
+                _command_input.add_text(_input_text, { 0, 0 });
+                _command_input.set_color({ 1, 1, 1 });
+            }
             _command_input.prepare();
         }
         _new_input = false;
@@ -134,24 +153,27 @@ void Fractalio::mainloop() {
         _fps_text.use();
         _fps_text.draw();
 
-        if (!_input_text.empty()) {
-            if (_input_text.contains(':')) {
-                _input_bg.use();
-                _input_bg.draw();
-            }
-            _command_input.use();
-            _command_input.draw();
+        if (_input_text.contains(':')) {
+            _input_bg.use();
+            _input_bg.draw();
         }
+        _command_input.use();
+        _command_input.draw();
 
         _window->swap_buffers();
         glfwPollEvents();
     }
 }
 
+void Fractalio::init_fractals() {
+    _fractals[Fractal::Type::HELP] = std::make_unique<Help>(_info);
+    _fractals[Fractal::Type::MANDELBROT] = std::make_unique<Mandelbrot>();
+
+    _active = _fractals[Fractal::Type::MANDELBROT].get();
+}
+
 void Fractalio::size_callback(int width, int height) {
     glViewport(0, 0, width, height);
-    _new_info = true;
-    _new_input = true;
     _wsize = { width, height };
     if (_active) {
         _active->use();
@@ -160,9 +182,19 @@ void Fractalio::size_callback(int width, int height) {
 
     _info.use();
     _info.resize(_wsize);
+    _info.set_transform(
+        glm::translate(
+            glm::identity<glm::mat4>(), { _wsize.x - SIDE_WIDTH + 10, 20, 0 }
+        )
+    );
 
     _fps_text.use();
     _fps_text.resize(_wsize);
+    _fps_text.set_transform(
+        glm::translate(
+            glm::identity<glm::mat4>(), { _wsize.x - SIDE_WIDTH + 10, 20, 0 }
+        )
+    );
 
     _input_bg.use();
     _input_bg.resize({ 0, _wsize.y - 25 }, { _wsize.x, 25 }, _wsize);
@@ -236,7 +268,7 @@ void Fractalio::key_callback(int key, int scancode, int action, int mods) {
     }
 }
 
-constexpr std::array FOLLOWUP_CMDS{ "r"sv };
+constexpr std::array FOLLOWUP_CMDS{ "r"sv, "g"sv };
 
 static inline bool is_modifier(char c) {
     return std::ranges::contains(std::array{ '=', '+', '-', '*', '/' }, c);
@@ -311,6 +343,8 @@ void Fractalio::long_command(std::string_view cmd) {
         consume_input();
         _last_command = cmd2;
         return;
+    } else if (cmd == ":h" || cmd == ":help") {
+        activate(Fractal::Type::HELP);
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
         return;
@@ -335,12 +369,15 @@ void Fractalio::execute_command(std::string_view whole_cmd) {
         }
     }
 
-    if (!_active) {
-        std::println(std::cerr, "Unused command.");
+    if (cmd == "gm") {
+        activate(Fractal::Type::MANDELBROT);
+    } else if (cmd == "gh" || cmd == "h") {
+        activate(Fractal::Type::HELP);
+    } else if (!_active) {
+        std::println(std::cerr, "Unused command `{}`", cmd);
+        _last_command = whole_cmd;
         return;
-    }
-
-    if (cmd == "i") {
+    } else if (cmd == "i") {
         _active->use();
         _active->map_iterations(maps::modified(mod, num, maps::dble));
         _new_info = true;
@@ -394,6 +431,17 @@ void Fractalio::execute_command(std::string_view whole_cmd) {
     }
 
     _last_command = whole_cmd;
+}
+
+void Fractalio::activate(Fractal::Type typ) {
+    if (!_fractals.contains(typ)) {
+        std::println(std::cerr, "Unknown fractal type.");
+        return;
+    }
+    _active = _fractals[typ].get();
+    _active->use();
+    _active->resize({ 0, 0 }, { _wsize.x - SIDE_WIDTH, _wsize.y }, _wsize);
+    _new_info = true;
 }
 
 } // namespace fio
