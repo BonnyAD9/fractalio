@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cctype>
 #include <charconv>
-#include <cmath>
 #include <format>
 #include <iostream>
 #include <limits>
@@ -16,6 +15,7 @@
 #include "font.hpp"
 #include "gl/gl.hpp"
 #include "mandelbrot/mandelbrot.hpp"
+#include "maps.hpp"
 
 namespace fio {
 
@@ -33,12 +33,6 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _fps_text(_info),
     _command_input(_info),
     _input_bg({ 0.1, 0.1, 0.1, 1 }) {
-
-    std::println(std::cerr, "_info program = {}", _info.get_program());
-    std::println(std::cerr, "_fps_text program = {}", _fps_text.get_program());
-    std::println(
-        std::cerr, "_command_input program = {}", _command_input.get_program()
-    );
 
     _window->make_context_current();
     auto size = _window->get_size();
@@ -232,6 +226,11 @@ void Fractalio::key_callback(int key, int scancode, int action, int mods) {
         }
         _new_input = true;
         break;
+    case GLFW_KEY_TAB:
+        if (_active) {
+            _active->map_use_double(maps::negate);
+            _new_info = true;
+        }
     default:
         break;
     }
@@ -317,57 +316,6 @@ void Fractalio::long_command(std::string_view cmd) {
         return;
     }
 }
-
-namespace maps {
-static inline std::function<float(float)> value(float v) {
-    return [=](float) { return v; };
-}
-
-static inline float dble(float v) {
-    return std::max(v * 2.F, 1.F);
-}
-
-static inline float half(float v) {
-    return v / 2;
-}
-
-static inline std::function<float(float)> add(float v) {
-    return [=](float p) { return p + v; };
-}
-
-static inline std::function<float(float)> mul(float v) {
-    return [=](float p) { return std::max(p * v, 1.F); };
-}
-
-static inline float reset(float) {
-    return NAN;
-}
-
-static inline std::function<float(float)> modified(
-    char modifier, std::optional<float> num, std::function<float(float)> def
-) {
-    switch (modifier) {
-    case '+':
-        return add(num.value_or(1.));
-    case '-':
-        return add(-num.value_or(1.));
-    case '*':
-        return mul(num.value_or(2.));
-    case '/':
-        return mul(1 / num.value_or(2.));
-    case '=':
-        if (num) {
-            return value(*num);
-        }
-        return reset;
-    default:
-        if (num) {
-            return value(*num);
-        }
-        return def;
-    }
-}
-} // namespace maps
 
 void Fractalio::execute_command(std::string_view whole_cmd) {
     if (whole_cmd.empty()) {

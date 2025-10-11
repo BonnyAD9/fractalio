@@ -29,24 +29,19 @@ static constexpr char FRAGMENT_SHADER[]{
 };
 
 Mandelbrot::Mandelbrot() {
-    gl::Shader vert(GL_VERTEX_SHADER);
-    vert.compile(VERTEX_SHADER);
-    gl::Shader frag(GL_FRAGMENT_SHADER);
-    frag.compile(FRAGMENT_SHADER);
-
-    _program.link(vert, frag);
+    _program.compile(VERTEX_SHADER, FRAGMENT_SHADER);
     _program.use();
 
     _loc_proj = _program.uniform_location("proj");
-    gl::uniform(_loc_proj, glm::ortho(0.F, 800.F, 600.F, 0.F));
+    _program.uniform(_loc_proj, glm::ortho(0.F, 800.F, 600.F, 0.F));
     _loc_center = _program.uniform_location("center");
-    gl::uniform(_loc_center, _center);
+    _program.uniform(_loc_center, _center);
     _loc_scale = _program.uniform_location("scale");
-    gl::uniform(_loc_scale, _scale);
+    _program.uniform(_loc_scale, _scale);
     _loc_iterations = _program.uniform_location("iterations");
-    gl::uniform(_loc_iterations, _iterations);
+    _program.uniform(_loc_iterations, _iterations);
     _loc_color_count = _program.uniform_location("color_count");
-    gl::uniform(_loc_color_count, _color_count);
+    _program.uniform(_loc_color_count, _color_count);
 
     _vao.bind();
 
@@ -82,7 +77,7 @@ void Mandelbrot::resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) {
         end.x, pos.y, /* */ 2,  h,  // TR
     };
 
-    gl::uniform(_loc_proj, glm::ortho(0.F, of.x, of.y, 0.F));
+    _program.uniform(_loc_proj, glm::ortho(0.F, of.x, of.y, 0.F));
     _vbo.bind(GL_ARRAY_BUFFER);
     gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
     glEnableVertexAttribArray(LOCATION);
@@ -96,24 +91,26 @@ void Mandelbrot::draw() {
 void Mandelbrot::drag(glm::dvec2 delta) {
     delta.y = -delta.y;
     _center -= delta / _wsizex * 4. * _scale;
-    gl::uniform(_loc_center, _center);
+    _program.uniform(_loc_center, _center);
 }
 
 void Mandelbrot::scale(double delta) {
     _scale *= pow(0.99, -delta);
-    gl::uniform(_loc_scale, _scale);
+    _program.uniform(_loc_scale, _scale);
 }
 
 std::string Mandelbrot::describe() {
     return std::format(
         R".(
 Mandelbrot set
+  precision: {}
   center:
     {:.6} + {:.6}i
   scale: {:.10}
   iterations: {}
   color count: {}
 ).",
+        _program.use_double() ? "double" : "single",
         -_center.x,
         -_center.y,
         1 / _scale,

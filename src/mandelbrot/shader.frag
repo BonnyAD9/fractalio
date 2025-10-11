@@ -1,5 +1,8 @@
 #version 460 core
 
+#define ploat float
+#define pvec2 vec2
+
 out vec4 frag_color;
 in vec2 cor;
 
@@ -11,12 +14,12 @@ uniform uint iterations;
 uniform float color_count;
 
 void main() {
-    vec2 c = vec2(cor * scale + center);
-    lowp vec2 x = c;
+    pvec2 c = pvec2(cor * scale + center);
+    pvec2 x = c;
 
     uint i = iterations;
     for (; i > 0; --i) {
-        vec2 x2 = x * x;
+        pvec2 x2 = x * x;
 
         // |x| > 2
         if (x2.x + x2.y > 4) {

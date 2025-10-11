@@ -23,6 +23,10 @@ public:
         (void)map;
     }
 
+    virtual void map_use_double(const std::function<bool(bool)> &map) {
+        (void)map;
+    }
+
     virtual std::string describe() = 0;
 
     virtual ~Fractal() = default;

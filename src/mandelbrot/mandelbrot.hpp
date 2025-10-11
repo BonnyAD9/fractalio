@@ -6,10 +6,10 @@
 #include <functional>
 #include <limits>
 
+#include "../df_shader_program.hpp"
 #include "../fractal.hpp"
 #include "../gl/buffer.hpp"
 #include "../gl/gl.hpp"
-#include "../gl/program.hpp"
 #include "../gl/texture.hpp"
 #include "../gl/vertex_array.hpp"
 
@@ -47,7 +47,7 @@ public:
                           it, 0.F, float(std::numeric_limits<GLuint>::max())
                       )
                   );
-        gl::uniform(_loc_iterations, _iterations);
+        _program.uniform(_loc_iterations, _iterations);
     }
 
     void map_color_count(const std::function<float(float)> &map) override {
@@ -59,13 +59,17 @@ public:
         } else {
             _color_count = cc;
         }
-        gl::uniform(_loc_color_count, _color_count);
+        _program.uniform(_loc_color_count, _color_count);
+    }
+
+    void map_use_double(const std::function<bool(bool)> &map) override {
+        _program.use_double(map(_program.use_double()));
     }
 
     std::string describe() override;
 
 private:
-    gl::Program _program;
+    DFShaderProgram _program;
     gl::VertexArray _vao;
     gl::Buffer _vbo;
     gl::Buffer _ebo;
@@ -73,15 +77,15 @@ private:
 
     double _wsizex = 0;
 
-    GLint _loc_proj;
+    glm::ivec2 _loc_proj;
     glm::dvec2 _center{ 0, 0 };
-    GLint _loc_center;
+    glm::ivec2 _loc_center;
     double _scale = 1.;
-    GLint _loc_scale;
+    glm::ivec2 _loc_scale;
     GLuint _iterations = DEFAULT_ITERATIONS;
-    GLint _loc_iterations;
+    glm::ivec2 _loc_iterations;
     float _color_count = DEFAULT_COLOR_COUNT;
-    GLint _loc_color_count;
+    glm::ivec2 _loc_color_count;
 
     std::array<float, 16> _vertices{
         0,   0,   /* */ -2, 2,  // TL
