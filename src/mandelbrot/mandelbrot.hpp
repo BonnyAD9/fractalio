@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <functional>
 
 #include "../fractal.hpp"
 #include "../gl/buffer.hpp"
@@ -30,6 +31,11 @@ public:
     void drag(glm::dvec2 delta) override;
     void scale(double delta) override;
 
+    void map_iterations(const std::function<float(float)> &map) override {
+        _iterations = GLuint(map(float(_iterations)));
+        gl::uniform(_loc_iterations, _iterations);
+    }
+
     std::string describe() override;
 
 private:
@@ -46,6 +52,8 @@ private:
     GLint _loc_center;
     double _scale = 1.;
     GLint _loc_scale;
+    GLuint _iterations = 256;
+    GLint _loc_iterations;
 
     std::array<float, 16> _vertices{
         0,   0,   /* */ -2, 2,  // TL

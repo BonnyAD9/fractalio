@@ -1,7 +1,16 @@
 #include "fractalio.hpp"
 
+#include <algorithm>
+#include <cctype>
+#include <charconv>
 #include <format>
+#include <iostream>
+#include <limits>
 #include <memory>
+#include <print>
+#include <utility>
+
+#include <GLFW/glfw3.h>
 
 #include "font.hpp"
 #include "gl/gl.hpp"
@@ -17,17 +26,27 @@ constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0.1, 0.1, 0.1, 1 };
 Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _window(std::move(window)),
     _font(font, FONT_SIZE),
-    _text_renderer(_font, std::size_t(FONT_SIZE * 3 / 2)),
-    _fps_text(_font, 0) {
+    _info(_font, std::size_t(FONT_SIZE * 3 / 2)),
+    _fps_text(_info),
+    _command_input(_info),
+    _input_bg({ 0.1, 0.1, 0.1, 1 }) {
+
+    std::println(std::cerr, "_info program = {}", _info.get_program());
+    std::println(std::cerr, "_fps_text program = {}", _fps_text.get_program());
+    std::println(
+        std::cerr, "_command_input program = {}", _command_input.get_program()
+    );
 
     _window->make_context_current();
-    // glfwSwapInterval(0); // to disable vsync
     auto size = _window->get_size();
-    _width = float(size.x);
+    _wsize = size;
+    // glfwSwapInterval(0); // to disable vsync
+
     glViewport(0, 0, size.x, size.y);
     gl::clear_color(DEFAULT_CLEAR_COLOR);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     _window->set_size_callback([&](int w, int h) { size_callback(w, h); });
     _window->set_mouse_move_callback([&](double x, double y) {
         mouse_move_callback(x, y);
@@ -35,21 +54,34 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _window->set_scroll_callback([&](double dx, double dy) {
         scroll_callback(dx, dy);
     });
+    _window->set_char_callback([&](unsigned c) { char_callback(c); });
+    _window->set_key_callback([&](int k, int s, int a, int m) {
+        key_callback(k, s, a, m);
+    });
 
     _active = std::make_unique<Mandelbrot>();
     _active->resize({ 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size);
 
-    _text_renderer.use();
-    _text_renderer.resize(size);
+    _info.use();
+    _info.resize(size);
 
     _fps_text.use();
     _fps_text.resize(size);
+
+    _input_bg.use();
+    _input_bg.resize({ 0, size.y - 25 }, { size.x, 25 }, size);
+
+    _command_input.use();
+    _command_input.resize(size);
 }
 
 void Fractalio::mainloop() {
     _window->make_context_current();
 
+    constexpr double FPS_INTERVAL = 0.1;
+
     double last_time = glfwGetTime();
+    double next_fps = 0;
     while (!_window->should_close()) {
         const double time = glfwGetTime();
         const double delta_time = time - last_time;
@@ -57,24 +89,41 @@ void Fractalio::mainloop() {
 
         process_input();
 
-        if (_new_text) {
-            _text_renderer.clear_text();
+        if (_new_info) {
+            _info.clear_text();
             if (_active) {
                 auto text = _active->describe();
-                _text_renderer.add_text(
-                    text, { _width - SIDE_WIDTH + 10, FONT_SIZE + 10 }
+                _info.add_text(
+                    text, { _wsize.x - SIDE_WIDTH + 10, FONT_SIZE + 10 }
                 );
             }
-            _text_renderer.use();
-            _text_renderer.prepare();
-            _new_text = false;
+            _info.use();
+            _info.prepare();
+            _new_info = false;
         }
 
-        _fps_text.clear_text();
-        auto fps = std::format("FPS: {}", std::size_t(1 / delta_time));
-        _fps_text.add_text(fps, { _width - SIDE_WIDTH + 10, FONT_SIZE + 10 });
-        _fps_text.use();
-        _fps_text.prepare();
+        if (last_time > next_fps) {
+            _fps_text.clear_text();
+            auto fps = std::format("FPS: {}", std::size_t(1 / delta_time));
+            _fps_text.add_text(
+                fps, { _wsize.x - SIDE_WIDTH + 10, FONT_SIZE + 10 }
+            );
+            _fps_text.use();
+            _fps_text.prepare();
+            next_fps += FPS_INTERVAL;
+        }
+
+        if (!_input_text.empty() && _new_input) {
+            _command_input.clear_text();
+            auto pos = _input_text.starts_with(':')
+                           ? glm::vec2{ 5, _wsize.y - FONT_SIZE + 10 }
+                           : glm::vec2{ _wsize.x - SIDE_WIDTH + 10,
+                                        _wsize.y - FONT_SIZE + 10 };
+            _command_input.add_text(_input_text, pos);
+            _command_input.use();
+            _command_input.prepare();
+        }
+        _new_input = false;
 
         glClear(GL_COLOR_BUFFER_BIT);
         if (_active) {
@@ -82,11 +131,20 @@ void Fractalio::mainloop() {
             _active->draw();
         }
 
-        _text_renderer.use();
-        _text_renderer.draw();
+        _info.use();
+        _info.draw();
 
         _fps_text.use();
         _fps_text.draw();
+
+        if (!_input_text.empty()) {
+            if (_input_text.starts_with(':')) {
+                _input_bg.use();
+                _input_bg.draw();
+            }
+            _command_input.use();
+            _command_input.draw();
+        }
 
         _window->swap_buffers();
         glfwPollEvents();
@@ -95,20 +153,25 @@ void Fractalio::mainloop() {
 
 void Fractalio::size_callback(int width, int height) {
     glViewport(0, 0, width, height);
-    _new_text = true;
-    _width = float(width);
+    _new_info = true;
+    _new_input = true;
+    _wsize = { width, height };
     if (_active) {
         _active->use();
-        _active->resize(
-            { 0, 0 }, { width - SIDE_WIDTH, height }, { width, height }
-        );
+        _active->resize({ 0, 0 }, { width - SIDE_WIDTH, height }, _wsize);
     }
 
-    _text_renderer.use();
-    _text_renderer.resize({ width, height });
+    _info.use();
+    _info.resize(_wsize);
 
     _fps_text.use();
-    _fps_text.resize({ width, height });
+    _fps_text.resize(_wsize);
+
+    _input_bg.use();
+    _input_bg.resize({ 0, _wsize.y - 25 }, { _wsize.x, 25 }, _wsize);
+
+    _command_input.use();
+    _command_input.resize(_wsize);
 }
 
 void Fractalio::mouse_move_callback(double x, double y) {
@@ -125,11 +188,11 @@ void Fractalio::mouse_move_callback(double x, double y) {
         GLFW_PRESS) {
         auto delta = mouse_pos - _last_mouse_pos;
         _active->drag(delta);
-        _new_text = true;
+        _new_info = true;
     } else if (glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_RIGHT) ==
                GLFW_PRESS) {
         _active->scale(mouse_pos.y - _last_mouse_pos.y);
-        _new_text = true;
+        _new_info = true;
     }
 
     _last_mouse_pos = mouse_pos;
@@ -143,6 +206,120 @@ void Fractalio::scroll_callback(double, double dy) {
     _active->scale(dy * 8);
 }
 
+void Fractalio::key_callback(int key, int scancode, int action, int mods) {
+    (void)scancode;
+    (void)action;
+    (void)mods;
+
+    switch (key) {
+    case GLFW_KEY_ESCAPE:
+        _input_text.clear();
+        _new_input = true;
+        break;
+    case GLFW_KEY_ENTER:
+        consume_input();
+        _new_input = true;
+        break;
+    case GLFW_KEY_BACKSPACE:
+        if (!_input_text.empty()) {
+            _input_text.pop_back();
+        }
+        _new_input = true;
+        break;
+    default:
+        break;
+    }
+}
+
+void Fractalio::char_callback(unsigned code) {
+    if (code > std::numeric_limits<char>::max()) {
+        return;
+    }
+    auto c = char(code);
+
+    if (_input_text.starts_with(':') || (_input_text.empty() && c == ':')) {
+        _input_text.push_back(c);
+        _new_input = true;
+        return;
+    }
+
+    if (std::isdigit(c)) {
+        _input_text.push_back(c);
+        _new_input = true;
+        return;
+    }
+
+    _input_text.push_back(c);
+    consume_input();
+    _new_input = true;
+}
+
 void Fractalio::process_input() { }
+
+void Fractalio::consume_input() {
+    if (_input_text.empty()) {
+        return;
+    }
+    if (_input_text.starts_with(':')) {
+        full_command(std::string_view(_input_text).substr(1));
+    } else {
+        short_command(_input_text);
+    }
+    _input_text.clear();
+}
+
+void Fractalio::full_command(std::string_view cmd) {
+    if (cmd == "x" || cmd == "exit") {
+        _window->set_should_close(true);
+    }
+}
+
+void Fractalio::short_command(std::string_view cmd) {
+    auto ne =
+        std::ranges::find_if(cmd, [](char c) { return !std::isdigit(c); });
+    std::string_view num_str{ cmd.begin(), ne };
+
+    std::optional<float> num;
+    if (!num_str.empty()) {
+        num = 0;
+        auto res = std::from_chars(num_str.begin(), num_str.end(), *num);
+        if (res.ec != std::errc{}) {
+            std::println(
+                std::cerr, "Invalid command number prefix `{}`.", num_str
+            );
+            return;
+        }
+    }
+
+    cmd = { ne, cmd.end() };
+
+    if (!_active) {
+        std::println(std::cerr, "Unused command.");
+        return;
+    }
+
+    if (cmd == "i") {
+        _active->use();
+        if (num) {
+            _active->map_iterations([=](float) { return *num; });
+        } else {
+            _active->map_iterations([](float i) {
+                return std::max(i * 2., 1.);
+            });
+        }
+        _new_info = true;
+    } else if (cmd == "I") {
+        _active->use();
+        if (num) {
+            _active->map_iterations([=](float) { return *num; });
+        } else {
+            _active->map_iterations([](float i) { return i / 2; });
+        }
+        _new_info = true;
+    } else {
+        std::println(std::cerr, "Unknown command `{}`", cmd);
+        return;
+    }
+}
 
 } // namespace fio

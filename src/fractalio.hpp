@@ -1,10 +1,12 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "font.hpp"
 #include "fractal.hpp"
 #include "glfw/window.hpp"
+#include "quad/quad.hpp"
 #include "text_renderer/text_renderer.hpp"
 
 namespace fio {
@@ -25,15 +27,26 @@ private:
     std::unique_ptr<Fractal> _active;
     glm::dvec2 _last_mouse_pos;
     Font _font;
-    TextRenderer _text_renderer;
+
+    TextRenderer _info;
+    bool _new_info = true;
     TextRenderer _fps_text;
-    bool _new_text = true;
-    float _width = 0;
+    TextRenderer _command_input;
+    Quad _input_bg;
+    std::string _input_text;
+    bool _new_input;
+
+    glm::vec2 _wsize;
 
     void size_callback(int width, int height);
     void mouse_move_callback(double x, double y);
     void scroll_callback(double dx, double dy);
+    void key_callback(int key, int scancode, int action, int mods);
+    void char_callback(unsigned code);
     void process_input();
+    void consume_input();
+    void full_command(std::string_view cmd);
+    void short_command(std::string_view cmd);
 };
 
 } // namespace fio

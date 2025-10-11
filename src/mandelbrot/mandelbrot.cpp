@@ -43,6 +43,8 @@ Mandelbrot::Mandelbrot() {
     gl::uniform(_loc_center, _center);
     _loc_scale = _program.uniform_location("scale");
     gl::uniform(_loc_scale, _scale);
+    _loc_iterations = _program.uniform_location("iterations");
+    gl::uniform(_loc_iterations, _iterations);
 
     _vao.bind();
 
@@ -107,10 +109,12 @@ Mandelbrot set
   center:
     {:.6} + {:.6}i
   scale: {:.10}
+  iterations: {}
 ).",
         _center.x,
         _center.y,
-        1 / _scale
+        1 / _scale,
+        _iterations
     );
 }
 

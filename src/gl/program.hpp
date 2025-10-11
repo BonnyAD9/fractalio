@@ -48,6 +48,11 @@ public:
 
     void use() const { glUseProgram(_id); }
 
+    [[nodiscard]]
+    GLuint get() const {
+        return _id;
+    }
+
     ~Program() {
         if (_id != 0) {
             glDeleteProgram(_id);

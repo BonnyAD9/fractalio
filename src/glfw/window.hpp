@@ -30,6 +30,8 @@ public:
         glfwSetFramebufferSizeCallback(get(), size_callback_inner);
         glfwSetCursorPosCallback(get(), mouse_move_callback_inner);
         glfwSetScrollCallback(get(), scroll_callback_inner);
+        glfwSetCharCallback(get(), char_callback_inner);
+        glfwSetKeyCallback(get(), key_callback_inner);
         glfwSetWindowSizeLimits(
             get(), 300, 100, GLFW_DONT_CARE, GLFW_DONT_CARE
         );
@@ -53,6 +55,18 @@ public:
         _scroll_callback = std::move(f);
     }
 
+    void set_char_callback(std::function<void(unsigned)> f) {
+        _char_callback = std::move(f);
+    }
+
+    void set_key_callback(std::function<void(int, int, int, int)> f) {
+        _key_callback = std::move(f);
+    }
+
+    void set_should_close(bool value) {
+        glfwSetWindowShouldClose(get(), value ? GLFW_TRUE : GLFW_FALSE);
+    }
+
     bool should_close() { return glfwWindowShouldClose(get()); }
 
     void swap_buffers() { glfwSwapBuffers(get()); }
@@ -68,6 +82,8 @@ private:
     std::optional<std::function<void(int, int)>> _size_callback;
     std::optional<std::function<void(double, double)>> _mouse_move_callback;
     std::optional<std::function<void(double, double)>> _scroll_callback;
+    std::optional<std::function<void(unsigned)>> _char_callback;
+    std::optional<std::function<void(int, int, int, int)>> _key_callback;
 
     static void size_callback_inner(
         GLFWwindow *window, int width, int height
@@ -94,6 +110,26 @@ private:
             reinterpret_cast<Window *>(glfwGetWindowUserPointer(window));
         if (win->_mouse_move_callback) {
             log_err([&]() { (*win->_scroll_callback)(x, y); });
+        }
+    }
+
+    static void char_callback_inner(GLFWwindow *window, unsigned code) {
+        auto win =
+            reinterpret_cast<Window *>(glfwGetWindowUserPointer(window));
+        if (win->_char_callback) {
+            log_err([&]() { (*win->_char_callback)(code); });
+        }
+    }
+
+    static void key_callback_inner(
+        GLFWwindow *window, int key, int scancode, int action, int mods
+    ) {
+        auto win =
+            reinterpret_cast<Window *>(glfwGetWindowUserPointer(window));
+        if (win->_key_callback) {
+            log_err([&]() {
+                (*win->_key_callback)(key, scancode, action, mods);
+            });
         }
     }
 };

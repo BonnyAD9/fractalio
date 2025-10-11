@@ -7,15 +7,15 @@ uniform sampler1D gradient;
 
 uniform dvec2 center;
 uniform double scale;
+uniform uint iterations;
 
 void main() {
-    const int LIM = 256;
     const int COLOR_COUNT = 256;
 
     vec2 c = vec2(cor * scale + center);
     lowp vec2 x = c;
 
-    int i = LIM;
+    uint i = iterations;
     for (; i > 0; --i) {
         vec2 x2 = x * x;
 
@@ -34,6 +34,6 @@ void main() {
     if (i <= 0) {
         frag_color = vec4(0, 0, 0, 1);
     } else {
-        frag_color = texture(gradient, float(LIM - i) / COLOR_COUNT);
+        frag_color = texture(gradient, float(iterations - i) / COLOR_COUNT);
     }
 }

@@ -129,6 +129,10 @@ static inline void uniform(GLint location, double value) {
     glUniform1d(location, value);
 }
 
+static inline void uniform(GLint location, GLuint value) {
+    glUniform1ui(location, value);
+}
+
 static inline void uniform(GLint location, glm::mat4 value) {
     glUniformMatrix4fv(location, 1, false, &value[0][0]);
 }

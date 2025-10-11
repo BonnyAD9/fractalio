@@ -16,6 +16,8 @@ namespace fio {
 class TextRenderer {
 public:
     TextRenderer(Font &font, float line_height);
+    explicit TextRenderer(const TextRenderer &conf) :
+        TextRenderer(conf._font, conf._line_h) { }
 
     void use() {
         _program.use();
@@ -38,6 +40,11 @@ public:
     void prepare();
 
     void clear_text();
+
+    [[nodiscard]]
+    GLuint get_program() const {
+        return _program.get();
+    }
 
 private:
     Font &_font;
