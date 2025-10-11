@@ -10,8 +10,6 @@
 #include <print>
 #include <utility>
 
-#include <GLFW/glfw3.h>
-
 #include "font.hpp"
 #include "gl/gl.hpp"
 #include "help.hpp"
