@@ -45,6 +45,8 @@ Mandelbrot::Mandelbrot() {
     gl::uniform(_loc_scale, _scale);
     _loc_iterations = _program.uniform_location("iterations");
     gl::uniform(_loc_iterations, _iterations);
+    _loc_color_count = _program.uniform_location("color_count");
+    gl::uniform(_loc_color_count, _color_count);
 
     _vao.bind();
 
@@ -110,11 +112,13 @@ Mandelbrot set
     {:.6} + {:.6}i
   scale: {:.10}
   iterations: {}
+  color count: {}
 ).",
-        _center.x,
-        _center.y,
+        -_center.x,
+        -_center.y,
         1 / _scale,
-        _iterations
+        _iterations,
+        _color_count
     );
 }
 

@@ -14,9 +14,14 @@ public:
     virtual void use() = 0;
     virtual void drag(glm::dvec2 delta) { (void)delta; };
     virtual void scale(double delta) { (void)delta; };
+
     virtual void map_iterations(const std::function<float(float)> &map) {
         (void)map;
     };
+
+    virtual void map_color_count(const std::function<float(float)> &map) {
+        (void)map;
+    }
 
     virtual std::string describe() = 0;
 

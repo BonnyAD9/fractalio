@@ -129,6 +129,10 @@ static inline void uniform(GLint location, double value) {
     glUniform1d(location, value);
 }
 
+static inline void uniform(GLint location, float value) {
+    glUniform1f(location, value);
+}
+
 static inline void uniform(GLint location, GLuint value) {
     glUniform1ui(location, value);
 }
