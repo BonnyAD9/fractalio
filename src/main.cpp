@@ -7,7 +7,6 @@
 #include "fractalio.hpp"
 #include "gl/gl.hpp"
 #include "glad.hpp"
-#include "glad/gl.h"
 #include "glfw/runner.hpp"
 #include "glfw/window.hpp"
 #include "log_err.hpp"

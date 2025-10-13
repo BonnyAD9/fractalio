@@ -30,14 +30,13 @@ static constexpr std::size_t FONT_SIZE = 16;
 constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0.1, 0.1, 0.1, 1 };
 
 Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
-    _window(std::move(window)),
+    _window((window->make_context_current(), std::move(window))),
     _font(font, FONT_SIZE),
     _info(_font, std::size_t(FONT_SIZE * 5 / 4)),
     _fps_text(_info),
     _command_input(_info),
     _input_bg({ 0.1, 0.1, 0.1, 1 }) {
 
-    _window->make_context_current();
     auto size = _window->get_size();
     _wsize = size;
     // glfwSwapInterval(0); // to disable vsync

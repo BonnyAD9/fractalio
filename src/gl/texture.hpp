@@ -10,6 +10,8 @@ public:
 
     void bind(GLenum type) const { glBindTexture(type, _id); }
 
+    operator bool() const { return _id; }
+
     ~Texture() {
         if (_id != 0) {
             glDeleteTextures(1, &_id);

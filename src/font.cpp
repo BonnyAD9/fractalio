@@ -31,6 +31,13 @@ Font::Font(const char *name, FT_UInt size) {
         face.load_char(c);
         _glyphs[c] = make_glyph(face->glyph);
     }
+
+    _gl_texture.bind(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    gl::tex_image_2d(data(), GLsizei(width()), GLsizei(height()), GL_RED);
 }
 
 Font::Glyph Font::make_glyph(FT_GlyphSlot glyph) {

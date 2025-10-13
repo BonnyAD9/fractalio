@@ -38,15 +38,6 @@ TextRenderer::TextRenderer(Font &font, float line_height) :
     _loc_trans = _program.uniform_location("trans");
     gl::uniform(_loc_trans, glm::identity<glm::mat4>());
 
-    _texture.bind(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    gl::tex_image_2d(
-        font.data(), font.width(), GLsizei(font.height()), GL_RED
-    );
-
     _vao.bind();
 
     _vbo.bind(GL_ARRAY_BUFFER);

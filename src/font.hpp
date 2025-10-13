@@ -7,6 +7,8 @@
 #include <freetype/freetype.h>
 #include <freetype/fttypes.h>
 
+#include "gl/texture.hpp"
+
 #include <glm/glm.hpp>
 
 namespace fio {
@@ -50,6 +52,8 @@ public:
         return res->second;
     }
 
+    void use() { _gl_texture.bind(GL_TEXTURE_2D); }
+
 private:
     std::unordered_map<char, Glyph> _glyphs;
     Glyph _unknown;
@@ -57,6 +61,8 @@ private:
     std::vector<std::uint8_t> _texture;
     std::size_t _line_y = 0;
     std::size_t _line_x = 0;
+
+    gl::Texture _gl_texture;
 
     Glyph make_glyph(FT_GlyphSlot glyph);
     glm::uvec2 add_render(std::uint8_t *data, glm::uvec2 size);

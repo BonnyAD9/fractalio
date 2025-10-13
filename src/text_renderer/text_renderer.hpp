@@ -22,7 +22,7 @@ public:
     void use() {
         _program.use();
         _vao.bind();
-        _texture.bind(GL_TEXTURE_2D);
+        _font.use();
     }
 
     void draw() {
@@ -65,7 +65,6 @@ private:
     gl::VertexArray _vao;
     gl::Buffer _vbo;
     gl::Buffer _ebo;
-    gl::Texture _texture;
     GLint _loc_proj;
     GLint _loc_color;
     GLint _loc_trans;
