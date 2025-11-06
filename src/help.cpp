@@ -39,6 +39,8 @@ constexpr std::string_view HELP_TEXT = R".(HELP
     `c`    Set number of colors.
     `x`    Set x (real) coordinate.
     `y`    Set y (imaginary) coordinate.
+    `:vsync`  `on`/`off`
+           Enable/disable vsync.
 ).";
 
 Help::Help(const TextRenderer &text) : _text(text) {

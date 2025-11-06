@@ -8,7 +8,9 @@
 #include <limits>
 #include <memory>
 #include <print>
+#include <ranges>
 #include <utility>
+#include <GLFW/glfw3.h>
 
 #include "font.hpp"
 #include "gl/gl.hpp"
@@ -39,7 +41,7 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
 
     auto size = _window->get_size();
     _wsize = size;
-    // glfwSwapInterval(0); // to disable vsync
+    glfwSwapInterval(1);
 
     glViewport(0, 0, size.x, size.y);
     gl::clear_color(DEFAULT_CLEAR_COLOR);
@@ -337,6 +339,10 @@ void Fractalio::consume_input() {
 }
 
 void Fractalio::long_command(std::string_view cmd) {
+    auto args = std::views::split(cmd, ' ');
+    auto argsi = args.begin();
+    cmd = std::string_view(*argsi);
+    ++argsi;
     if (cmd == ":x" || cmd == ":exit" || cmd == ":q" || cmd == ":quit") {
         _window->set_should_close(true);
     } else if (cmd.starts_with("::")) {
@@ -350,6 +356,8 @@ void Fractalio::long_command(std::string_view cmd) {
         return;
     } else if (cmd == ":h" || cmd == ":help") {
         activate(Fractal::Type::HELP);
+    } else if (cmd == ":vsync") {
+        glfwSwapInterval(std::string_view(*argsi) != "off");
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
         return;
