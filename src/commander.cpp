@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <GLFW/glfw3.h>
 
 #include "fractalio.hpp"
 #include "maps.hpp"
@@ -140,6 +141,9 @@ void Commander::long_command(std::string_view cmd) {
     } else if (cmd == ":h" || cmd == ":help") {
         _app.activate(Fractal::Type::HELP);
     } else if (cmd == ":vsync") {
+        if (args == argss.end()) {
+            glfwSwapInterval(0);
+        }
         glfwSwapInterval(std::string_view(*args) != "off");
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
