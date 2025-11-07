@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <ranges>
+
 #include <GLFW/glfw3.h>
 
 #include "fractalio.hpp"
