@@ -1,18 +1,19 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <unordered_map>
 
+#include "commander.hpp"
 #include "font.hpp"
 #include "fractal.hpp"
 #include "glfw/window.hpp"
-#include "quad/quad.hpp"
 #include "text_renderer/text_renderer.hpp"
 
 namespace fio {
 
 class Fractalio {
+    friend class Commander;
+
 public:
     Fractalio(Fractalio &&) = delete;
     Fractalio &operator=(Fractalio &&) = delete;
@@ -24,6 +25,10 @@ public:
     void mainloop();
 
 private:
+    static constexpr std::size_t FONT_SIZE = 16;
+    static constexpr std::size_t SIDE_WIDTH = 300;
+    static constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0.1, 0.1, 0.1, 1 };
+
     std::unique_ptr<glfw::Window> _window;
     std::unordered_map<Fractal::Type, std::unique_ptr<Fractal>> _fractals;
     Fractal *_active = nullptr;
@@ -33,12 +38,7 @@ private:
     TextRenderer _info;
     bool _new_info = true;
     TextRenderer _fps_text;
-    TextRenderer _command_input;
-    Quad _input_bg;
-    std::string _input_text;
-    bool _new_input = true;
-    std::string _last_command;
-    bool _no_recurse = false;
+    Commander _commander;
 
     glm::vec2 _wsize;
 
