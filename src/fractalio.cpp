@@ -57,18 +57,16 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
 
     init_fractals();
 
-    if (_active) {
-        _active->use();
-        _active->resize({ 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size);
-        auto picker = _active->picker();
-        if (picker) {
-            picker->use();
-            picker->resize(
-                { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE - SIDE_WIDTH },
-                { SIDE_WIDTH, SIDE_WIDTH },
-                _wsize
-            );
-        }
+    _active->use();
+    _active->resize({ 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size);
+    auto picker = _active->picker();
+    if (picker) {
+        picker->use();
+        picker->resize(
+            { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE - SIDE_WIDTH },
+            { SIDE_WIDTH, SIDE_WIDTH },
+            _wsize
+        );
     }
 
     const glm::vec2 side_start{ _wsize.x - SIDE_WIDTH + 10, 20 };
@@ -103,7 +101,7 @@ void Fractalio::mainloop() {
         if (_new_info) {
             _info.clear_text();
             if (_active) {
-                auto text = _active->describe();
+                auto text = _focus->describe();
                 _info.add_text(text, { 0, 0 });
             }
             _info.use();
@@ -123,14 +121,12 @@ void Fractalio::mainloop() {
         _commander.prepare();
 
         glClear(GL_COLOR_BUFFER_BIT);
-        if (_active) {
-            _active->use();
-            _active->draw();
-            auto picker = _active->picker();
-            if (picker) {
-                picker->use();
-                picker->draw();
-            }
+        _active->use();
+        _active->draw();
+        auto picker = _active->picker();
+        if (picker) {
+            picker->use();
+            picker->draw();
         }
 
         _info.use();
@@ -152,24 +148,23 @@ void Fractalio::init_fractals() {
     _fractals[Fractal::Type::JULIA] = std::make_unique<Julia>();
 
     _active = _fractals[Fractal::Type::MANDELBROT].get();
+    _focus = _active;
 }
 
 void Fractalio::size_callback(int width, int height) {
     glViewport(0, 0, width, height);
     _wsize = { width, height };
-    if (_active) {
-        _active->use();
-        _active->resize({ 0, 0 }, { width - SIDE_WIDTH, height }, _wsize);
-        auto picker = _active->picker();
-        if (picker) {
-            picker->use();
-            picker->resize(
-                { _wsize.x - SIDE_WIDTH,
-                  _wsize.y - FONT_SIZE * 1.5 - SIDE_WIDTH },
-                { SIDE_WIDTH, SIDE_WIDTH },
-                _wsize
-            );
-        }
+
+    _active->use();
+    _active->resize({ 0, 0 }, { width - SIDE_WIDTH, height }, _wsize);
+    auto picker = _active->picker();
+    if (picker) {
+        picker->use();
+        picker->resize(
+            { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE * 1.5 - SIDE_WIDTH },
+            { SIDE_WIDTH, SIDE_WIDTH },
+            _wsize
+        );
     }
 
     _info.use();
@@ -205,7 +200,6 @@ void Fractalio::mouse_move_callback(double x, double y) {
 }
 
 void Fractalio::mouse_press_callback(int button, int action, int mods) {
-
     if (_drag) {
         if (action == GLFW_RELEASE) {
             _drag->drag_end(button);
@@ -282,6 +276,7 @@ void Fractalio::activate(Fractal::Type typ) {
         return;
     }
     _active = _fractals[typ].get();
+    _focus = _active;
     _active->use();
     _active->resize({ 0, 0 }, { _wsize.x - SIDE_WIDTH, _wsize.y }, _wsize);
     _new_info = true;

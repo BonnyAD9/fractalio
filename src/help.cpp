@@ -20,6 +20,10 @@ constexpr std::string_view HELP_TEXT = R".(HELP
   Commands:
     `?` `gh` `:h` `:help`
            Show this help.
+    <esc>  Cancel currently typed command. If there is no such command, make
+           the base fractal focused.
+    <space>
+           Give command focus to the picker (if present).
     <tab>  Toggle single/double precision.
     `r`<char>
            Reset configuration of fractal. The next character will decide what

@@ -20,11 +20,7 @@ public:
     void char_in(char c);
     void consume();
 
-    void cancel() {
-        _text.clear();
-        _new_input = true;
-    }
-
+    void cancel();
     void backspace() {
         if (!_text.empty()) {
             _text.pop_back();

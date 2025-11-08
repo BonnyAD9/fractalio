@@ -33,6 +33,7 @@ private:
     std::unique_ptr<glfw::Window> _window;
     std::unordered_map<Fractal::Type, std::unique_ptr<Fractal>> _fractals;
     Fractal *_active = nullptr;
+    Fractal *_focus = nullptr;
     glm::dvec2 _last_mouse_pos;
     Font _font;
 

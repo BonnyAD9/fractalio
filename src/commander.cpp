@@ -44,6 +44,16 @@ split_short_cmd(std::string_view cmd) {
 Commander::Commander(Fractalio &app, const TextRenderer &text_cfg) :
     _app(app), _input(text_cfg), _bg(Fractalio::DEFAULT_CLEAR_COLOR) { }
 
+void Commander::cancel() {
+    if (_text.empty()) {
+        _app._focus = _app._active;
+        _app._new_info = true;
+    } else {
+        _text.clear();
+    }
+    _new_input = true;
+}
+
 void Commander::prepare() {
     if (_new_input) {
         _input.clear_text();
@@ -179,61 +189,63 @@ void Commander::execute_command(std::string_view whole_cmd) {
         _app.activate(Fractal::Type::JULIA);
     } else if (cmd == "G") {
         _app.activate(Fractal::Type(std::size_t(num.value_or(0))));
-    } else if (!_app._active) {
-        std::println(std::cerr, "Unused command `{}`", cmd);
-        _last = whole_cmd;
-        return;
+    } else if (cmd == " ") {
+        _app._focus = _app._active->picker();
+        if (!_app._focus) {
+            _app._focus = _app._active;
+        }
+        _app._new_info = true;
     } else if (cmd == "i") {
-        _app._active->use();
-        _app._active->map_iterations(
+        _app._focus->use();
+        _app._focus->map_iterations(
             maps::modified<float>(mod, num, maps::dble<float>)
         );
         _app._new_info = true;
     } else if (cmd == "I") {
-        _app._active->use();
-        _app._active->map_iterations(
+        _app._focus->use();
+        _app._focus->map_iterations(
             maps::modified<float>(mod, num, maps::half<float>)
         );
         _app._new_info = true;
     } else if (cmd == "c") {
-        _app._active->use();
-        _app._active->map_color_count(
+        _app._focus->use();
+        _app._focus->map_color_count(
             maps::modified<float>(mod, num, maps::dble<float>)
         );
         _app._new_info = true;
     } else if (cmd == "C") {
-        _app._active->use();
-        _app._active->map_color_count(
+        _app._focus->use();
+        _app._focus->map_color_count(
             maps::modified<float>(mod, num, maps::half<float>)
         );
         _app._new_info = true;
     } else if (cmd == "z") {
-        _app._active->use();
-        _app._active->map_scale(
+        _app._focus->use();
+        _app._focus->map_scale(
             maps::inverse(maps::modified<double>(mod, num, maps::dble<double>))
         );
         _app._new_info = true;
     } else if (cmd == "Z") {
-        _app._active->use();
-        _app._active->map_scale(
+        _app._focus->use();
+        _app._focus->map_scale(
             maps::inverse(maps::modified<double>(mod, num, maps::half<double>))
         );
         _app._new_info = true;
     } else if (cmd == "x" || cmd == "L") {
-        _app._active->use();
-        _app._active->map_x(maps::modified<double>(mod, num, [&](double p) {
+        _app._focus->use();
+        _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale();
         }));
         _app._new_info = true;
     } else if (cmd == "X" || cmd == "H") {
-        _app._active->use();
-        _app._active->map_x(maps::modified<double>(mod, num, [&](double p) {
+        _app._focus->use();
+        _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p - _app._active->scale();
         }));
         _app._new_info = true;
     } else if (cmd == "y" || cmd == "K") {
-        _app._active->use();
-        _app._active->map_y(maps::modified<double>(mod, num, [&](double p) {
+        _app._focus->use();
+        _app._focus->map_y(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale();
         }));
         _app._new_info = true;
@@ -244,67 +256,67 @@ void Commander::execute_command(std::string_view whole_cmd) {
         }));
         _app._new_info = true;
     } else if (cmd == "l") {
-        _app._active->use();
-        _app._active->map_x(maps::modified<double>(mod, num, [&](double p) {
+        _app._focus->use();
+        _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "h") {
-        _app._active->use();
-        _app._active->map_x(maps::modified<double>(mod, num, [&](double p) {
+        _app._focus->use();
+        _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p - _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "k") {
-        _app._active->use();
-        _app._active->map_y(maps::modified<double>(mod, num, [&](double p) {
+        _app._focus->use();
+        _app._focus->map_y(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "j") {
-        _app._active->use();
-        _app._active->map_y(maps::modified<double>(mod, num, [&](double p) {
+        _app._focus->use();
+        _app._focus->map_y(maps::modified<double>(mod, num, [&](double p) {
             return p - _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "ri") {
-        _app._active->use();
-        _app._active->map_iterations(maps::reset<float>);
+        _app._focus->use();
+        _app._focus->map_iterations(maps::reset<float>);
         _app._new_info = true;
     } else if (cmd == "rc") {
-        _app._active->use();
-        _app._active->map_color_count(maps::reset<float>);
+        _app._focus->use();
+        _app._focus->map_color_count(maps::reset<float>);
         _app._new_info = true;
     } else if (cmd == "rz") {
-        _app._active->use();
-        _app._active->map_scale(maps::reset<double>);
+        _app._focus->use();
+        _app._focus->map_scale(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "rx") {
-        _app._active->use();
-        _app._active->map_x(maps::reset<double>);
+        _app._focus->use();
+        _app._focus->map_x(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "ry") {
-        _app._active->use();
-        _app._active->map_y(maps::reset<double>);
+        _app._focus->use();
+        _app._focus->map_y(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "rp") {
-        _app._active->use();
-        _app._active->map_scale(maps::reset<double>);
-        _app._active->map_x(maps::reset<double>);
-        _app._active->map_y(maps::reset<double>);
+        _app._focus->use();
+        _app._focus->map_scale(maps::reset<double>);
+        _app._focus->map_x(maps::reset<double>);
+        _app._focus->map_y(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "rr") {
-        _app._active->use();
-        _app._active->map_iterations(maps::reset<float>);
-        _app._active->map_color_count(maps::reset<float>);
+        _app._focus->use();
+        _app._focus->map_iterations(maps::reset<float>);
+        _app._focus->map_color_count(maps::reset<float>);
         _app._new_info = true;
     } else if (cmd == "R") {
-        _app._active->use();
-        _app._active->map_iterations(maps::reset<float>);
-        _app._active->map_color_count(maps::reset<float>);
-        _app._active->map_scale(maps::reset<double>);
-        _app._active->map_x(maps::reset<double>);
-        _app._active->map_y(maps::reset<double>);
+        _app._focus->use();
+        _app._focus->map_iterations(maps::reset<float>);
+        _app._focus->map_color_count(maps::reset<float>);
+        _app._focus->map_scale(maps::reset<double>);
+        _app._focus->map_x(maps::reset<double>);
+        _app._focus->map_y(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == ";") {
         if (_no_recurse) {
