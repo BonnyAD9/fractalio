@@ -10,6 +10,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "burning_ship/burning_ship.hpp"
 #include "commander.hpp"
 #include "font.hpp"
 #include "gl/gl.hpp"
@@ -146,6 +147,7 @@ void Fractalio::init_fractals() {
     _fractals[Fractal::Type::HELP] = std::make_unique<Help>(_info);
     _fractals[Fractal::Type::MANDELBROT] = std::make_unique<Mandelbrot>();
     _fractals[Fractal::Type::JULIA] = std::make_unique<Julia>();
+    _fractals[Fractal::Type::BURNING_SHIP] = std::make_unique<BurningShip>();
 
     _active = _fractals[Fractal::Type::MANDELBROT].get();
     _focus = _active;

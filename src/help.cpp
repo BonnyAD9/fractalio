@@ -45,14 +45,16 @@ constexpr std::string_view HELP_TEXT = R".(HELP
            Enable/disable vsync.
     `g`<char>
            Go to the given fractal:
-             `h`: Help.
-             `m`: Mandelbrot set.
-             `j`: Julia set.
+             `h`: Help
+             `m`: Mandelbrot set
+             `j`: Julia set
+             `s`: Burning ship
     <number>`G`
            Go to fractal/page identified by number:
              0: Help
              1: Mandelbrot set
              2: Julia set
+             3: Burning ship
 ).";
 
 Help::Help(const TextRenderer &text) : _text(text) {
