@@ -175,6 +175,10 @@ void Commander::execute_command(std::string_view whole_cmd) {
         _app.activate(Fractal::Type::MANDELBROT);
     } else if (cmd == "gh" || cmd == "?") {
         _app.activate(Fractal::Type::HELP);
+    } else if (cmd == "gj") {
+        _app.activate(Fractal::Type::JULIA);
+    } else if (cmd == "G") {
+        _app.activate(Fractal::Type(std::size_t(num.value_or(0))));
     } else if (!_app._active) {
         std::println(std::cerr, "Unused command `{}`", cmd);
         _last = whole_cmd;

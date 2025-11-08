@@ -4,6 +4,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <print>
 #include <utility>
 
@@ -13,6 +14,7 @@
 #include "font.hpp"
 #include "gl/gl.hpp"
 #include "help.hpp"
+#include "julia/julia.hpp"
 #include "mandelbrot/mandelbrot.hpp"
 #include "maps.hpp"
 
@@ -49,11 +51,24 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _window->set_key_callback([&](int k, int s, int a, int m) {
         key_callback(k, s, a, m);
     });
+    _window->set_mouse_press_callback([&](int b, int a, int m) {
+        mouse_press_callback(b, a, m);
+    });
 
     init_fractals();
 
     if (_active) {
+        _active->use();
         _active->resize({ 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size);
+        auto picker = _active->picker();
+        if (picker) {
+            picker->use();
+            picker->resize(
+                { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE - SIDE_WIDTH },
+                { SIDE_WIDTH, SIDE_WIDTH },
+                _wsize
+            );
+        }
     }
 
     const glm::vec2 side_start{ _wsize.x - SIDE_WIDTH + 10, 20 };
@@ -111,6 +126,11 @@ void Fractalio::mainloop() {
         if (_active) {
             _active->use();
             _active->draw();
+            auto picker = _active->picker();
+            if (picker) {
+                picker->use();
+                picker->draw();
+            }
         }
 
         _info.use();
@@ -129,6 +149,7 @@ void Fractalio::mainloop() {
 void Fractalio::init_fractals() {
     _fractals[Fractal::Type::HELP] = std::make_unique<Help>(_info);
     _fractals[Fractal::Type::MANDELBROT] = std::make_unique<Mandelbrot>();
+    _fractals[Fractal::Type::JULIA] = std::make_unique<Julia>();
 
     _active = _fractals[Fractal::Type::MANDELBROT].get();
 }
@@ -139,6 +160,16 @@ void Fractalio::size_callback(int width, int height) {
     if (_active) {
         _active->use();
         _active->resize({ 0, 0 }, { width - SIDE_WIDTH, height }, _wsize);
+        auto picker = _active->picker();
+        if (picker) {
+            picker->use();
+            picker->resize(
+                { _wsize.x - SIDE_WIDTH,
+                  _wsize.y - FONT_SIZE * 1.5 - SIDE_WIDTH },
+                { SIDE_WIDTH, SIDE_WIDTH },
+                _wsize
+            );
+        }
     }
 
     _info.use();
@@ -163,25 +194,40 @@ void Fractalio::size_callback(int width, int height) {
 void Fractalio::mouse_move_callback(double x, double y) {
     const glm::dvec2 mouse_pos{ x, y };
 
-    if (!_active) {
+    if (!_drag) {
         _last_mouse_pos = mouse_pos;
         return;
     }
 
-    _active->use();
+    _drag->drag(mouse_pos, mouse_pos - _last_mouse_pos);
+    _new_info = true;
+    _last_mouse_pos = mouse_pos;
+}
 
-    if (glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_LEFT) ==
-        GLFW_PRESS) {
-        auto delta = mouse_pos - _last_mouse_pos;
-        _active->drag(delta);
-        _new_info = true;
-    } else if (glfwGetMouseButton(_window->get(), GLFW_MOUSE_BUTTON_RIGHT) ==
-               GLFW_PRESS) {
-        _active->scale(mouse_pos.y - _last_mouse_pos.y);
-        _new_info = true;
+void Fractalio::mouse_press_callback(int button, int action, int mods) {
+
+    if (_drag) {
+        if (action == GLFW_RELEASE) {
+            _drag->drag_end(button);
+            return;
+        }
+        _drag->drag_end(std::nullopt);
     }
 
-    _last_mouse_pos = mouse_pos;
+    auto bot_size = _wsize.y - FONT_SIZE * 1.5;
+
+    if (_last_mouse_pos.x < _wsize.x - SIDE_WIDTH) {
+        _drag = _active;
+    } else if (_active && _last_mouse_pos.y > bot_size - SIDE_WIDTH &&
+               _last_mouse_pos.y < bot_size) {
+        if (_active) {
+            _drag = _active->picker();
+        }
+    }
+
+    if (_drag) {
+        _drag->drag_start(button, mods, _last_mouse_pos);
+    }
 }
 
 void Fractalio::scroll_callback(double, double dy) {
@@ -239,6 +285,15 @@ void Fractalio::activate(Fractal::Type typ) {
     _active->use();
     _active->resize({ 0, 0 }, { _wsize.x - SIDE_WIDTH, _wsize.y }, _wsize);
     _new_info = true;
+    auto picker = _active->picker();
+    if (picker) {
+        picker->use();
+        picker->resize(
+            { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE * 1.5 - SIDE_WIDTH },
+            { SIDE_WIDTH, SIDE_WIDTH },
+            _wsize
+        );
+    }
 }
 
 } // namespace fio

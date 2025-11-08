@@ -9,6 +9,8 @@ namespace fio::gl {
 
 class Program {
 public:
+    using Location = GLint;
+
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
 
@@ -23,6 +25,14 @@ public:
     }
 
     Program() : _id(glCreateProgram()) { }
+
+    void compile(const char *vert_src, const char *frag_src) const {
+        Shader vert(GL_VERTEX_SHADER);
+        Shader frag(GL_FRAGMENT_SHADER);
+        vert.compile(vert_src);
+        frag.compile(frag_src);
+        link(vert, frag);
+    }
 
     void link(Shader &vert, Shader &frag) const {
         glAttachShader(_id, vert.get());
@@ -46,7 +56,18 @@ public:
         return glGetUniformLocation(_id, name);
     }
 
+    template<typename T> void uniform(GLint location, T value) {
+        gl::uniform(location, value);
+    }
+
     void use() const { glUseProgram(_id); }
+
+    constexpr void use_double(bool) const { }
+    [[nodiscard]]
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    constexpr bool use_double() const {
+        return false;
+    }
 
     [[nodiscard]]
     GLuint get() const {

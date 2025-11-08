@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <string_view>
 
 #include "gl/program.hpp"
@@ -11,6 +10,8 @@ namespace fio {
 
 class DFShaderProgram {
 public:
+    using Location = glm::ivec2;
+
     void compile(const char *vert_src, std::string_view frag_src);
 
     glm::ivec2 uniform_location(const char *name) const {

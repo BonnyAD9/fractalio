@@ -1,0 +1,43 @@
+#version 460 core
+
+#define ploat float
+#define pvec2 vec2
+
+out vec4 frag_color;
+in vec2 cor;
+
+uniform sampler1D gradient;
+
+uniform dvec2 center;
+uniform double scale;
+uniform uint iterations;
+uniform float color_count;
+
+uniform dvec2 par;
+
+void main() {
+    pvec2 x = pvec2(cor * scale + center);
+    pvec2 c = pvec2(par);
+
+    uint i = iterations;
+    for (; i > 0; --i) {
+        pvec2 x2 = x * x;
+
+        // |x| > 2
+        if (x2.x + x2.y > 4) {
+            break;
+        }
+
+        // (x, y)^2 == (x * x - y * y, 2 * x * y)
+        x.y = 2 * x.x * x.y;
+        x.x = x2.x - x2.y;
+
+        x += c;
+    }
+    
+    if (i <= 0) {
+        frag_color = vec4(0, 0, 0, 1);
+    } else {
+        frag_color = texture(gradient, (iterations - i) / color_count);
+    }
+}

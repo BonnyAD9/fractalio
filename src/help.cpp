@@ -32,8 +32,6 @@ constexpr std::string_view HELP_TEXT = R".(HELP
     `;`    Repeat the last command.
     `::`<characters>
            Simulate the press of the following characters.
-    `g`<char>
-           Go to the given fractal. `h` - help, `m` - mandelbrot set.
     `z`    Set scale.
     `i`    Set number of iterations.
     `c`    Set number of colors.
@@ -41,6 +39,16 @@ constexpr std::string_view HELP_TEXT = R".(HELP
     `y`    Set y (imaginary) coordinate.
     `:vsync`  `on`/`off`
            Enable/disable vsync.
+    `g`<char>
+           Go to the given fractal:
+             `h`: Help.
+             `m`: Mandelbrot set.
+             `j`: Julia set.
+    <number>`G`
+           Go to fractal/page identified by number:
+             0: Help
+             1: Mandelbrot set
+             2: Julia set
 ).";
 
 Help::Help(const TextRenderer &text) : _text(text) {

@@ -117,6 +117,10 @@ static inline void uniform(GLint location, glm::dvec2 value) {
     glUniform2d(location, value.x, value.y);
 }
 
+static inline void uniform(GLint location, glm::vec2 value) {
+    glUniform2f(location, value.x, value.y);
+}
+
 static inline void uniform(GLint location, glm::vec3 value) {
     glUniform3f(location, value.x, value.y, value.z);
 }

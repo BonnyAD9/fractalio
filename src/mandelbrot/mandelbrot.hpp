@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../complex_fractal/complex_fractal.hpp"
-
-#include <glm/glm.hpp>
+#include "../df_shader_program.hpp"
 
 namespace fio {
 
-class Mandelbrot : public ComplexFractal {
+class Mandelbrot : public ComplexFractal<DFShaderProgram> {
 public:
     Mandelbrot();
 

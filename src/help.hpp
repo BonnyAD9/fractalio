@@ -14,7 +14,7 @@ public:
         _text.resize(of);
     }
 
-    void drag(glm::dvec2 delta) override {
+    void move(glm::dvec2 delta) override {
         _position += delta;
         _text.set_transform(
             glm::translate(glm::identity<glm::mat4>(), { _position, 0 })

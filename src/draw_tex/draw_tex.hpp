@@ -2,7 +2,6 @@
 
 #include "../fractal.hpp"
 #include "../gl/buffer.hpp"
-#include "../gl/gl.hpp"
 #include "../gl/program.hpp"
 #include "../gl/texture.hpp"
 #include "../gl/vertex_array.hpp"
@@ -23,7 +22,6 @@ public:
         _texture.bind(GL_TEXTURE_2D);
     }
 
-    void drag(glm::dvec2) override { }
     void scale(double) override { }
     void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) override;
 

@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "commander.hpp"
+#include "drag_listener.hpp"
 #include "font.hpp"
 #include "fractal.hpp"
 #include "glfw/window.hpp"
@@ -42,9 +43,12 @@ private:
 
     glm::vec2 _wsize;
 
+    DragListener *_drag = nullptr;
+
     void init_fractals();
     void size_callback(int width, int height);
     void mouse_move_callback(double x, double y);
+    void mouse_press_callback(int button, int action, int mods);
     void scroll_callback(double dx, double dy);
     void key_callback(int key, int scancode, int action, int mods);
     void char_callback(unsigned code);

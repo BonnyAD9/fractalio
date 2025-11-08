@@ -32,6 +32,7 @@ public:
         glfwSetScrollCallback(get(), scroll_callback_inner);
         glfwSetCharCallback(get(), char_callback_inner);
         glfwSetKeyCallback(get(), key_callback_inner);
+        glfwSetMouseButtonCallback(get(), mouse_press_callback_inner);
         glfwSetWindowSizeLimits(
             get(), 300, 100, GLFW_DONT_CARE, GLFW_DONT_CARE
         );
@@ -63,6 +64,10 @@ public:
         _key_callback = std::move(f);
     }
 
+    void set_mouse_press_callback(std::function<void(int, int, int)> f) {
+        _mouse_press_callback = std::move(f);
+    }
+
     void set_should_close(bool value) {
         glfwSetWindowShouldClose(get(), value ? GLFW_TRUE : GLFW_FALSE);
     }
@@ -84,6 +89,7 @@ private:
     std::optional<std::function<void(double, double)>> _scroll_callback;
     std::optional<std::function<void(unsigned)>> _char_callback;
     std::optional<std::function<void(int, int, int, int)>> _key_callback;
+    std::optional<std::function<void(int, int, int)>> _mouse_press_callback;
 
     static void size_callback_inner(
         GLFWwindow *window, int width, int height
@@ -129,6 +135,18 @@ private:
         if (win->_key_callback) {
             log_err([&]() {
                 (*win->_key_callback)(key, scancode, action, mods);
+            });
+        }
+    }
+
+    static void mouse_press_callback_inner(
+        GLFWwindow *window, int button, int action, int mods
+    ) {
+        auto win =
+            reinterpret_cast<Window *>(glfwGetWindowUserPointer(window));
+        if (win->_char_callback) {
+            log_err([&]() {
+                (*win->_mouse_press_callback)(button, action, mods);
             });
         }
     }

@@ -1,4 +1,4 @@
-#include "mandelbrot.hpp"
+#include "mandel_picker.hpp"
 
 namespace fio {
 
@@ -8,6 +8,7 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-Mandelbrot::Mandelbrot() : ComplexFractal(FRAGMENT_SHADER) { }
+MandelPicker::MandelPicker(DFShaderProgram &program) :
+    ParPicker(FRAGMENT_SHADER, program) { }
 
 } // namespace fio
