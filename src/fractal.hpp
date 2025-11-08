@@ -24,6 +24,7 @@ public:
         MANDELBROT,
         JULIA,
         BURNING_SHIP,
+        POWERBROT,
     };
 
     virtual void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) = 0;

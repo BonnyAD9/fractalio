@@ -18,6 +18,7 @@
 #include "julia/julia.hpp"
 #include "mandelbrot/mandelbrot.hpp"
 #include "maps.hpp"
+#include "powerbrot/powerbrot.hpp"
 
 #include <glm/ext/matrix_transform.hpp>
 
@@ -148,6 +149,7 @@ void Fractalio::init_fractals() {
     _fractals[Fractal::Type::MANDELBROT] = std::make_unique<Mandelbrot>();
     _fractals[Fractal::Type::JULIA] = std::make_unique<Julia>();
     _fractals[Fractal::Type::BURNING_SHIP] = std::make_unique<BurningShip>();
+    _fractals[Fractal::Type::POWERBROT] = std::make_unique<Powerbrot>();
 
     _active = _fractals[Fractal::Type::MANDELBROT].get();
     _focus = _active;
