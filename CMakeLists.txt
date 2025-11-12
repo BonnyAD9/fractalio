@@ -21,7 +21,7 @@ FetchContent_MakeAvailable(glad)
 
 add_executable(fractalio)
 
-file(GLOB fractalio_files CONFIGURE_DEPENDS "src/**/*.cpp" "src/*.cpp")
+file(GLOB fractalio_files CONFIGURE_DEPENDS "src/**/**/*.cpp" "src/**/*.cpp" "src/*.cpp")
 target_sources(fractalio PRIVATE ${fractalio_files})
 
 find_package(glfw3 REQUIRED)

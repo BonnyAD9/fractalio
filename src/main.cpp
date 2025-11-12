@@ -4,7 +4,7 @@
 #include <print>
 #include <string_view>
 
-#include "fractalio.hpp"
+#include "app/fractalio.hpp"
 #include "gl/gl.hpp"
 #include "glad.hpp"
 #include "glfw/runner.hpp"
@@ -51,7 +51,7 @@ static void run() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(err_callback, nullptr);
 
-    Fractalio app(std::move(window));
+    app::Fractalio app(std::move(window));
     app.mainloop();
 }
 
