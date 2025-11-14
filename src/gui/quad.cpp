@@ -1,5 +1,7 @@
 #include "quad.hpp"
 
+#include <functional>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -24,7 +26,8 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-Quad::Quad(glm::vec4 color) {
+Quad::Quad(glm::vec4 color, std::function<glm::mat3x2(glm::vec2)> s_fun) :
+    _s_fun(std::move(s_fun)) {
     gl::Shader vert(GL_VERTEX_SHADER);
     vert.compile(VERTEX_SHADER);
     gl::Shader frag(GL_FRAGMENT_SHADER);
@@ -51,8 +54,11 @@ Quad::Quad(glm::vec4 color) {
     gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, INDICES);
 }
 
-void Quad::resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) {
-    auto end = pos + size;
+void Quad::resize(glm::vec2 size) {
+    auto sizes = _s_fun(size);
+    glm::vec2 pos = sizes[0];
+    glm::vec2 of = sizes[2];
+    auto end = pos + sizes[1];
 
     _vertices = {
         pos.x, pos.y, pos.x, end.y, end.x, end.y, end.x, pos.y,

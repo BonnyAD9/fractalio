@@ -13,7 +13,10 @@ namespace fio::fractals {
 
 class Julia : public ComplexFractal<gl::DFShaderProgram> {
 public:
-    Julia();
+    Julia(
+        std::function<glm::mat3x2(glm::vec2)> s_fun,
+        std::function<glm::mat3x2(glm::vec2)> sp_fun
+    );
 
     std::string describe() override {
         auto par = _picker->par();

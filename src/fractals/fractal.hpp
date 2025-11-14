@@ -27,7 +27,7 @@ public:
         POWERBROT,
     };
 
-    virtual void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) = 0;
+    virtual void resize(glm::vec2 size) = 0;
     virtual void draw() = 0;
     virtual void use() = 0;
 

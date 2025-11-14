@@ -10,9 +10,7 @@ class Help : public Fractal {
 public:
     Help(const gui::Text &text_cfg);
 
-    void resize(glm::vec2, glm::vec2, glm::vec2 of) override {
-        _text.resize(of);
-    }
+    void resize(glm::vec2 size) override { _text.resize(size); }
 
     void move(glm::dvec2 delta) override {
         _position += delta;

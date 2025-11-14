@@ -8,6 +8,7 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-Mandelbrot::Mandelbrot() : ComplexFractal(FRAGMENT_SHADER) { }
+Mandelbrot::Mandelbrot(std::function<glm::mat3x2(glm::vec2)> s_fun) :
+    ComplexFractal(FRAGMENT_SHADER, std::move(s_fun)) { }
 
 } // namespace fio::fractals

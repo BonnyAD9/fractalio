@@ -20,7 +20,10 @@ public:
     static constexpr GLuint DEFAULT_ITERATIONS = 256;
     static constexpr float DEFAULT_COLOR_COUNT = 256;
 
-    ComplexFractal(const char *df_frag) {
+    ComplexFractal(
+        const char *df_frag, std::function<glm::mat3x2(glm::vec2)> s_fun
+    ) :
+        _s_fun(std::move(s_fun)) {
         _program.compile(vertex_shader(), df_frag);
         _program.use();
 
@@ -56,14 +59,16 @@ public:
         gl::tex_image_1d(grad);
     };
 
-    void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) override {
-        _wsizex = size.x;
-        _size = size;
-        _top_left = pos;
+    void resize(glm::vec2 size) override {
+        auto sizes = _s_fun(size);
+        _size = sizes[1];
+        _top_left = sizes[0];
+        glm::vec2 of = sizes[2];
+        glm::vec2 pos = sizes[0];
 
-        auto end = pos + size;
+        auto end = pos + glm::vec2(_size);
 
-        const float h = size.y / size.x * 2;
+        const float h = _size.y / _size.x * 2;
         _vertices = {
             pos.x, pos.y, /* */ -2, h,  // TL
             pos.x, end.y, /* */ -2, -h, // BL
@@ -90,7 +95,7 @@ public:
 
     void move(glm::dvec2 delta) override {
         delta.y = -delta.y;
-        _center -= delta / _wsizex * 4. * _scale;
+        _center -= delta / _size.x * 4. * _scale;
         _program.uniform(_loc_center, _center);
     }
 
@@ -181,7 +186,7 @@ protected:
 
     [[nodiscard]]
     constexpr double wsizex() const {
-        return _wsizex;
+        return _size.x;
     }
 
 private:
@@ -210,7 +215,8 @@ private:
     gl::Buffer _ebo;
     gl::Texture _texture;
 
-    double _wsizex = 0;
+    std::function<glm::mat3x2(glm::vec2)> _s_fun;
+
     glm::dvec2 _size;
     glm::dvec2 _top_left;
 

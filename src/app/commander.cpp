@@ -42,7 +42,11 @@ split_short_cmd(std::string_view cmd) {
 }
 
 Commander::Commander(Fractalio &app, const gui::Text &text_cfg) :
-    _app(app), _input(text_cfg), _bg(Fractalio::DEFAULT_CLEAR_COLOR) { }
+    _app(app),
+    _input(text_cfg),
+    _bg(Fractalio::DEFAULT_CLEAR_COLOR, [=](glm::vec2 size) -> glm::mat3x2 {
+        return { { 0, size.y - 25 }, { size.x, 25 }, size };
+    }) { }
 
 void Commander::cancel() {
     if (_text.empty()) {
@@ -89,7 +93,7 @@ void Commander::draw() {
 void Commander::resize(glm::vec2 size) {
     _wsize = size;
     _bg.use();
-    _bg.resize({ 0, _wsize.y - 25 }, { _wsize.x, 25 }, _wsize);
+    _bg.resize(size);
 
     _input.use();
     auto pos = _text.contains(':')

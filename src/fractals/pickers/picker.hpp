@@ -1,5 +1,8 @@
 #pragma once
 
+#include <iostream>
+#include <print>
+
 #include "../../gl/df_shader_program.hpp"
 #include "../../gl/program.hpp"
 #include "../complex_fractal.hpp"
@@ -11,8 +14,12 @@ namespace fio::fractals::pickers {
 
 class Picker : public ComplexFractal<gl::Program> {
 public:
-    Picker(const char *frag, gl::DFShaderProgram &program) :
-        ComplexFractal(frag), _that_program(program) {
+    Picker(
+        const char *frag,
+        gl::DFShaderProgram &program,
+        std::function<glm::mat3x2(glm::vec2)> s_fun
+    ) :
+        ComplexFractal(frag, std::move(s_fun)), _that_program(program) {
         auto &prog = this->program();
         prog.use();
         _loc_this_par = prog.uniform_location("par");

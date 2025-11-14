@@ -28,7 +28,14 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-DrawTex::DrawTex(const std::uint8_t *data, GLsizei w, GLsizei h, GLenum typ) {
+DrawTex::DrawTex(
+    const std::uint8_t *data,
+    GLsizei w,
+    GLsizei h,
+    GLenum typ,
+    std::function<glm::mat3x2(glm::vec2)> s_fun
+) :
+    _s_fun(s_fun) {
     gl::Shader vert(GL_VERTEX_SHADER);
     vert.compile(VERTEX_SHADER);
     gl::Shader frag(GL_FRAGMENT_SHADER);
@@ -66,8 +73,11 @@ void DrawTex::draw() {
     gl::draw_elements(GL_TRIANGLES, INDICES.size(), GL_UNSIGNED_INT, 0);
 }
 
-void DrawTex::resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) {
-    auto end = pos + size;
+void DrawTex::resize(glm::vec2 size) {
+    auto sizes = _s_fun(size);
+    glm::vec2 pos = sizes[0];
+    glm::vec2 of = sizes[2];
+    auto end = pos + sizes[1];
 
     _vertices = {
         pos.x, pos.y, /* */ 0, 0, // TL

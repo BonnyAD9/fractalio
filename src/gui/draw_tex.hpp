@@ -12,7 +12,13 @@ namespace fio::gui {
 
 class DrawTex : public fractals::Fractal {
 public:
-    DrawTex(const std::uint8_t *data, GLsizei w, GLsizei h, GLenum typ);
+    DrawTex(
+        const std::uint8_t *data,
+        GLsizei w,
+        GLsizei h,
+        GLenum typ,
+        std::function<glm::mat3x2(glm::vec2)> s_fun
+    );
 
     void draw() override;
 
@@ -23,7 +29,7 @@ public:
     }
 
     void scale(double) override { }
-    void resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) override;
+    void resize(glm::vec2 size) override;
 
     std::string describe() override { return "Texture view"; }
 
@@ -33,6 +39,8 @@ private:
     gl::Buffer _vbo;
     gl::Buffer _ebo;
     gl::Texture _texture;
+
+    std::function<glm::mat3x2(glm::vec2)> _s_fun;
 
     GLint _loc_proj;
 

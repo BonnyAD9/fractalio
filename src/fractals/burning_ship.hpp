@@ -7,7 +7,7 @@ namespace fio::fractals {
 
 class BurningShip : public ComplexFractal<gl::DFShaderProgram> {
 public:
-    BurningShip();
+    BurningShip(std::function<glm::mat3x2(glm::vec2)> s_fun);
 
     std::string describe() override { return describe_part("Burning ship"); }
 };

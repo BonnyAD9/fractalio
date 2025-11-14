@@ -13,7 +13,10 @@ namespace fio::fractals {
 
 class Powerbrot : public ComplexFractal<gl::DFShaderProgram> {
 public:
-    Powerbrot();
+    Powerbrot(
+        std::function<glm::mat3x2(glm::vec2)> s_fun,
+        std::function<glm::mat3x2(glm::vec2)> sp_fun
+    );
 
     std::string describe() override {
         auto par = _picker->par();

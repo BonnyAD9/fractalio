@@ -60,15 +60,11 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     init_fractals();
 
     _active->use();
-    _active->resize({ 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size);
+    _active->resize(size);
     auto picker = _active->picker();
     if (picker) {
         picker->use();
-        picker->resize(
-            { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE - SIDE_WIDTH },
-            { SIDE_WIDTH, SIDE_WIDTH },
-            _wsize
-        );
+        picker->resize(_wsize);
     }
 
     const glm::vec2 side_start{ _wsize.x - SIDE_WIDTH + 10, 20 };
@@ -148,16 +144,27 @@ void Fractalio::mainloop() {
 }
 
 void Fractalio::init_fractals() {
+    std::function<glm::mat3x2(glm::vec2)> s_fun =
+        [=](glm::vec2 size) -> glm::mat3x2 {
+        return { { 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size };
+    };
+    std::function<glm::mat3x2(glm::vec2)> sp_fun =
+        [=](glm::vec2 size) -> glm::mat3x2 {
+        return { { size.x - SIDE_WIDTH,
+                   size.y - FONT_SIZE * 1.5 - SIDE_WIDTH },
+                 { SIDE_WIDTH, SIDE_WIDTH },
+                 size };
+    };
     _fractals[fractals::Fractal::Type::HELP] =
         std::make_unique<fractals::Help>(_info);
     _fractals[fractals::Fractal::Type::MANDELBROT] =
-        std::make_unique<fractals::Mandelbrot>();
+        std::make_unique<fractals::Mandelbrot>(s_fun);
     _fractals[fractals::Fractal::Type::JULIA] =
-        std::make_unique<fractals::Julia>();
+        std::make_unique<fractals::Julia>(s_fun, sp_fun);
     _fractals[fractals::Fractal::Type::BURNING_SHIP] =
-        std::make_unique<fractals::BurningShip>();
+        std::make_unique<fractals::BurningShip>(s_fun);
     _fractals[fractals::Fractal::Type::POWERBROT] =
-        std::make_unique<fractals::Powerbrot>();
+        std::make_unique<fractals::Powerbrot>(s_fun, sp_fun);
 
     _active = _fractals[fractals::Fractal::Type::MANDELBROT].get();
     _focus = _active;
@@ -168,15 +175,11 @@ void Fractalio::size_callback(int width, int height) {
     _wsize = { width, height };
 
     _active->use();
-    _active->resize({ 0, 0 }, { width - SIDE_WIDTH, height }, _wsize);
+    _active->resize(_wsize);
     auto picker = _active->picker();
     if (picker) {
         picker->use();
-        picker->resize(
-            { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE * 1.5 - SIDE_WIDTH },
-            { SIDE_WIDTH, SIDE_WIDTH },
-            _wsize
-        );
+        picker->resize(_wsize);
     }
 
     _info.use();
@@ -300,16 +303,12 @@ void Fractalio::activate(fractals::Fractal::Type typ) {
     _active = _fractals[typ].get();
     _focus = _active;
     _active->use();
-    _active->resize({ 0, 0 }, { _wsize.x - SIDE_WIDTH, _wsize.y }, _wsize);
+    _active->resize(_wsize);
     _new_info = true;
     auto picker = _active->picker();
     if (picker) {
         picker->use();
-        picker->resize(
-            { _wsize.x - SIDE_WIDTH, _wsize.y - FONT_SIZE * 1.5 - SIDE_WIDTH },
-            { SIDE_WIDTH, SIDE_WIDTH },
-            _wsize
-        );
+        picker->resize(_wsize);
     }
 }
 

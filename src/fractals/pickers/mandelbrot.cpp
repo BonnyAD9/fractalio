@@ -8,7 +8,9 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-Mandelbrot::Mandelbrot(gl::DFShaderProgram &program) :
-    Picker(FRAGMENT_SHADER, program) { }
+Mandelbrot::Mandelbrot(
+    gl::DFShaderProgram &program, std::function<glm::mat3x2(glm::vec2)> s_fun
+) :
+    Picker(FRAGMENT_SHADER, program, std::move(s_fun)) { }
 
 } // namespace fio::fractals::pickers

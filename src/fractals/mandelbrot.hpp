@@ -7,7 +7,7 @@ namespace fio::fractals {
 
 class Mandelbrot : public ComplexFractal<gl::DFShaderProgram> {
 public:
-    Mandelbrot();
+    Mandelbrot(std::function<glm::mat3x2(glm::vec2)> s_fun);
 
     std::string describe() override { return describe_part("Mandelbrot set"); }
 };
