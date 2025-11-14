@@ -93,10 +93,9 @@ void Fractalio::mainloop() {
 
     double last_time = glfwGetTime();
     double next_fps = 0;
+    int fcnt = 0;
     while (!_window->should_close()) {
         const double time = glfwGetTime();
-        const double delta_time = time - last_time;
-        last_time = time;
 
         process_input();
 
@@ -111,14 +110,18 @@ void Fractalio::mainloop() {
             _new_info = false;
         }
 
-        if (last_time > next_fps) {
+        if (time > next_fps) {
+            const double delta_time = time - last_time;
+            last_time = time;
             _fps_text.clear_text();
-            auto fps = std::format("FPS: {}", std::size_t(1 / delta_time));
+            auto fps = std::format("FPS: {}", std::size_t(fcnt / delta_time));
             _fps_text.add_text(fps, { 0, 0 });
             _fps_text.use();
             _fps_text.prepare();
             next_fps = last_time + FPS_INTERVAL;
+            fcnt = 0;
         }
+        fcnt += 1;
 
         _commander.prepare();
 
