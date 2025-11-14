@@ -1,9 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include <print>
-
 #include "../../gl/df_shader_program.hpp"
+#include "../../gl/gl.hpp"
 #include "../../gl/program.hpp"
 #include "../complex_fractal.hpp"
 #include "../fractal.hpp"
@@ -38,12 +36,13 @@ public:
         return (_par - center()) / ComplexFractal::scale();
     }
 
-    void drag_start(int button, int, glm::dvec2 pos) override {
+    void drag_start(int button, int mod, glm::dvec2 pos) override {
         switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: {
             auto d = to_part_complex(pos) - par_inv();
             if (d.x * d.x + d.y * d.y < 0.004) {
                 drag_mode(DragMode::PARAMETER);
+                _x_only = (mod & GLFW_MOD_SHIFT) == GLFW_MOD_SHIFT;
             } else {
                 drag_mode(DragMode::MOVE);
             }
@@ -68,6 +67,9 @@ public:
             scale(delta.y);
             break;
         case DragMode::PARAMETER: {
+            if (_x_only) {
+                delta.y = 0;
+            }
             delta.y = -delta.y;
             _par += delta / wsizex() * 4. * ComplexFractal::scale();
             auto &prog = this->program();
@@ -111,6 +113,7 @@ private:
     gl::DFShaderProgram &_that_program;
 
     glm::dvec2 _par{ 0, 0 };
+    bool _x_only;
     GLint _loc_this_par;
     glm::ivec2 _loc_that_par;
 };
