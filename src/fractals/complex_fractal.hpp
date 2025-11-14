@@ -4,11 +4,11 @@
 #include <format>
 #include <string_view>
 
-#include "fractal.hpp"
 #include "../gl/buffer.hpp"
 #include "../gl/texture.hpp"
 #include "../gl/vertex_array.hpp"
 #include "../gradient.hpp"
+#include "fractal.hpp"
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/fwd.hpp>
@@ -232,4 +232,4 @@ private:
     };
 };
 
-}; // namespace fio
+}; // namespace fio::fractals

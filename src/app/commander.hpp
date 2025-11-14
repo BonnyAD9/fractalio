@@ -43,4 +43,4 @@ private:
     bool _new_input = true;
 };
 
-} // namespace fio
+} // namespace fio::app

@@ -347,4 +347,4 @@ void Commander::execute_command(std::string_view whole_cmd) {
     _last = whole_cmd;
 }
 
-} // namespace fio
+} // namespace fio::app

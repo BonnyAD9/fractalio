@@ -10,4 +10,4 @@ static constexpr char FRAGMENT_SHADER[]{
 
 BurningShip::BurningShip() : ComplexFractal(FRAGMENT_SHADER) { }
 
-} // namespace fio
+} // namespace fio::fractals

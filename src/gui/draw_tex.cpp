@@ -81,4 +81,4 @@ void DrawTex::resize(glm::vec2 pos, glm::vec2 size, glm::vec2 of) {
     glEnableVertexAttribArray(LOCATION);
 }
 
-} // namespace fio
+} // namespace fio::gui

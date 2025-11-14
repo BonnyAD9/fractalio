@@ -3,8 +3,8 @@
 #include <functional>
 #include <string>
 
-#include "../gui/drag_listener.hpp"
 #include "../gl/gl.hpp"
+#include "../gui/drag_listener.hpp"
 
 #include <glm/glm.hpp>
 
@@ -81,6 +81,11 @@ public:
         }
     }
 
+    void scroll(glm::dvec2, glm::dvec2 delta) override {
+        use();
+        scale(8 * delta.y);
+    }
+
     virtual void move(glm::dvec2 delta) { (void)delta; }
 
     virtual void scale(double delta) { (void)delta; }
@@ -124,4 +129,4 @@ private:
     DragMode _drag_mode = DragMode::NONE;
 };
 
-} // namespace fio
+} // namespace fio::fractals

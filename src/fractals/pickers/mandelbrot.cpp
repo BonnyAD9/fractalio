@@ -11,4 +11,4 @@ static constexpr char FRAGMENT_SHADER[]{
 Mandelbrot::Mandelbrot(gl::DFShaderProgram &program) :
     Picker(FRAGMENT_SHADER, program) { }
 
-} // namespace fio
+} // namespace fio::fractals::pickers

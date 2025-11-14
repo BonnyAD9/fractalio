@@ -15,8 +15,7 @@ namespace fio::gui {
 class Text {
 public:
     Text(ft::Font &font, float line_height);
-    explicit Text(const Text &conf) :
-        Text(conf._font, conf._line_h) { }
+    explicit Text(const Text &conf) : Text(conf._font, conf._line_h) { }
 
     void use() {
         _program.use();
@@ -71,4 +70,4 @@ private:
     void add_glyph(ft::Font::Glyph &glyph);
 };
 
-} // namespace fio
+} // namespace fio::gui

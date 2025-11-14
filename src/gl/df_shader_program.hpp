@@ -2,8 +2,8 @@
 
 #include <string_view>
 
-#include "program.hpp"
 #include "gl.hpp"
+#include "program.hpp"
 
 #include <glm/glm.hpp>
 
@@ -62,4 +62,4 @@ private:
     bool _is_double = false;
 };
 
-} // namespace fio
+} // namespace fio::gl

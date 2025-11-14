@@ -34,4 +34,4 @@ private:
     std::array<float, 8> _vertices{};
 };
 
-} // namespace fio
+} // namespace fio::gui

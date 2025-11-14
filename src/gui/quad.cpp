@@ -69,4 +69,4 @@ void Quad::draw() {
     gl::draw_elements(GL_TRIANGLES, INDICES.size(), GL_UNSIGNED_INT, 0);
 }
 
-} // namespace fio
+} // namespace fio::gui

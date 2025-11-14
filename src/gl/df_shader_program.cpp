@@ -80,4 +80,4 @@ static void process_defines(
     }
 }
 
-} // namespace fio
+} // namespace fio::gl

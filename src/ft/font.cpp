@@ -106,4 +106,4 @@ static std::string find_font(const char *name) {
     return { reinterpret_cast<const char *>(v.u.f) };
 }
 
-} // namespace fio
+} // namespace fio::ft

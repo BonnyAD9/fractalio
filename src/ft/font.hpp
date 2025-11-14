@@ -68,4 +68,4 @@ private:
     glm::uvec2 add_render(std::uint8_t *data, glm::uvec2 size);
 };
 
-} // namespace fio
+} // namespace fio::ft

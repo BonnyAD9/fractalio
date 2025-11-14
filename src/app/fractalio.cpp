@@ -11,14 +11,14 @@
 #include <GLFW/glfw3.h>
 
 #include "../fractals/burning_ship.hpp"
-#include "commander.hpp"
-#include "../ft/font.hpp"
-#include "../gl/gl.hpp"
 #include "../fractals/help.hpp"
 #include "../fractals/julia.hpp"
 #include "../fractals/mandelbrot.hpp"
-#include "maps.hpp"
 #include "../fractals/powerbrot.hpp"
+#include "../ft/font.hpp"
+#include "../gl/gl.hpp"
+#include "commander.hpp"
+#include "maps.hpp"
 
 #include <glm/ext/matrix_transform.hpp>
 
@@ -145,11 +145,16 @@ void Fractalio::mainloop() {
 }
 
 void Fractalio::init_fractals() {
-    _fractals[fractals::Fractal::Type::HELP] = std::make_unique<fractals::Help>(_info);
-    _fractals[fractals::Fractal::Type::MANDELBROT] = std::make_unique<fractals::Mandelbrot>();
-    _fractals[fractals::Fractal::Type::JULIA] = std::make_unique<fractals::Julia>();
-    _fractals[fractals::Fractal::Type::BURNING_SHIP] = std::make_unique<fractals::BurningShip>();
-    _fractals[fractals::Fractal::Type::POWERBROT] = std::make_unique<fractals::Powerbrot>();
+    _fractals[fractals::Fractal::Type::HELP] =
+        std::make_unique<fractals::Help>(_info);
+    _fractals[fractals::Fractal::Type::MANDELBROT] =
+        std::make_unique<fractals::Mandelbrot>();
+    _fractals[fractals::Fractal::Type::JULIA] =
+        std::make_unique<fractals::Julia>();
+    _fractals[fractals::Fractal::Type::BURNING_SHIP] =
+        std::make_unique<fractals::BurningShip>();
+    _fractals[fractals::Fractal::Type::POWERBROT] =
+        std::make_unique<fractals::Powerbrot>();
 
     _active = _fractals[fractals::Fractal::Type::MANDELBROT].get();
     _focus = _active;
@@ -225,16 +230,26 @@ void Fractalio::mouse_press_callback(int button, int action, int mods) {
 
     if (_drag) {
         _drag->drag_start(button, mods, _last_mouse_pos);
+        _new_info = true;
     }
 }
 
-void Fractalio::scroll_callback(double, double dy) {
-    if (!_active) {
-        return;
+void Fractalio::scroll_callback(double dx, double dy) {
+    auto bot_size = _wsize.y - FONT_SIZE * 1.5;
+
+    if (_last_mouse_pos.x < _wsize.x - SIDE_WIDTH) {
+        _drag = _active;
+    } else if (_last_mouse_pos.y > bot_size - SIDE_WIDTH &&
+               _last_mouse_pos.y < bot_size) {
+        if (_active) {
+            _drag = _active->picker();
+        }
     }
 
-    _active->use();
-    _active->scale(dy * 8);
+    if (_drag) {
+        _drag->scroll(_last_mouse_pos, { dx, dy });
+        _new_info = true;
+    }
 }
 
 void Fractalio::key_callback(int key, int scancode, int action, int mods) {
@@ -295,4 +310,4 @@ void Fractalio::activate(fractals::Fractal::Type typ) {
     }
 }
 
-} // namespace fio
+} // namespace fio::app

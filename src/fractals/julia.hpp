@@ -3,8 +3,8 @@
 #include <format>
 #include <memory>
 
-#include "complex_fractal.hpp"
 #include "../gl/df_shader_program.hpp"
+#include "complex_fractal.hpp"
 #include "pickers/picker.hpp"
 
 #include <glm/glm.hpp>
@@ -35,4 +35,4 @@ private:
     std::unique_ptr<pickers::Picker> _picker;
 };
 
-} // namespace fio
+} // namespace fio::fractals

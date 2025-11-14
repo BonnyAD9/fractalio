@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../complex_fractal.hpp"
 #include "../../gl/df_shader_program.hpp"
-#include "../fractal.hpp"
 #include "../../gl/program.hpp"
+#include "../complex_fractal.hpp"
+#include "../fractal.hpp"
 
 #include <glm/glm.hpp>
 
@@ -108,4 +108,4 @@ private:
     glm::ivec2 _loc_that_par;
 };
 
-} // namespace fio
+} // namespace fio::fractals::pickers

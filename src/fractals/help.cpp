@@ -63,4 +63,4 @@ Help::Help(const gui::Text &text_cfg) : _text(text_cfg) {
     _text.prepare();
 }
 
-} // namespace fio
+} // namespace fio::fractals

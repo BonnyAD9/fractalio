@@ -10,4 +10,4 @@ static constexpr char FRAGMENT_SHADER[]{
 
 Mandelbrot::Mandelbrot() : ComplexFractal(FRAGMENT_SHADER) { }
 
-} // namespace fio
+} // namespace fio::fractals

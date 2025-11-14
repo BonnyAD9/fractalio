@@ -65,4 +65,4 @@ static inline std::function<T(T)> modified(
     }
 }
 
-} // namespace fio::maps
+} // namespace fio::app::maps

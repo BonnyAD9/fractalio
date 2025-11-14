@@ -119,4 +119,4 @@ void Text::add_glyph(ft::Font::Glyph &glyph) {
     );
 }
 
-} // namespace fio
+} // namespace fio::gui

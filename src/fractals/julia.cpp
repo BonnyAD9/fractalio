@@ -16,4 +16,4 @@ Julia::Julia() : ComplexFractal(FRAGMENT_SHADER) {
     _picker = std::make_unique<pickers::Mandelbrot>(program());
 }
 
-} // namespace fio
+} // namespace fio::fractals

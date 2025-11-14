@@ -1,7 +1,7 @@
 #pragma once
 
-#include "fractal.hpp"
 #include "../gui/text.hpp"
+#include "fractal.hpp"
 
 #include <glm/ext/matrix_transform.hpp>
 namespace fio::fractals {
@@ -55,4 +55,4 @@ private:
     glm::vec2 _position{ 0, 0 };
 };
 
-} // namespace fio
+} // namespace fio::fractals

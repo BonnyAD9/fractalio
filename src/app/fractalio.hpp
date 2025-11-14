@@ -2,12 +2,12 @@
 
 #include <memory>
 
-#include "commander.hpp"
-#include "../gui/drag_listener.hpp"
-#include "../ft/font.hpp"
 #include "../fractals/fractal.hpp"
+#include "../ft/font.hpp"
 #include "../glfw/window.hpp"
+#include "../gui/drag_listener.hpp"
 #include "../gui/text.hpp"
+#include "commander.hpp"
 
 namespace fio::app {
 
@@ -30,7 +30,10 @@ private:
     static constexpr glm::vec4 DEFAULT_CLEAR_COLOR{ 0.1, 0.1, 0.1, 1 };
 
     std::unique_ptr<glfw::Window> _window;
-    std::unordered_map<fractals::Fractal::Type, std::unique_ptr<fractals::Fractal>> _fractals;
+    std::unordered_map<
+        fractals::Fractal::Type,
+        std::unique_ptr<fractals::Fractal>>
+        _fractals;
     fractals::Fractal *_active = nullptr;
     fractals::Fractal *_focus = nullptr;
     glm::dvec2 _last_mouse_pos;
@@ -59,4 +62,4 @@ private:
     void activate(fractals::Fractal::Type typ);
 };
 
-} // namespace fio
+} // namespace fio::app
