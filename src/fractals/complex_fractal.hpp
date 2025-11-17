@@ -154,6 +154,20 @@ public:
         _program.uniform(_loc_center, _center);
     }
 
+    void map_parameter_x(const std::function<double(double)> &map) override {
+        auto p = picker();
+        if (p) {
+            p->map_parameter_x(map);
+        }
+    }
+
+    void map_parameter_y(const std::function<double(double)> &map) override {
+        auto p = picker();
+        if (p) {
+            p->map_parameter_y(map);
+        }
+    }
+
 protected:
     virtual std::string describe_part(std::string_view name) {
         return std::format(

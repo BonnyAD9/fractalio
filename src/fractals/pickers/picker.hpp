@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "../../gl/df_shader_program.hpp"
 #include "../../gl/gl.hpp"
 #include "../../gl/program.hpp"
@@ -28,9 +30,11 @@ public:
     }
 
     [[nodiscard]]
-    constexpr glm::vec2 par() const {
+    constexpr glm::dvec2 par() const {
         return _par;
     }
+
+    constexpr void par(glm::dvec2 p) { _par = p; }
 
     glm::dvec2 par_inv() {
         return (_par - center()) / ComplexFractal::scale();
@@ -107,6 +111,32 @@ public:
             _par.y
         );
         return desc;
+    }
+
+    void map_parameter_x(const std::function<double(double)> &map) override {
+        auto nx = map(_par.x);
+        if (std::isnan(nx)) {
+            _par.x = 0;
+        } else {
+            _par.x = nx;
+        }
+        auto &prog = this->program();
+        prog.use();
+        prog.uniform(_loc_this_par, glm::vec2(par_inv()));
+        _that_program.uniform(_loc_that_par, _par);
+    }
+
+    void map_parameter_y(const std::function<double(double)> &map) override {
+        auto ny = map(_par.y);
+        if (std::isnan(ny)) {
+            _par.y = 0;
+        } else {
+            _par.y = ny;
+        }
+        auto &prog = this->program();
+        prog.use();
+        prog.uniform(_loc_this_par, glm::vec2(par_inv()));
+        _that_program.uniform(_loc_that_par, _par);
     }
 
 private:

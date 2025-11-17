@@ -111,6 +111,14 @@ public:
 
     virtual void map_y(const std::function<double(double)> &map) { (void)map; }
 
+    virtual void map_parameter_x(const std::function<double(double)> &map) {
+        (void)map;
+    }
+
+    virtual void map_parameter_y(const std::function<double(double)> &map) {
+        (void)map;
+    }
+
     virtual Fractal *picker() { return nullptr; }
 
     virtual std::string describe() = 0;

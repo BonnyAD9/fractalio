@@ -3,6 +3,8 @@
 #include <charconv>
 #include <concepts>
 #include <format>
+#include <iostream>
+#include <print>
 #include <stdexcept>
 #include <string_view>
 #include <utility>
@@ -49,6 +51,7 @@ template<FromChars T> T from_arg(std::string_view arg) {
     if (res.ptr != arg.end()) {
         throw std::runtime_error("Failed to parse with from_chars.");
     }
+    return value;
 }
 
 template<typename T, typename... Args>
