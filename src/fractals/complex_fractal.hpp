@@ -63,8 +63,8 @@ public:
         auto sizes = _s_fun(size);
         _size = sizes[1];
         _top_left = sizes[0];
-        glm::vec2 of = sizes[2];
-        glm::vec2 pos = sizes[0];
+        const glm::vec2 of = sizes[2];
+        const glm::vec2 pos = sizes[0];
 
         auto end = pos + glm::vec2(_size);
 

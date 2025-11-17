@@ -1,10 +1,15 @@
 #include "commander.hpp"
 
 #include <algorithm>
+#include <exception>
+#include <iostream>
+#include <print>
 #include <ranges>
 
 #include <GLFW/glfw3.h>
 
+#include "../pareg/pareg.hpp"
+#include "../pareg/split_on_whitespace.hpp"
 #include "fractalio.hpp"
 #include "maps.hpp"
 
@@ -131,17 +136,20 @@ void Commander::char_in(char c) {
 }
 
 void Commander::consume() {
-    execute_command(_text);
+    try {
+        execute_command(_text);
+    } catch (std::exception &ex) {
+        std::println(std::cerr, "Failed to execute command: {}", ex.what());
+    }
     _text.clear();
     _new_input = true;
 }
 
 void Commander::long_command(std::string_view cmd) {
-    auto argss = std::views::split(cmd, ' ');
-    auto args = argss.begin();
+    auto arg = mdt::pareg::SplitWhitespace(cmd);
+    auto args = mdt::pareg::Pareg(arg.begin(), arg.end());
 
     cmd = std::string_view(*args);
-    ++args;
     if (cmd == ":x" || cmd == ":exit" || cmd == ":q" || cmd == ":quit") {
         _app._window->set_should_close(true);
     } else if (cmd.starts_with("::")) {
@@ -156,10 +164,15 @@ void Commander::long_command(std::string_view cmd) {
     } else if (cmd == ":h" || cmd == ":help") {
         _app.activate(fractals::Fractal::Type::HELP);
     } else if (cmd == ":vsync") {
-        if (args == argss.end()) {
-            glfwSwapInterval(0);
+        if (args.empty()) {
+            glfwSwapInterval(1);
+        } else {
+            glfwSwapInterval(
+                args.next_arg<bool, std::string_view, std::string_view>(
+                    "on", "off"
+                )
+            );
         }
-        glfwSwapInterval(std::string_view(*args) != "off");
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
         return;

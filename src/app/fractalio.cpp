@@ -144,11 +144,11 @@ void Fractalio::mainloop() {
 }
 
 void Fractalio::init_fractals() {
-    std::function<glm::mat3x2(glm::vec2)> s_fun =
+    const std::function<glm::mat3x2(glm::vec2)> s_fun =
         [=](glm::vec2 size) -> glm::mat3x2 {
         return { { 0, 0 }, { size.x - SIDE_WIDTH, size.y }, size };
     };
-    std::function<glm::mat3x2(glm::vec2)> sp_fun =
+    const std::function<glm::mat3x2(glm::vec2)> sp_fun =
         [=](glm::vec2 size) -> glm::mat3x2 {
         return { { size.x - SIDE_WIDTH,
                    size.y - FONT_SIZE * 1.5 - SIDE_WIDTH },

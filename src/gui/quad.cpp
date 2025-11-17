@@ -56,8 +56,8 @@ Quad::Quad(glm::vec4 color, std::function<glm::mat3x2(glm::vec2)> s_fun) :
 
 void Quad::resize(glm::vec2 size) {
     auto sizes = _s_fun(size);
-    glm::vec2 pos = sizes[0];
-    glm::vec2 of = sizes[2];
+    const glm::vec2 pos = sizes[0];
+    const glm::vec2 of = sizes[2];
     auto end = pos + sizes[1];
 
     _vertices = {
