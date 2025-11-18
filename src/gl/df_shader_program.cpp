@@ -26,6 +26,12 @@ void DFShaderProgram::compile(
         {
             { "ploat", "float" },
             { "pvec2", "vec2" },
+            { "patan", "atan" },
+            { "pcos", "cos" },
+            { "psin", "sin" },
+            { "pexp", "exp" },
+            { "plog", "log" },
+            { "ppow", "pow" },
         }
     );
     gl::Shader float_frag(GL_FRAGMENT_SHADER);
@@ -38,6 +44,12 @@ void DFShaderProgram::compile(
         {
             { "ploat", "double" },
             { "pvec2", "dvec2" },
+            { "patan", "datan" },
+            { "pcos", "dcos" },
+            { "psin", "dsin" },
+            { "pexp", "dexp" },
+            { "plog", "dlog" },
+            { "ppow", "dpow" },
         }
     );
     gl::Shader double_frag(GL_FRAGMENT_SHADER);
