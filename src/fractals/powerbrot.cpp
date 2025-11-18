@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "pickers/mandelbrot.hpp"
+#include "pickers/grid.hpp"
 
 namespace fio::fractals {
 
@@ -17,8 +17,7 @@ Powerbrot::Powerbrot(
     std::function<glm::mat3x2(glm::vec2)> sp_fun
 ) :
     ComplexFractal(FRAGMENT_SHADER, std::move(s_fun)) {
-    _picker =
-        std::make_unique<pickers::Mandelbrot>(program(), std::move(sp_fun));
+    _picker = std::make_unique<pickers::Grid>(program(), std::move(sp_fun));
 }
 
 } // namespace fio::fractals
