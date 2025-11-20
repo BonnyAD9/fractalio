@@ -22,11 +22,23 @@ uniform float color_count;
 uniform dvec2 par;
 
 float after(float v) {
+    if (v == -0.) {
+        return intBitsToFloat(1);
+    }
+    if (v < 0) {
+        return intBitsToFloat(floatBitsToInt(v) - 1);
+    }
     return intBitsToFloat(floatBitsToInt(v) + 1);
 }
 
 float before(float v) {
-    return intBitsToFloat(floatBitsToInt(v) - 1);
+if (v == 0.) {
+    return intBitsToFloat(0x80000001);
+}
+if (v < 0) {
+    return intBitsToFloat(floatBitsToInt(v) + 1);
+}
+return intBitsToFloat(floatBitsToInt(v) - 1);
 }
 
 #define PI 3.141592653589793
