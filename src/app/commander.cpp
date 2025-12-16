@@ -60,17 +60,18 @@ void Commander::cancel() {
     } else {
         _text.clear();
     }
-    _new_input = true;
+    _draw_flags |= NEW_INPUT;
 }
 
-void Commander::prepare() {
-    if (_new_input) {
+void Commander::draw() {
+    const bool long_cmd = _text.contains(':');
+
+    if (_draw_flags & NEW_INPUT) {
         _input.clear_text();
-        auto pos = _text.contains(':')
+        auto pos = long_cmd
                        ? glm::vec2{ 5, _wsize.y - Fractalio::FONT_SIZE + 10 }
                        : glm::vec2{ _wsize.x - Fractalio::SIDE_WIDTH + 10,
                                     _wsize.y - Fractalio::FONT_SIZE + 10 };
-        _input.use();
         _input.set_transform(
             glm::translate(glm::identity<glm::mat4>(), { pos, 0 })
         );
@@ -81,26 +82,19 @@ void Commander::prepare() {
             _input.add_text(_text, { 0, 0 });
             _input.set_color({ 1, 1, 1 });
         }
-        _input.prepare();
     }
-    _new_input = false;
-}
 
-void Commander::draw() {
+    _draw_flags = 0;
     if (_text.contains(':')) {
-        _bg.use();
         _bg.draw();
     }
-    _input.use();
     _input.draw();
 }
 
 void Commander::resize(glm::vec2 size) {
     _wsize = size;
-    _bg.use();
     _bg.resize(size);
 
-    _input.use();
     auto pos = _text.contains(':')
                    ? glm::vec2{ 5, _wsize.y - Fractalio::FONT_SIZE + 10 }
                    : glm::vec2{ _wsize.x - Fractalio::SIDE_WIDTH + 10,
@@ -112,20 +106,19 @@ void Commander::resize(glm::vec2 size) {
 }
 
 void Commander::char_in(char c) {
+    _draw_flags |= NEW_INPUT;
+
     if (_text.contains(':') || c == ':') {
         _text.push_back(c);
-        _new_input = true;
         return;
     }
 
     if (is_prefix(c)) {
         _text.push_back(c);
-        _new_input = true;
         return;
     }
 
     _text.push_back(c);
-    _new_input = true;
 
     auto cmd = split_short_cmd(_text);
     if (std::ranges::contains(FOLLOWUP_CMDS, std::get<2>(cmd))) {
@@ -136,13 +129,14 @@ void Commander::char_in(char c) {
 }
 
 void Commander::consume() {
+    _draw_flags |= NEW_INPUT;
+
     try {
         execute_command(_text);
     } catch (std::exception &ex) {
         std::println(std::cerr, "Failed to execute command: {}", ex.what());
     }
     _text.clear();
-    _new_input = true;
 }
 
 void Commander::long_command(std::string_view cmd) {
@@ -176,7 +170,6 @@ void Commander::long_command(std::string_view cmd) {
     } else if (cmd == ":par" || cmd == ":parameter") {
         auto x = args.next_arg<double>();
         auto y = args.next_arg<double>();
-        _app._focus->use();
         _app._focus->map_parameter_x(maps::value(x));
         _app._focus->map_parameter_y(maps::value(y));
         _app._new_info = true;
@@ -222,122 +215,100 @@ void Commander::execute_command(std::string_view whole_cmd) {
         }
         _app._new_info = true;
     } else if (cmd == "i") {
-        _app._focus->use();
         _app._focus->map_iterations(
             maps::modified<float>(mod, num, maps::dble<float>)
         );
         _app._new_info = true;
     } else if (cmd == "I") {
-        _app._focus->use();
         _app._focus->map_iterations(
             maps::modified<float>(mod, num, maps::half<float>)
         );
         _app._new_info = true;
     } else if (cmd == "c") {
-        _app._focus->use();
         _app._focus->map_color_count(
             maps::modified<float>(mod, num, maps::dble<float>)
         );
         _app._new_info = true;
     } else if (cmd == "C") {
-        _app._focus->use();
         _app._focus->map_color_count(
             maps::modified<float>(mod, num, maps::half<float>)
         );
         _app._new_info = true;
     } else if (cmd == "z") {
-        _app._focus->use();
         _app._focus->map_scale(
             maps::inverse(maps::modified<double>(mod, num, maps::dble<double>))
         );
         _app._new_info = true;
     } else if (cmd == "Z") {
-        _app._focus->use();
         _app._focus->map_scale(
             maps::inverse(maps::modified<double>(mod, num, maps::half<double>))
         );
         _app._new_info = true;
     } else if (cmd == "x" || cmd == "L") {
-        _app._focus->use();
         _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale();
         }));
         _app._new_info = true;
     } else if (cmd == "X" || cmd == "H") {
-        _app._focus->use();
         _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p - _app._active->scale();
         }));
         _app._new_info = true;
     } else if (cmd == "y" || cmd == "K") {
-        _app._focus->use();
         _app._focus->map_y(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale();
         }));
         _app._new_info = true;
     } else if (cmd == "Y" || cmd == "J") {
-        _app._active->use();
         _app._active->map_y(maps::modified<double>(mod, num, [&](double p) {
             return p - _app._active->scale();
         }));
         _app._new_info = true;
     } else if (cmd == "l") {
-        _app._focus->use();
         _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "h") {
-        _app._focus->use();
         _app._focus->map_x(maps::modified<double>(mod, num, [&](double p) {
             return p - _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "k") {
-        _app._focus->use();
         _app._focus->map_y(maps::modified<double>(mod, num, [&](double p) {
             return p + _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "j") {
-        _app._focus->use();
         _app._focus->map_y(maps::modified<double>(mod, num, [&](double p) {
             return p - _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
     } else if (cmd == "ri") {
-        _app._focus->use();
         _app._focus->map_iterations(maps::reset<float>);
         _app._new_info = true;
     } else if (cmd == "rc") {
-        _app._focus->use();
         _app._focus->map_color_count(maps::reset<float>);
         _app._new_info = true;
     } else if (cmd == "rz") {
-        _app._focus->use();
         _app._focus->map_scale(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "rx") {
-        _app._focus->use();
         _app._focus->map_x(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "ry") {
-        _app._focus->use();
         _app._focus->map_y(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "rp") {
-        _app._focus->use();
         _app._focus->map_scale(maps::reset<double>);
         _app._focus->map_x(maps::reset<double>);
         _app._focus->map_y(maps::reset<double>);
         _app._new_info = true;
     } else if (cmd == "rr") {
-        _app._focus->use();
         _app._focus->map_iterations(maps::reset<float>);
         _app._focus->map_color_count(maps::reset<float>);
         _app._new_info = true;
     } else if (cmd == "R") {
-        _app._focus->use();
         _app._focus->map_iterations(maps::reset<float>);
         _app._focus->map_color_count(maps::reset<float>);
         _app._focus->map_scale(maps::reset<double>);

@@ -2,7 +2,6 @@
 
 #include <cmath>
 
-#include "../../gl/df_shader_program.hpp"
 #include "../../gl/gl.hpp"
 #include "../../gl/program.hpp"
 #include "../complex_fractal.hpp"
@@ -14,24 +13,22 @@ namespace fio::fractals::pickers {
 
 class Picker : public ComplexFractal<gl::Program> {
 public:
-    Picker(
-        const char *frag,
-        gl::DFShaderProgram &program,
-        std::function<glm::mat3x2(glm::vec2)> s_fun
-    ) :
-        ComplexFractal(frag, std::move(s_fun)), _that_program(program) {
+    Picker(const char *frag, std::function<glm::mat3x2(glm::vec2)> s_fun) :
+        ComplexFractal(frag, std::move(s_fun)) {
         auto &prog = this->program();
         prog.use();
         _loc_this_par = prog.uniform_location("par");
         prog.uniform(_loc_this_par, glm::vec2(par_inv()));
-        _that_program.use();
-        _loc_that_par = _that_program.uniform_location("par");
-        _that_program.uniform(_loc_that_par, _par);
     }
 
     [[nodiscard]]
     constexpr glm::dvec2 par() const {
         return _par;
+    }
+
+    [[nodiscard]]
+    bool new_par() const {
+        return _draw_flags & NEW_PAR;
     }
 
     constexpr void par(glm::dvec2 p) { _par = p; }
@@ -63,11 +60,9 @@ public:
     void drag(glm::dvec2, glm::dvec2 delta) override {
         switch (drag_mode()) {
         case DragMode::MOVE:
-            use();
             move(delta);
             break;
         case DragMode::SCALE:
-            use();
             scale(delta.y);
             break;
         case DragMode::PARAMETER: {
@@ -79,25 +74,11 @@ public:
             auto &prog = this->program();
             prog.use();
             prog.uniform(_loc_this_par, glm::vec2(par_inv()));
-            _that_program.uniform(_loc_that_par, _par);
+            _draw_flags |= NEW_PAR;
         }
         default:
             break;
         }
-    }
-
-    void move(glm::dvec2 delta) override {
-        ComplexFractal::move(delta);
-        auto &prog = this->program();
-        prog.use();
-        prog.uniform(_loc_this_par, glm::vec2(par_inv()));
-    }
-
-    void scale(double delta) override {
-        ComplexFractal::scale(delta);
-        auto &prog = this->program();
-        prog.use();
-        prog.uniform(_loc_this_par, glm::vec2(par_inv()));
     }
 
     std::string describe_part(std::string_view name) override {
@@ -120,10 +101,7 @@ public:
         } else {
             _par.x = nx;
         }
-        auto &prog = this->program();
-        prog.use();
-        prog.uniform(_loc_this_par, glm::vec2(par_inv()));
-        _that_program.uniform(_loc_that_par, _par);
+        _draw_flags |= NEW_PAR;
     }
 
     void map_parameter_y(const std::function<double(double)> &map) override {
@@ -133,19 +111,28 @@ public:
         } else {
             _par.y = ny;
         }
-        auto &prog = this->program();
-        prog.use();
-        prog.uniform(_loc_this_par, glm::vec2(par_inv()));
-        _that_program.uniform(_loc_that_par, _par);
+        _draw_flags |= NEW_PAR;
+    }
+
+protected:
+    void update_parameters(bool force) override {
+        constexpr int REDRAW_FLAGS = NEW_CENTER | NEW_SCALE;
+
+        if (force || _draw_flags & NEW_PAR ||
+            get_draw_flags() & REDRAW_FLAGS) {
+            this->program().uniform(_loc_this_par, glm::vec2(par_inv()));
+        }
     }
 
 private:
-    gl::DFShaderProgram &_that_program;
+    enum DrawFlags {
+        NEW_PAR = 1,
+    };
 
+    int _draw_flags = NEW_PAR;
     glm::dvec2 _par{ 0, 0 };
     bool _x_only;
     GLint _loc_this_par;
-    glm::ivec2 _loc_that_par;
 };
 
 } // namespace fio::fractals::pickers

@@ -59,23 +59,19 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
 
     init_fractals();
 
-    _active->use();
     _active->resize(size);
     auto picker = _active->picker();
     if (picker) {
-        picker->use();
         picker->resize(_wsize);
     }
 
     const glm::vec2 side_start{ _wsize.x - SIDE_WIDTH + 10, 20 };
 
-    _info.use();
     _info.resize(size);
     _info.set_transform(
         glm::translate(glm::identity<glm::mat4>(), { side_start, 0 })
     );
 
-    _fps_text.use();
     _fps_text.resize(size);
     _fps_text.set_transform(
         glm::translate(glm::identity<glm::mat4>(), { side_start, 0 })
@@ -95,16 +91,22 @@ void Fractalio::mainloop() {
 
         process_input();
 
+        glClear(GL_COLOR_BUFFER_BIT);
+        _active->draw();
+        auto picker = _active->picker();
+        if (picker) {
+            picker->draw();
+        }
+
         if (_new_info) {
             _info.clear_text();
             if (_active) {
                 auto text = _focus->describe();
                 _info.add_text(text, { 0, 0 });
             }
-            _info.use();
-            _info.prepare();
             _new_info = false;
         }
+        _info.draw();
 
         if (time > next_fps) {
             const double delta_time = time - last_time;
@@ -112,28 +114,10 @@ void Fractalio::mainloop() {
             _fps_text.clear_text();
             auto fps = std::format("FPS: {}", std::size_t(fcnt / delta_time));
             _fps_text.add_text(fps, { 0, 0 });
-            _fps_text.use();
-            _fps_text.prepare();
             next_fps = last_time + FPS_INTERVAL;
             fcnt = 0;
         }
         fcnt += 1;
-
-        _commander.prepare();
-
-        glClear(GL_COLOR_BUFFER_BIT);
-        _active->use();
-        _active->draw();
-        auto picker = _active->picker();
-        if (picker) {
-            picker->use();
-            picker->draw();
-        }
-
-        _info.use();
-        _info.draw();
-
-        _fps_text.use();
         _fps_text.draw();
 
         _commander.draw();
@@ -174,15 +158,12 @@ void Fractalio::size_callback(int width, int height) {
     glViewport(0, 0, width, height);
     _wsize = { width, height };
 
-    _active->use();
     _active->resize(_wsize);
     auto picker = _active->picker();
     if (picker) {
-        picker->use();
         picker->resize(_wsize);
     }
 
-    _info.use();
     _info.resize(_wsize);
     _info.set_transform(
         glm::translate(
@@ -190,7 +171,6 @@ void Fractalio::size_callback(int width, int height) {
         )
     );
 
-    _fps_text.use();
     _fps_text.resize(_wsize);
     _fps_text.set_transform(
         glm::translate(
@@ -302,12 +282,10 @@ void Fractalio::activate(fractals::Fractal::Type typ) {
     }
     _active = _fractals[typ].get();
     _focus = _active;
-    _active->use();
     _active->resize(_wsize);
     _new_info = true;
     auto picker = _active->picker();
     if (picker) {
-        picker->use();
         picker->resize(_wsize);
     }
 }

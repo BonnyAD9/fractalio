@@ -19,16 +19,19 @@ public:
 
     void draw();
 
-    void use() {
-        _program.use();
-        _vao.bind();
-    }
-
 private:
+    enum DrawFlags {
+        NEW_INDICES = 1,
+        NEW_PROJECTION = 2,
+    };
+
     gl::Program _program;
     gl::VertexArray _vao;
     gl::Buffer _vbo;
     gl::Buffer _ebo;
+
+    glm::vec2 _wsize;
+    int _draw_flags = 0;
 
     std::function<glm::mat3x2(glm::vec2)> _s_fun;
 

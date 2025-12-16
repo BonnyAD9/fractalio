@@ -89,6 +89,10 @@ static inline void draw_elements(
     );
 }
 
+static inline void draw_arrays(GLenum mode, GLint first, GLsizei count) {
+    glDrawArrays(mode, first, count);
+}
+
 static inline void tex_image_1d(
     GLuint t_type, GLint ifmt, GLenum fmt, GLsizei width, const char *data
 ) {

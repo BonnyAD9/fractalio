@@ -59,8 +59,6 @@ constexpr std::string_view HELP_TEXT = R".(HELP
 
 Help::Help(const gui::Text &text_cfg) : _text(text_cfg) {
     _text.add_text(HELP_TEXT, { 10, 20 });
-    _text.use();
-    _text.prepare();
 }
 
 } // namespace fio::fractals

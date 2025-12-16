@@ -7,11 +7,6 @@
 
 namespace fio::gui {
 
-static constexpr std::array<GLuint, 6> INDICES{
-    0, 1, 2, //
-    0, 2, 3, //
-};
-
 static constexpr GLuint LOCATION = 0;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
@@ -49,30 +44,37 @@ Quad::Quad(glm::vec4 color, std::function<glm::mat3x2(glm::vec2)> s_fun) :
         LOCATION, 2, GL_FLOAT, false, 2 * sizeof(float), 0
     );
     glEnableVertexAttribArray(LOCATION);
-
-    _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
-    gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, INDICES);
 }
 
 void Quad::resize(glm::vec2 size) {
     auto sizes = _s_fun(size);
     const glm::vec2 pos = sizes[0];
-    const glm::vec2 of = sizes[2];
+    _wsize = sizes[2];
     auto end = pos + sizes[1];
 
     _vertices = {
-        pos.x, pos.y, pos.x, end.y, end.x, end.y, end.x, pos.y,
+        pos.x, end.y, pos.x, pos.y, end.x, end.y, end.x, pos.y,
     };
 
-    gl::uniform(_loc_proj, glm::ortho(0.F, of.x, of.y, 0.F));
-    _vbo.bind(GL_ARRAY_BUFFER);
-    gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
-    glEnableVertexAttribArray(LOCATION);
+    _draw_flags |= NEW_INDICES | NEW_PROJECTION;
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void Quad::draw() {
-    gl::draw_elements(GL_TRIANGLES, INDICES.size(), GL_UNSIGNED_INT, 0);
+    _program.use();
+    _vao.bind();
+
+    if (_draw_flags & NEW_INDICES) {
+        _vbo.bind(GL_ARRAY_BUFFER);
+        gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
+    }
+
+    if (_draw_flags & NEW_PROJECTION) {
+        gl::uniform(_loc_proj, glm::ortho(0.F, _wsize.x, _wsize.y, 0.F));
+    }
+
+    _draw_flags = 0;
+    gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 } // namespace fio::gui

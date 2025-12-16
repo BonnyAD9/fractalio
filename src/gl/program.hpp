@@ -62,7 +62,8 @@ public:
 
     void use() const { glUseProgram(_id); }
 
-    constexpr void use_double(bool) const { }
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static,modernize-use-nodiscard)
+    constexpr bool use_double(bool) const { return false; }
     [[nodiscard]]
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
     constexpr bool use_double() const {

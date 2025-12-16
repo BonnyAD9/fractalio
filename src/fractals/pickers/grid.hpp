@@ -6,10 +6,7 @@ namespace fio::fractals::pickers {
 
 class Grid : public Picker {
 public:
-    Grid(
-        gl::DFShaderProgram &program,
-        std::function<glm::mat3x2(glm::vec2)> s_fun
-    );
+    Grid(std::function<glm::mat3x2(glm::vec2)> s_fun);
 
     std::string describe() override { return describe_part("Grid picker"); }
 };

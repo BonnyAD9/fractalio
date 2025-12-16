@@ -44,8 +44,6 @@ public:
 
     void draw() override { _text.draw(); }
 
-    void use() override { _text.use(); }
-
     std::string describe() override { return ""; }
 
 private:

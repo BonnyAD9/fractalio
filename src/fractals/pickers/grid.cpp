@@ -8,9 +8,7 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-Grid::Grid(
-    gl::DFShaderProgram &program, std::function<glm::mat3x2(glm::vec2)> s_fun
-) :
-    Picker(FRAGMENT_SHADER, program, std::move(s_fun)) { }
+Grid::Grid(std::function<glm::mat3x2(glm::vec2)> s_fun) :
+    Picker(FRAGMENT_SHADER, std::move(s_fun)) { }
 
 } // namespace fio::fractals::pickers

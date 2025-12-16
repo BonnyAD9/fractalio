@@ -1,5 +1,7 @@
 #include "text.hpp"
 
+#include <memory>
+
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
@@ -22,21 +24,12 @@ static constexpr char FRAGMENT_SHADER[]{
 };
 
 Text::Text(ft::Font &font, float line_height) :
-    _font(font), _line_h(line_height) {
-    gl::Shader vert(GL_VERTEX_SHADER);
-    vert.compile(VERTEX_SHADER);
-    gl::Shader frag(GL_FRAGMENT_SHADER);
-    frag.compile(FRAGMENT_SHADER);
+    _font(font), _line_h(line_height), _program(new_program()) {
 
-    _program.link(vert, frag);
-    _program.use();
-
-    _loc_proj = _program.uniform_location("proj");
-    gl::uniform(_loc_proj, glm::mat4());
-    _loc_color = _program.uniform_location("color");
-    gl::uniform(_loc_color, glm::vec3{ 1, 1, 1 });
-    _loc_trans = _program.uniform_location("trans");
-    gl::uniform(_loc_trans, glm::identity<glm::mat4>());
+    _program->use();
+    _loc_proj = _program->uniform_location("proj");
+    _loc_color = _program->uniform_location("color");
+    _loc_trans = _program->uniform_location("trans");
 
     _vao.bind();
 
@@ -52,8 +45,36 @@ Text::Text(ft::Font &font, float line_height) :
     glEnableVertexAttribArray(LOCATION);
 }
 
-void Text::resize(glm::vec2 size) const {
-    gl::uniform(_loc_proj, glm::ortho(0.F, size.x, size.y, 0.F));
+void Text::draw() {
+    if (_indices.empty()) {
+        return;
+    }
+
+    _program->use();
+    _vao.bind();
+    _font.use();
+
+    if (_draw_flags & NEW_TRIANGLES) {
+        _vbo.bind(GL_ARRAY_BUFFER);
+        gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
+        glEnableVertexAttribArray(LOCATION);
+        _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
+        gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, _indices);
+    }
+
+    gl::uniform(_loc_proj, glm::ortho(0.F, _wsize.x, _wsize.y, 0.F));
+    gl::uniform(_loc_trans, _transform);
+    gl::uniform(_loc_color, _color);
+
+    gl::draw_elements(
+        GL_TRIANGLES, GLsizei(_indices.size()), GL_UNSIGNED_INT, 0
+    );
+
+    _draw_flags = 0;
+}
+
+void Text::resize(glm::vec2 size) {
+    _wsize = size;
 }
 
 void Text::add_text(std::string_view text) {
@@ -71,14 +92,6 @@ void Text::add_text(std::string_view text, glm::vec2 pos) {
     _pos = pos;
     _x0 = pos.x;
     add_text(text);
-}
-
-void Text::prepare() {
-    _vbo.bind(GL_ARRAY_BUFFER);
-    gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
-    glEnableVertexAttribArray(LOCATION);
-    _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
-    gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, _indices);
 }
 
 void Text::clear_text() {
@@ -117,6 +130,28 @@ void Text::add_glyph(ft::Font::Glyph &glyph) {
             // clang-format on
         }
     );
+
+    _draw_flags |= NEW_TRIANGLES;
+}
+
+std::shared_ptr<gl::Program> Text::new_program() {
+    static std::weak_ptr<gl::Program> program;
+
+    auto res = program.lock();
+    if (res) {
+        return res;
+    }
+
+    auto new_program = std::make_shared<gl::Program>();
+    gl::Shader vert(GL_VERTEX_SHADER);
+    vert.compile(VERTEX_SHADER);
+    gl::Shader frag(GL_FRAGMENT_SHADER);
+    frag.compile(FRAGMENT_SHADER);
+
+    new_program->link(vert, frag);
+
+    program = new_program;
+    return new_program;
 }
 
 } // namespace fio::gui

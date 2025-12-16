@@ -34,7 +34,16 @@ public:
 
     Fractal *picker() override { return _picker.get(); }
 
+protected:
+    void update_parameters(bool force) override {
+        if (force || _picker->new_par()) {
+            program().uniform(_loc_par, _picker->par());
+        }
+    }
+
 private:
+    glm::ivec2 _loc_par;
+
     std::unique_ptr<pickers::Picker> _picker;
 };
 

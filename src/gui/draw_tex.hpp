@@ -22,18 +22,16 @@ public:
 
     void draw() override;
 
-    void use() override {
-        _program.use();
-        _vao.bind();
-        _texture.bind(GL_TEXTURE_2D);
-    }
-
     void scale(double) override { }
     void resize(glm::vec2 size) override;
 
     std::string describe() override { return "Texture view"; }
 
 private:
+    enum DrawFlags {
+        NEW_SIZE = 1,
+    };
+
     gl::Program _program;
     gl::VertexArray _vao;
     gl::Buffer _vbo;
@@ -41,7 +39,9 @@ private:
     gl::Texture _texture;
 
     std::function<glm::mat3x2(glm::vec2)> _s_fun;
+    glm::vec2 _wsize;
 
+    int _draw_flags = 0;
     GLint _loc_proj;
 
     std::array<float, 16> _vertices{

@@ -30,24 +30,18 @@ public:
 
     template<typename T> void uniform(glm::ivec2 location, T value) {
         if (_is_double) {
-            _float.use();
-            gl::uniform(location.x, value);
-            _double.use();
             gl::uniform(location.y, value);
         } else {
-            _double.use();
-            gl::uniform(location.y, value);
-            _float.use();
             gl::uniform(location.x, value);
         }
     }
 
-    void use_double(bool v) {
+    bool use_double(bool v) {
         if (v == _is_double) {
-            return;
+            return false;
         }
         _is_double = v;
-        use();
+        return true;
     }
 
     [[nodiscard]]

@@ -13,7 +13,6 @@ class Commander {
 public:
     Commander(Fractalio &app, const gui::Text &text_cfg);
 
-    void prepare();
     void draw();
     void resize(glm::vec2 size);
 
@@ -24,13 +23,14 @@ public:
     void backspace() {
         if (!_text.empty()) {
             _text.pop_back();
-            _new_input = true;
+            _draw_flags |= NEW_INPUT;
         }
     }
 
 private:
-    void long_command(std::string_view cmd);
-    void execute_command(std::string_view whole_cmd);
+    enum DrawFlags {
+        NEW_INPUT = 1,
+    };
 
     Fractalio &_app;
     gui::Text _input;
@@ -40,7 +40,10 @@ private:
 
     glm::vec2 _wsize;
     bool _no_recurse = false;
-    bool _new_input = true;
+    int _draw_flags = NEW_INPUT;
+
+    void long_command(std::string_view cmd);
+    void execute_command(std::string_view whole_cmd);
 };
 
 } // namespace fio::app

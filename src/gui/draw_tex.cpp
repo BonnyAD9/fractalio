@@ -70,13 +70,25 @@ DrawTex::DrawTex(
 }
 
 void DrawTex::draw() {
+    _program.use();
+    _vao.bind();
+    _texture.bind(GL_TEXTURE_2D);
+
+    if (_draw_flags & NEW_SIZE) {
+        gl::uniform(_loc_proj, glm::ortho(0.F, _wsize.x, _wsize.y, 0.F));
+        gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
+        glEnableVertexAttribArray(LOCATION);
+    }
+
+    _draw_flags = 0;
+
     gl::draw_elements(GL_TRIANGLES, INDICES.size(), GL_UNSIGNED_INT, 0);
 }
 
 void DrawTex::resize(glm::vec2 size) {
     auto sizes = _s_fun(size);
     const glm::vec2 pos = sizes[0];
-    const glm::vec2 of = sizes[2];
+    _wsize = sizes[2];
     auto end = pos + sizes[1];
 
     _vertices = {
@@ -86,9 +98,7 @@ void DrawTex::resize(glm::vec2 size) {
         end.x, pos.y, /* */ 1, 0, // TR
     };
 
-    gl::uniform(_loc_proj, glm::ortho(0.F, of.x, of.y, 0.F));
-    gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
-    glEnableVertexAttribArray(LOCATION);
+    _draw_flags |= NEW_SIZE;
 }
 
 } // namespace fio::gui

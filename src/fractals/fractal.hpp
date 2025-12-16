@@ -29,7 +29,6 @@ public:
 
     virtual void resize(glm::vec2 size) = 0;
     virtual void draw() = 0;
-    virtual void use() = 0;
 
     void drag_start(int button, int, glm::dvec2) override {
         switch (button) {
@@ -47,11 +46,9 @@ public:
     void drag(glm::dvec2, glm::dvec2 delta) override {
         switch (_drag_mode) {
         case DragMode::MOVE:
-            use();
             move(delta);
             break;
         case DragMode::SCALE:
-            use();
             scale(delta.y);
             break;
         default:
@@ -81,10 +78,7 @@ public:
         }
     }
 
-    void scroll(glm::dvec2, glm::dvec2 delta) override {
-        use();
-        scale(8 * delta.y);
-    }
+    void scroll(glm::dvec2, glm::dvec2 delta) override { scale(8 * delta.y); }
 
     virtual void move(glm::dvec2 delta) { (void)delta; }
 

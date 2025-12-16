@@ -17,7 +17,10 @@ Powerbrot::Powerbrot(
     std::function<glm::mat3x2(glm::vec2)> sp_fun
 ) :
     ComplexFractal(FRAGMENT_SHADER, std::move(s_fun)) {
-    _picker = std::make_unique<pickers::Grid>(program(), std::move(sp_fun));
+    auto &prog = program();
+    prog.use();
+    _loc_par = prog.uniform_location("par");
+    _picker = std::make_unique<pickers::Grid>(std::move(sp_fun));
 }
 
 } // namespace fio::fractals
