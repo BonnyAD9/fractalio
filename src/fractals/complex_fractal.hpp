@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <format>
 #include <string_view>
 
@@ -15,11 +14,14 @@
 
 namespace fio::fractals {
 
-template<typename P> class ComplexFractal : public Fractal {
-public:
-    static constexpr GLuint DEFAULT_ITERATIONS = 256;
-    static constexpr float DEFAULT_COLOR_COUNT = 256;
+namespace pickers {
+class PickerImpl;
+}
 
+template<typename P> class ComplexFractal : public Fractal {
+    friend pickers::PickerImpl;
+
+public:
     ComplexFractal(
         const char *df_frag, std::function<glm::mat3x2(glm::vec2)> s_fun
     ) :
@@ -33,10 +35,6 @@ public:
         _program.uniform(_loc_center, _center);
         _loc_scale = _program.uniform_location("scale");
         _program.uniform(_loc_scale, _scale);
-        _loc_iterations = _program.uniform_location("iterations");
-        _program.uniform(_loc_iterations, _iterations);
-        _loc_color_count = _program.uniform_location("color_count");
-        _program.uniform(_loc_color_count, _color_count);
 
         _vao.bind();
 
@@ -107,14 +105,6 @@ public:
             _program.uniform(_loc_scale, _scale);
         }
 
-        if (force || _draw_flags & NEW_ITERATIONS) {
-            _program.uniform(_loc_iterations, _iterations);
-        }
-
-        if (force || _draw_flags & NEW_COLOR_COUNT) {
-            _program.uniform(_loc_color_count, _color_count);
-        }
-
         update_parameters(force);
 
         _draw_flags = 0;
@@ -134,31 +124,6 @@ public:
 
     double scale() override { return _scale; }
     glm::dvec2 center() { return _center; }
-
-    void map_iterations(const std::function<float(float)> &map) override {
-        auto it = map(float(_iterations));
-        _iterations =
-            std::isnan(it)
-                ? DEFAULT_ITERATIONS
-                : GLuint(
-                      std::clamp(
-                          it, 0.F, float(std::numeric_limits<GLuint>::max())
-                      )
-                  );
-        _draw_flags |= NEW_ITERATIONS;
-    }
-
-    void map_color_count(const std::function<float(float)> &map) override {
-        auto cc = map(_color_count);
-        if (cc == 0) {
-            _color_count = 1;
-        } else if (std::isnan(cc)) {
-            _color_count = DEFAULT_COLOR_COUNT;
-        } else {
-            _color_count = cc;
-        }
-        _draw_flags |= NEW_COLOR_COUNT;
-    }
 
     void map_use_double(const std::function<bool(bool)> &map) override {
         if (_program.use_double(map(_program.use_double()))) {
@@ -207,16 +172,12 @@ protected:
   center:
     {:.6} + {:.6}i
   scale: {:.10}
-  iterations: {}
-  color count: {}
-    ).",
+).",
             name,
             _program.use_double() ? "double" : "single",
             _center.x,
             _center.y,
-            1 / _scale,
-            _iterations,
-            _color_count
+            1 / _scale
         );
     }
 
@@ -237,17 +198,18 @@ protected:
 
     enum DrawFlags {
         NEW_VERTICES = 1,
-        NEW_USE_DOUBLE = 2,
-        NEW_CENTER = 4,
-        NEW_SCALE = 8,
-        NEW_ITERATIONS = 16,
-        NEW_COLOR_COUNT = 32,
+        NEW_USE_DOUBLE = NEW_VERTICES << 1,
+        NEW_CENTER = NEW_USE_DOUBLE << 1,
+        NEW_SCALE = NEW_CENTER << 1,
+        LAST_DRAW_FLAG = NEW_SCALE,
     };
 
     [[nodiscard]]
-    int get_draw_flags() const {
+    int draw_flags() const {
         return _draw_flags;
     }
+
+    int add_draw_flag(int flag) { return _draw_flags |= flag; }
 
 private:
     static constexpr const GLuint LOCATION = 0;
@@ -269,10 +231,6 @@ private:
     P::Location _loc_center;
     double _scale = 1.;
     P::Location _loc_scale;
-    GLuint _iterations = DEFAULT_ITERATIONS;
-    P::Location _loc_iterations;
-    float _color_count = DEFAULT_COLOR_COUNT;
-    P::Location _loc_color_count;
 
     int _draw_flags = 0;
 

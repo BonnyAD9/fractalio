@@ -4,14 +4,14 @@
 #include <memory>
 
 #include "../gl/df_shader_program.hpp"
-#include "complex_fractal.hpp"
+#include "iterative_fractal.hpp"
 #include "pickers/picker.hpp"
 
 #include <glm/glm.hpp>
 
 namespace fio::fractals {
 
-class Powerbrot : public ComplexFractal<gl::DFShaderProgram> {
+class Powerbrot : public IterativeFractal<gl::DFShaderProgram> {
 public:
     Powerbrot(
         std::function<glm::mat3x2(glm::vec2)> s_fun,
@@ -32,7 +32,7 @@ public:
         return desc;
     }
 
-    Fractal *picker() override { return _picker.get(); }
+    Fractal *picker() override { return &_picker->as_fractal(); }
 
 protected:
     void update_parameters(bool force) override {
