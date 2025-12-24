@@ -149,17 +149,17 @@ public:
         _draw_flags |= NEW_CENTER;
     }
 
-    void map_parameter_x(const std::function<double(double)> &map) override {
+    void map_parameter_x(std::size_t idx, const std::function<double(double)> &map) override {
         auto p = picker();
         if (p) {
-            p->map_parameter_x(map);
+            p->map_parameter_x(idx, map);
         }
     }
 
-    void map_parameter_y(const std::function<double(double)> &map) override {
+    void map_parameter_y(std::size_t idx, const std::function<double(double)> &map) override {
         auto p = picker();
         if (p) {
-            p->map_parameter_y(map);
+            p->map_parameter_y(idx, map);
         }
     }
 

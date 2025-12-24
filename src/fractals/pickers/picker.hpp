@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "../fractal.hpp"
 
 #include <glm/glm.hpp>
@@ -10,6 +11,7 @@ class Picker {
 public:
     virtual bool new_par() = 0;
     virtual glm::dvec2 par() = 0;
+    virtual std::vector<glm::vec2> pars() = 0;
     virtual Fractal &as_fractal() = 0;
 
     virtual ~Picker() = default;

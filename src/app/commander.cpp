@@ -170,8 +170,8 @@ void Commander::long_command(std::string_view cmd) {
     } else if (cmd == ":par" || cmd == ":parameter") {
         auto x = args.next_arg<double>();
         auto y = args.next_arg<double>();
-        _app._focus->map_parameter_x(maps::value(x));
-        _app._focus->map_parameter_y(maps::value(y));
+        _app._focus->map_parameter_x(0, maps::value(x));
+        _app._focus->map_parameter_y(0, maps::value(y));
         _app._new_info = true;
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);

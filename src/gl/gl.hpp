@@ -117,6 +117,10 @@ static inline void tex_image_2d(
     );
 }
 
+static inline void uniform(GLint location, std::span<glm::vec2> value) {
+    glUniform2fv(location, GLsizei(value.size()), reinterpret_cast<const float *>(value.data()));
+}
+
 static inline void uniform(GLint location, glm::dvec2 value) {
     glUniform2d(location, value.x, value.y);
 }

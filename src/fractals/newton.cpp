@@ -1,0 +1,71 @@
+#include "newton.hpp"
+#include <glm/glm.hpp>
+#include <format>
+#include <functional>
+#include <print>
+#include "../gl/process_defines.hpp"
+
+namespace fio::fractals {
+    
+static constexpr double SQRT3O2 = 0.8660254037844386;
+
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+static constexpr char FRAGMENT_SHADER[]{
+#embed "newton.frag"
+    , 0
+};
+
+static std::string prepare_shader(std::size_t root_cnt) {
+    std::string res;
+    gl::process_defines(res, FRAGMENT_SHADER, {{ "max_roots", std::format("{}", root_cnt) }});
+    return res;
+}
+    
+Newton::Newton(std::function<glm::mat3x2(glm::vec2)> s_fun, std::size_t root_cnt)
+    : IterativeFractal(prepare_shader(root_cnt).c_str(), std::move(s_fun)), _picker({{1, 0}, {-.5, -SQRT3O2}, {-.5, SQRT3O2}}, root_cnt) {
+    auto &prog = program();
+    prog.use();
+    _loc_coefs = prog.uniform_location("coefs");
+    _loc_roots = prog.uniform_location("roots");
+    _loc_root_cnt = prog.uniform_location("root_cnt");
+}
+
+std::string Newton::describe() {
+    auto desc = describe_part("Newton fractal");
+    desc += "\n  roots:\n";
+    for (auto &r : _picker.dpars()) {
+        desc += std::format("    {:.6} + {:.6}i\n", r.x, r.y);
+    }
+    return desc;
+}
+
+void Newton::update_parameters(bool force) {
+    auto &prog = program();
+    
+    if (_picker.update_parameter(force, *this)) {
+        auto roots = _picker.pars();
+        auto coefs = get_coefs(roots);
+        prog.uniform(_loc_coefs, coefs);
+        prog.uniform(_loc_roots, roots);
+        prog.uniform(_loc_root_cnt, GLuint(roots.size()));
+    }
+}
+
+static glm::vec2 cmul(glm::vec2 a, glm::vec2 b) {
+   return { a.x * b.x - a.y * b.y, a.x * b.y + b.x * a.y };
+}
+
+std::vector<glm::vec2> Newton::get_coefs(std::span<glm::vec2> roots) {
+    std::vector<glm::vec2> coefs{roots.size() + 1, {0, 0}};
+    coefs[roots.size()] = { 1, 0 };
+    
+    for (std::size_t i = roots.size(); i > 0; --i) {
+        for (std::size_t j = i - 1; j < roots.size(); ++j) {
+            coefs[j] = cmul(coefs[j], -roots[i - 1]) + coefs[j + 1];
+        }
+        coefs[roots.size()] = cmul(coefs[roots.size()], -roots[i - 1]);
+    }
+    return coefs;
+}
+    
+}
