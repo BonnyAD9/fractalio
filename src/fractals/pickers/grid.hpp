@@ -10,7 +10,7 @@ class Grid : public ComplexFractal<gl::Program>, public Picker {
 public:
     Grid(std::function<glm::mat3x2(glm::vec2)> s_fun);
 
-    USE_PICKER_FULL(_picker, "Grid picker", _par_loc)
+    USE_PICKER_FULL(_picker, "Grid picker", _par_loc, ComplexFractal)
 
 private:
     GLint _par_loc;

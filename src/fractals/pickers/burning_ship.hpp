@@ -9,11 +9,11 @@
 
 namespace fio::fractals::pickers {
 
-class Mandelbrot : public IterativeFractal<gl::Program>, public Picker {
+class BurningShip : public IterativeFractal<gl::Program>, public Picker {
 public:
-    Mandelbrot(std::function<glm::mat3x2(glm::vec2)> s_fun);
+    BurningShip(std::function<glm::mat3x2(glm::vec2)> s_fun);
 
-    USE_PICKER_FULL(_picker, "Mandelbrot picker", _par_loc, IterativeFractal)
+    USE_PICKER_FULL(_picker, "Burning ship picker", _par_loc, IterativeFractal)
 
 private:
     GLint _par_loc;

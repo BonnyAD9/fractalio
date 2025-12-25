@@ -26,6 +26,7 @@ public:
         BURNING_SHIP,
         POWERBROT,
         NEWTON,
+        BURNING_JULIA,
     };
 
     virtual void resize(glm::vec2 size) = 0;

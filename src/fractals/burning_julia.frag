@@ -8,17 +8,18 @@ in vec2 cor;
 
 uniform sampler1D gradient;
 
-uniform uint flags;
+uniform uint flags; // unused
 
 uniform dvec2 center;
 uniform double scale;
 uniform uint iterations;
 uniform float color_count;
 
+uniform dvec2 par;
+
 void main() {
-    pvec2 c = pvec2(cor * scale + center);
-    c = pvec2(c.x, -c.y);
-    pvec2 x = abs(c);
+    pvec2 x = pvec2(cor * scale + center);
+    pvec2 c = pvec2(par.x, -par.y);
 
     uint i = iterations;
     for (; i > 0; --i) {
@@ -44,10 +45,9 @@ void main() {
         switch (flags & 0xFu) {
         case 0:
             break;
-        case 1: {
+        case 1:
             cidx += 1 - log(log(float(length(x)))) / 0.6931471805599453;
             break;
-        }
         case 2:
             brightness = 1 - log(log(float(length(x)))) / 0.6931471805599453; 
             break;

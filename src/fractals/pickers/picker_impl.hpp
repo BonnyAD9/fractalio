@@ -231,7 +231,7 @@ public:                                                                       \
         (picker).map_parameter_y(idx, map);                                   \
     }
 
-#define USE_PICKER_FULL(picker, name, par_loc)                                \
+#define USE_PICKER_FULL(picker, name, par_loc, parent)                        \
     USE_PICKER(picker)                                                        \
     std::string describe() override {                                         \
         return (picker).describe_part(name, *this);                           \
@@ -239,6 +239,8 @@ public:                                                                       \
                                                                               \
 protected:                                                                    \
     void update_parameters(bool force) override {                             \
+        parent::update_parameters(force);                                     \
+                                                                              \
         auto &prog = program();                                               \
                                                                               \
         if (_picker.update_parameter(force, *this)) {                         \

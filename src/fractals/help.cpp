@@ -58,9 +58,12 @@ constexpr std::string_view HELP_TEXT = R".(HELP
              3: Burning ship
              4: Powerbrot
              5: Newton fractal
+             6: Burning julia
     :flags <mask> <value>
            Set flags of the current fractal. Mask is bit mask of bits that will
-           be set, value is the value of the bits.
+           be set, value is the value of the bits. The meaning of the bits is
+           dependant on the fractal, but usually the lowest 4 bits are coloring
+           type.
 ).";
 
 Help::Help(const gui::Text &text_cfg) : _text(text_cfg) {

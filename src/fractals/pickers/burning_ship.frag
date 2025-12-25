@@ -8,12 +8,14 @@ in vec2 cor;
 
 uniform sampler1D gradient;
 
-uniform uint flags;
+uniform uint flags; // unused
 
 uniform dvec2 center;
 uniform double scale;
 uniform uint iterations;
 uniform float color_count;
+
+uniform vec2 par;
 
 void main() {
     pvec2 c = pvec2(cor * scale + center);
@@ -39,21 +41,13 @@ void main() {
     if (i <= 0) {
         frag_color = vec4(0, 0, 0, 1);
     } else {
-        float brightness = 1;
-        float cidx = iterations - i;
-        switch (flags & 0xFu) {
-        case 0:
-            break;
-        case 1: {
-            cidx += 1 - log(log(float(length(x)))) / 0.6931471805599453;
-            break;
-        }
-        case 2:
-            brightness = 1 - log(log(float(length(x)))) / 0.6931471805599453; 
-            break;
-        }
-        
-        vec3 col = texture(gradient, cidx / color_count).xyz;
-        frag_color = vec4(col * brightness, 1);
+        frag_color = texture(gradient, (iterations - i) / color_count);
+    }
+    
+    vec2 pv = par - cor;
+    pv *= pv;
+    float pd = pv.x + pv.y;
+    if (pd < 0.004 && pd > 0.002) {
+        frag_color = vec4(vec3(1, 1, 1) - frag_color.xyz, 1);
     }
 }
