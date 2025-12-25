@@ -167,6 +167,11 @@ void Commander::long_command(std::string_view cmd) {
                 )
             );
         }
+    } else if (cmd == ":flags") {
+        auto mask = args.next_arg<GLuint>();
+        auto value = args.next_arg<GLuint>();
+        _app._focus->set_flags(mask, value);
+        _app._new_info = true;
     } else if (cmd == ":par" || cmd == ":parameter") {
         auto x = args.next_arg<double>();
         auto y = args.next_arg<double>();

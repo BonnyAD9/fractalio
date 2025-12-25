@@ -20,6 +20,7 @@ Julia::Julia(
     auto &prog = program();
     prog.use();
     _loc_par = prog.uniform_location("par");
+    set_flags(0xF, 1);
 
     _picker = std::make_unique<pickers::Mandelbrot>(std::move(sp_fun));
 }

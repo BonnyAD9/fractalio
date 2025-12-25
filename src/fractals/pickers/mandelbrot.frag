@@ -8,6 +8,8 @@ in vec2 cor;
 
 uniform sampler1D gradient;
 
+uniform uint flags; // unused
+
 uniform dvec2 center;
 uniform double scale;
 uniform uint iterations;

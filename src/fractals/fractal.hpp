@@ -126,6 +126,11 @@ public:
 
     virtual ~Fractal() = default;
 
+    virtual void set_flags(GLuint mask, GLuint value) {
+        (void)mask;
+        (void)value;
+    }
+
 protected:
     [[nodiscard]]
     constexpr DragMode drag_mode() const {

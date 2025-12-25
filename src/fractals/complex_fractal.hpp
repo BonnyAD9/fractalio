@@ -35,6 +35,7 @@ public:
         _program.uniform(_loc_center, _center);
         _loc_scale = _program.uniform_location("scale");
         _program.uniform(_loc_scale, _scale);
+        _loc_flags = _program.uniform_location("flags");
 
         _vao.bind();
 
@@ -105,6 +106,10 @@ public:
             _program.uniform(_loc_scale, _scale);
         }
 
+        if (force || _draw_flags & NEW_FLAGS) {
+            _program.uniform(_loc_flags, _flags);
+        }
+
         update_parameters(force);
 
         _draw_flags = 0;
@@ -167,18 +172,26 @@ public:
         }
     }
 
+    void set_flags(GLuint mask, GLuint value) override {
+        _flags &= ~mask;
+        _flags |= value & mask;
+        _draw_flags |= NEW_FLAGS;
+    }
+
 protected:
     virtual std::string describe_part(std::string_view name) {
         return std::format(
             R".(
 {}
   precision: {}
+  flags: {:X}
   center:
     {:.6} + {:.6}i
   scale: {:.10}
 ).",
             name,
             _program.use_double() ? "double" : "single",
+            _flags,
             _center.x,
             _center.y,
             1 / _scale
@@ -205,7 +218,8 @@ protected:
         NEW_USE_DOUBLE = NEW_VERTICES << 1,
         NEW_CENTER = NEW_USE_DOUBLE << 1,
         NEW_SCALE = NEW_CENTER << 1,
-        LAST_DRAW_FLAG = NEW_SCALE,
+        NEW_FLAGS = NEW_SCALE << 1,
+        LAST_DRAW_FLAG = NEW_FLAGS,
     };
 
     [[nodiscard]]
@@ -235,6 +249,8 @@ private:
     P::Location _loc_center;
     double _scale = 1.;
     P::Location _loc_scale;
+    GLuint _flags = 0;
+    P::Location _loc_flags;
 
     int _draw_flags = 0;
 

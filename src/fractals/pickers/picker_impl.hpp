@@ -2,8 +2,6 @@
 
 #include <cmath>
 #include <format>
-#include <print>
-#include <ranges>
 
 #include "../complex_fractal.hpp"
 #include "../fractal.hpp"

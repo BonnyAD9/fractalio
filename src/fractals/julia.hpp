@@ -37,6 +37,8 @@ public:
 
 protected:
     void update_parameters(bool force) override {
+        IterativeFractal::update_parameters(force);
+
         if (force || _picker->new_par()) {
             program().uniform(_loc_par, _picker->par());
         }

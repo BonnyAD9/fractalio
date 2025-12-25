@@ -36,6 +36,7 @@ Newton::Newton(
     _loc_coefs = prog.uniform_location("coefs");
     _loc_roots = prog.uniform_location("roots");
     _loc_root_cnt = prog.uniform_location("root_cnt");
+    set_flags(0xF, 1);
 }
 
 std::string Newton::describe() {
@@ -48,6 +49,8 @@ std::string Newton::describe() {
 }
 
 void Newton::update_parameters(bool force) {
+    IterativeFractal::update_parameters(force);
+
     auto &prog = program();
 
     if (_picker.update_parameter(force, *this)) {

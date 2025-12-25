@@ -9,6 +9,8 @@ in vec2 cor;
 
 uniform sampler1D gradient;
 
+uniform uint flags; // unused
+
 uniform dvec2 center;
 uniform double scale;
 uniform uint iterations;
@@ -56,16 +58,35 @@ void main() {
     
     vec3 col = vec3(0, 0, 0);
     if (i != 0) {
-        float r = 20; // speed of brigtening
-        float d = float(md);
-        float brightness = log(1 + r - (i - d * 1000) / iterations * r);
-        col = texture(gradient, float(c) / root_cnt).xyz * brightness;
+        float d = 0;
+        if ((flags & 0x10u) == 0) {
+            d = float(md) * 1000;
+        }
+        float brightness = 1;
+        float cidx = float(c) / root_cnt;
+        switch (flags & 0xFu) {
+        case 0:
+            break;
+        case 1:
+            brightness = log(1 + 20 - (i - d) / iterations * 20);
+            break;
+        case 2:
+            brightness = pow((i - d) / iterations, 8);
+            break;
+        case 3:
+            cidx = (iterations - i) / color_count;
+            break;
+        case 4:
+            cidx = log(1 + 20 - (i - d) / iterations * 20);
+            break;
+        }
+        col = texture(gradient, cidx).xyz * brightness;
     }
     
     vec2 pv = (roots[c] - vec2(center)) / float(scale) - cor;
     pv *= pv;
     float pd = pv.x + pv.y;
-    if (pd < 0.004 && pd > 0.0015) {
+    if ((flags & 0x20u) == 0 && pd < 0.004 && pd > 0.0015) {
         col = vec3(1, 1, 1) - col;
     }
     
