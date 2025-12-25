@@ -49,7 +49,7 @@ void main() {
                 c = j;
             }
         }
-        if (md < 0.1) {
+        if (md < 0.001) {
             break;
         }
     }
@@ -58,7 +58,7 @@ void main() {
     if (i != 0) {
         float r = 20; // speed of brigtening
         float d = float(md);
-        float brightness = log(1 + r - (i - d * 10) / iterations * r);
+        float brightness = log(1 + r - (i - d * 1000) / iterations * r);
         col = texture(gradient, float(c) / root_cnt).xyz * brightness;
     }
     

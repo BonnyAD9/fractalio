@@ -14,13 +14,15 @@ namespace fio::fractals::pickers {
 
 class PickerImpl {
 public:
-    PickerImpl() : PickerImpl(glm::dvec2{0, 0}) {}
-    
-    PickerImpl(glm::dvec2 def) : _pars({def}) {}
-    
-    PickerImpl(std::size_t par_cnt, std::size_t max_size = 0) : _pars(par_cnt, {0, 0}), _max_size(max_size) {}
-    
-    PickerImpl(std::vector<glm::dvec2> def, std::size_t max_size = 0) : _pars(std::move(def)), _max_size(max_size) {}
+    PickerImpl() : PickerImpl(glm::dvec2{ 0, 0 }) { }
+
+    PickerImpl(glm::dvec2 def) : _pars({ def }) { }
+
+    PickerImpl(std::size_t par_cnt, std::size_t max_size = 0) :
+        _pars(par_cnt, { 0, 0 }), _max_size(max_size) { }
+
+    PickerImpl(std::vector<glm::dvec2> def, std::size_t max_size = 0) :
+        _pars(std::move(def)), _max_size(max_size) { }
 
     [[nodiscard]]
     constexpr glm::dvec2 par() const {
@@ -36,20 +38,21 @@ public:
         _pars[0] = p;
         _draw_flags &= NEW_PAR;
     }
-    
+
     std::vector<glm::vec2> pars() {
         std::vector<glm::vec2> res;
+        res.reserve(_pars.size());
         for (auto &a : _pars) {
             res.emplace_back(a);
         }
         return res;
     }
-    
+
     [[nodiscard]]
     std::span<const glm::dvec2> dpars() const {
         return _pars;
     }
-    
+
     [[nodiscard]]
     std::size_t max_size() const {
         return _max_size;
@@ -58,7 +61,7 @@ public:
     template<typename P> glm::dvec2 par_space(ComplexFractal<P> &frac) {
         return to_space(_pars[0], frac);
     }
-    
+
     template<typename P>
     std::vector<glm::vec2> pars_space(ComplexFractal<P> &frac) {
         std::vector<glm::vec2> res(_pars.size());
@@ -75,22 +78,36 @@ public:
         switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: {
             auto pc = frac.to_part_complex(pos);
-            for (std::size_t i = 0; i < _pars.size(); ++i) {
-                auto d = pc - to_space(_pars[i], frac);
-                if (d.x * d.x + d.y * d.y < 0.004) {
-                    frac.drag_mode(DragMode(int(DragMode::PARAMETER) + int(i)));
-                    _x_only = (mod & GLFW_MOD_SHIFT) == GLFW_MOD_SHIFT;
-                    return;
-                }
+            auto close = par_below(pc, frac);
+            if (!close) {
+                frac.drag_mode(DragMode::MOVE);
+                return;
             }
-            frac.drag_mode(DragMode::MOVE);
-            break;
+            frac.drag_mode(DragMode(int(DragMode::PARAMETER) + int(*close)));
+            _x_only = (mod & GLFW_MOD_SHIFT) == GLFW_MOD_SHIFT;
+            return;
         }
         case GLFW_MOUSE_BUTTON_RIGHT:
             frac.drag_mode(DragMode::SCALE);
-            break;
+            return;
+        case GLFW_MOUSE_BUTTON_MIDDLE: {
+            if (_max_size == 0) {
+                return;
+            }
+            _draw_flags |= NEW_PAR;
+            auto pc = frac.to_part_complex(pos);
+            auto close = par_below(pc, frac);
+            if (close) {
+                _pars.erase(_pars.begin() + *close);
+                return;
+            }
+            if (_pars.size() >= _max_size) {
+                return;
+            }
+            _pars.push_back(pc);
+        }
         default:
-            break;
+            return;
         }
     }
 
@@ -108,12 +125,12 @@ public:
             if (int(dm) < int(DragMode::PARAMETER)) {
                 break;
             }
-            
+
             if (_x_only) {
                 delta.y = 0;
             }
             delta.y = -delta.y;
-            std::size_t idx = int(dm) - int(DragMode::PARAMETER);
+            const std::size_t idx = int(dm) - int(DragMode::PARAMETER);
             _pars[idx] += delta / frac.wsizex() * 4. * frac.scale();
             _draw_flags |= NEW_PAR;
         }
@@ -130,7 +147,9 @@ public:
         return desc;
     }
 
-    void map_parameter_x(std::size_t idx, const std::function<double(double)> &map) {
+    void map_parameter_x(
+        std::size_t idx, const std::function<double(double)> &map
+    ) {
         auto nx = map(_pars[idx].x);
         if (std::isnan(nx)) {
             _pars[idx].x = 0;
@@ -140,7 +159,9 @@ public:
         _draw_flags |= NEW_PAR;
     }
 
-    void map_parameter_y(std::size_t idx, const std::function<double(double)> &map) {
+    void map_parameter_y(
+        std::size_t idx, const std::function<double(double)> &map
+    ) {
         auto ny = map(_pars[idx].y);
         if (std::isnan(ny)) {
             _pars[idx].y = 0;
@@ -155,8 +176,8 @@ public:
         constexpr int REDRAW_FLAGS =
             ComplexFractal<P>::NEW_CENTER | ComplexFractal<P>::NEW_SCALE;
 
-        auto res = force || _draw_flags & NEW_PAR ||
-               frac.draw_flags() & REDRAW_FLAGS;
+        auto res =
+            force || _draw_flags & NEW_PAR || frac.draw_flags() & REDRAW_FLAGS;
         _draw_flags = 0;
         return res;
     }
@@ -170,10 +191,23 @@ private:
     std::vector<glm::dvec2> _pars;
     bool _x_only;
     std::size_t _max_size;
-    
+
     template<typename P>
     static glm::dvec2 to_space(glm::dvec2 p, ComplexFractal<P> &frac) {
         return (p - frac.center()) / frac.scale();
+    }
+
+    template<typename P>
+    std::optional<std::size_t> par_below(
+        glm::dvec2 pos, ComplexFractal<P> &frac
+    ) {
+        for (std::size_t i = 0; i < _pars.size(); ++i) {
+            auto d = pos - to_space(_pars[i], frac);
+            if (d.x * d.x + d.y * d.y < 0.004) {
+                return i;
+            }
+        }
+        return std::nullopt;
     }
 };
 
@@ -187,13 +221,17 @@ public:                                                                       \
         (picker).drag(pos, delta, *this);                                     \
     }                                                                         \
                                                                               \
-    void map_parameter_x(std::size_t idx, const std::function<double(double)> &map) override { \
-        (picker).map_parameter_x(idx, map);                                        \
+    void map_parameter_x(                                                     \
+        std::size_t idx, const std::function<double(double)> &map             \
+    ) override {                                                              \
+        (picker).map_parameter_x(idx, map);                                   \
     }                                                                         \
                                                                               \
-    void map_parameter_y(std::size_t idx, const std::function<double(double)> &map) override { \
-        (picker).map_parameter_y(idx, map);                                        \
-    }                                                                         
+    void map_parameter_y(                                                     \
+        std::size_t idx, const std::function<double(double)> &map             \
+    ) override {                                                              \
+        (picker).map_parameter_y(idx, map);                                   \
+    }
 
 #define USE_PICKER_FULL(picker, name, par_loc)                                \
     USE_PICKER(picker)                                                        \
@@ -208,22 +246,22 @@ protected:                                                                    \
         if (_picker.update_parameter(force, *this)) {                         \
             prog.uniform(par_loc, glm::vec2((picker).par_space(*this)));      \
         }                                                                     \
-    } \
-    \
-bool new_par() override {                                                 \
-return (picker).new_par();                                            \
-}                                                                         \
-    \
-glm::dvec2 par() override {                                               \
-return (picker).par();                                                \
-}                                                                         \
-    \
-Fractal &as_fractal() override {                                          \
-return *this;                                                         \
-} \
-\
-std::vector<glm::vec2> pars() override { \
-return (picker).pars(); \
-}
+    }                                                                         \
+                                                                              \
+    bool new_par() override {                                                 \
+        return (picker).new_par();                                            \
+    }                                                                         \
+                                                                              \
+    glm::dvec2 par() override {                                               \
+        return (picker).par();                                                \
+    }                                                                         \
+                                                                              \
+    Fractal &as_fractal() override {                                          \
+        return *this;                                                         \
+    }                                                                         \
+                                                                              \
+    std::vector<glm::vec2> pars() override {                                  \
+        return (picker).pars();                                               \
+    }
 
 } // namespace fio::fractals::pickers

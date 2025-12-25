@@ -206,6 +206,8 @@ void Commander::execute_command(std::string_view whole_cmd) {
         _app.activate(fractals::Fractal::Type::JULIA);
     } else if (cmd == "gs") {
         _app.activate(fractals::Fractal::Type::BURNING_SHIP);
+    } else if (cmd == "gn") {
+        _app.activate(fractals::Fractal::Type::NEWTON);
     } else if (cmd == "G") {
         _app.activate(fractals::Fractal::Type(std::size_t(num.value_or(0))));
     } else if (cmd == " ") {

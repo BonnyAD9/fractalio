@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "../fractal.hpp"
 
 #include <glm/glm.hpp>

@@ -1,4 +1,5 @@
 #include "process_defines.hpp"
+
 #include <ranges>
 
 namespace fio::gl {
@@ -36,4 +37,4 @@ void process_defines(
     }
 }
 
-}
+} // namespace fio::gl

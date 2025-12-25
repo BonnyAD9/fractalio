@@ -49,12 +49,15 @@ constexpr std::string_view HELP_TEXT = R".(HELP
              `m`: Mandelbrot set
              `j`: Julia set
              `s`: Burning ship
+             `n`: Newton fractal
     <number>`G`
            Go to fractal/page identified by number:
              0: Help
              1: Mandelbrot set
              2: Julia set
              3: Burning ship
+             4: Powerbrot
+             5: Newton fractal
 ).";
 
 Help::Help(const gui::Text &text_cfg) : _text(text_cfg) {

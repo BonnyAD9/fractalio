@@ -106,12 +106,16 @@ public:
 
     virtual void map_y(const std::function<double(double)> &map) { (void)map; }
 
-    virtual void map_parameter_x(std::size_t idx, const std::function<double(double)> &map) {
+    virtual void map_parameter_x(
+        std::size_t idx, const std::function<double(double)> &map
+    ) {
         (void)idx;
         (void)map;
     }
 
-    virtual void map_parameter_y(std::size_t idx, const std::function<double(double)> &map) {
+    virtual void map_parameter_y(
+        std::size_t idx, const std::function<double(double)> &map
+    ) {
         (void)idx;
         (void)map;
     }
