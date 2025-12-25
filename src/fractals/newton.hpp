@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../gl/program.hpp"
+#include "../gl/df_shader_program.hpp"
 #include "iterative_fractal.hpp"
 #include "pickers/picker_impl.hpp"
 
@@ -10,7 +10,7 @@
 
 namespace fio::fractals {
 
-class Newton : public IterativeFractal<gl::Program> {
+class Newton : public IterativeFractal<gl::DFShaderProgram> {
 public:
     static constexpr std::size_t DEFAULT_MAX_ROOTS = 15;
 
@@ -27,9 +27,9 @@ protected:
     void update_parameters(bool force) override;
 
 private:
-    GLint _loc_coefs;
-    GLint _loc_roots;
-    GLint _loc_root_cnt;
+    glm::ivec2 _loc_coefs;
+    glm::ivec2 _loc_roots;
+    glm::ivec2 _loc_root_cnt;
 
     pickers::PickerImpl _picker;
 

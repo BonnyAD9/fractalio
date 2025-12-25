@@ -68,16 +68,16 @@ void main() {
         case 0:
             break;
         case 1:
-            brightness = log(1 + 20 - (i - d) / iterations * 20);
+            brightness = log(1 + 20 - (i - pow(d, 0.128) * 1.7) / iterations * 20);
             break;
         case 2:
-            brightness = pow((i - d) / iterations, 8);
+            brightness = pow((i - pow(d, 0.128) * 1.7) / iterations, 8);
             break;
         case 3:
             cidx = (iterations - i) / color_count;
             break;
         case 4:
-            cidx = log(1 + 20 - (i - d) / iterations * 20);
+            cidx = log(1 + 20 - (i - pow(d, 0.128) * 1.7) / iterations * 20);
             break;
         }
         col = texture(gradient, cidx).xyz * brightness;
