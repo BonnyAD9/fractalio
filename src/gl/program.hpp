@@ -26,7 +26,7 @@ public:
 
     Program() : _id(glCreateProgram()) { }
 
-    void compile(const char *vert_src, const char *frag_src) const {
+    void compile(std::string_view vert_src, std::string_view frag_src) const {
         Shader vert(GL_VERTEX_SHADER);
         Shader frag(GL_FRAGMENT_SHADER);
         vert.compile(vert_src);

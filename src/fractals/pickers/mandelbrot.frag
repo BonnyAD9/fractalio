@@ -1,8 +1,5 @@
 #version 460 core
 
-#define ploat float
-#define pvec2 vec2
-
 out vec4 frag_color;
 in vec2 cor;
 
@@ -16,6 +13,8 @@ uniform uint iterations;
 uniform float color_count;
 
 uniform vec2 par;
+
+#include <ploat>
 
 void main() {
     pvec2 c = pvec2(cor * scale + center);

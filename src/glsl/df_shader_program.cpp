@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include "preprocess.hpp"
 #include "../gl/shader.hpp"
+#include "preprocess.hpp"
 
 namespace fio::glsl {
 
@@ -14,43 +14,17 @@ void DFShaderProgram::compile(
     vert.compile(vert_src);
 
     std::string src;
-    preprocess_defines(
-        src,
-        frag_src,
-        {
-            { "ploat", "float" },
-            { "pvec2", "vec2" },
-            { "patan", "atan" },
-            { "pcos", "cos" },
-            { "psin", "sin" },
-            { "pexp", "exp" },
-            { "plog", "log" },
-            { "ppow", "pow" },
-        }
-    );
+    preprocess_defines(src, frag_src, { { "PRECISION", "4" } });
     gl::Shader float_frag(GL_FRAGMENT_SHADER);
-    float_frag.compile(src.c_str());
+    float_frag.compile(src);
 
     src.clear();
-    preprocess_defines(
-        src,
-        frag_src,
-        {
-            { "ploat", "double" },
-            { "pvec2", "dvec2" },
-            { "patan", "datan" },
-            { "pcos", "dcos" },
-            { "psin", "dsin" },
-            { "pexp", "dexp" },
-            { "plog", "dlog" },
-            { "ppow", "dpow" },
-        }
-    );
+    preprocess_defines(src, frag_src, { { "PRECISION", "8" } });
     gl::Shader double_frag(GL_FRAGMENT_SHADER);
-    double_frag.compile(src.c_str());
+    double_frag.compile(src);
 
     _float.link(vert, float_frag);
     _double.link(vert, double_frag);
 }
 
-} // namespace fio::gl
+} // namespace fio::glsl

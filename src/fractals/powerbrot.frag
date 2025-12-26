@@ -1,12 +1,5 @@
 #version 460 core
 
-#define patan atan
-#define pcos cos
-#define psin sin
-#define pexp exp
-#define plog log
-#define ppow pow
-
 out vec4 frag_color;
 in vec2 cor;
 
@@ -23,6 +16,15 @@ uniform dvec2 par;
 
 #include <ploat>
 #include <mb_coloring>
+
+#if PRECISION == 8
+
+#define patan datan
+#define pcos dcos
+#define psin dsin
+#define pexp dexp
+#define plog dlog
+#define ppow dpow
 
 float after(float v) {
     if (v == -0.) {
@@ -112,6 +114,17 @@ double dpow(double v, float p) {
     }
     return res;
 }
+
+#else
+
+#define patan atan
+#define pcos cos
+#define psin sin
+#define pexp exp
+#define plog log
+#define ppow pow
+
+#endif
 
 pvec2 to_polar(pvec2 num) {
     return pvec2(

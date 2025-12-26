@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "../app/maps.hpp"
 #include "pickers/grid.hpp"
 
 namespace fio::fractals {
@@ -21,6 +22,8 @@ Powerbrot::Powerbrot(
     prog.use();
     _loc_par = prog.uniform_location("par");
     _picker = std::make_unique<pickers::Grid>(std::move(sp_fun));
+    _picker->as_fractal().map_parameter_x(0, app::maps::value(3));
+    _picker->as_fractal().map_x(app::maps::value(3));
 }
 
 } // namespace fio::fractals

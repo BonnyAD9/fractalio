@@ -15,8 +15,10 @@ public:
 
     Shader(GLenum type) : _id(glCreateShader(type)) { }
 
-    void compile(const char *source) const {
-        glShaderSource(_id, 1, &source, nullptr);
+    void compile(std::string_view source) const {
+        auto str = source.data();
+        auto len = GLint(source.size());
+        glShaderSource(_id, 1, &str, &len);
         glCompileShader(_id);
 
         GLint success;

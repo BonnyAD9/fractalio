@@ -56,4 +56,4 @@ private:
     bool _is_double = false;
 };
 
-} // namespace fio::gl
+} // namespace fio::glsl

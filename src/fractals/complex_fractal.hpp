@@ -1,7 +1,6 @@
 #pragma once
 
 #include <format>
-#include <print>
 #include <string_view>
 
 #include "../gl/buffer.hpp"
@@ -29,7 +28,7 @@ public:
     ) :
         _s_fun(std::move(s_fun)) {
         auto frag = glsl::preprocess_mylib(df_frag);
-        _program.compile(vertex_shader(), frag.c_str());
+        _program.compile(vertex_shader(), frag);
         _program.use();
 
         _loc_proj = _program.uniform_location("proj");

@@ -1,6 +1,8 @@
 #ifndef MB_COLORING_INCLUDED
 #define MB_COLORING_INCLUDED
 
+#include <ploat>
+
 float lla(pvec2 x) {
     const float ILN2 = 1.442695040888963;
     return log(log(float(length(x)))) * ILN2;

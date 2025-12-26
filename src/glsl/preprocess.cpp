@@ -41,9 +41,13 @@ void preprocess_defines(
     }
 }
 
-void preprocess_includes(std::string &out, std::string_view src, const std::unordered_map<std::string_view, std::string_view> &inc_map) {
+void preprocess_includes(
+    std::string &out,
+    std::string_view src,
+    const std::unordered_map<std::string_view, std::string_view> &inc_map
+) {
     constexpr std::string_view PREFIX = "#include ";
-    
+
     for (auto l : std::ranges::views::split(src, '\n')) {
         const std::string_view line{ l };
         if (!line.starts_with(PREFIX)) {
@@ -51,18 +55,20 @@ void preprocess_includes(std::string &out, std::string_view src, const std::unor
             out.push_back('\n');
             continue;
         }
-        
+
         auto file = line.substr(PREFIX.size() + 1);
         file = file.substr(0, file.length() - 1);
         std::string_view contents;
         try {
             contents = inc_map.at(file);
         } catch (...) {
-            throw std::runtime_error(std::format("Invalid include `{}` in line `{}`", file, line));
+            throw std::runtime_error(
+                std::format("Invalid include `{}` in line `{}`", file, line)
+            );
         }
         preprocess_includes(out, contents, inc_map);
         out.push_back('\n');
     }
 }
 
-} // namespace fio::gl
+} // namespace fio::glsl
