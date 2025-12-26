@@ -12,8 +12,6 @@ uniform uint flags; // unused
 
 uniform dvec2 center;
 uniform double scale;
-uniform uint iterations;
-uniform float color_count;
 
 uniform vec2 par;
 

@@ -102,7 +102,7 @@ public:
             if (_pars.size() >= _max_size) {
                 return;
             }
-            _pars.push_back(pc);
+            _pars.push_back(pc * frac.scale() + frac.center());
         }
         default:
             return;

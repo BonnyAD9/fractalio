@@ -69,7 +69,7 @@ DrawTex::DrawTex(
     gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, INDICES);
 }
 
-void DrawTex::draw() {
+void DrawTex::draw(double) {
     _program.use();
     _vao.bind();
     _texture.bind(GL_TEXTURE_2D);

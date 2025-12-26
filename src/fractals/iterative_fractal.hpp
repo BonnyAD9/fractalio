@@ -65,6 +65,8 @@ protected:
     }
 
     void update_parameters(bool force) override {
+        ComplexFractal<P>::update_parameters(force);
+
         auto flags = ComplexFractal<P>::draw_flags();
         auto &prog = ComplexFractal<P>::program();
 

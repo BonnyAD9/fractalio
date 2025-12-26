@@ -42,7 +42,7 @@ public:
         );
     }
 
-    void draw() override { _text.draw(); }
+    void draw(double) override { _text.draw(); }
 
     std::string describe() override { return ""; }
 

@@ -12,6 +12,7 @@
 
 #include "../fractals/burning_julia.hpp"
 #include "../fractals/burning_ship.hpp"
+#include "../fractals/double_pendulum.hpp"
 #include "../fractals/help.hpp"
 #include "../fractals/julia.hpp"
 #include "../fractals/mandelbrot.hpp"
@@ -86,18 +87,21 @@ void Fractalio::mainloop() {
     _window->make_context_current();
 
     double last_time = glfwGetTime();
+    double last_fps = glfwGetTime();
     double next_fps = 0;
     int fcnt = 0;
     while (!_window->should_close()) {
         const double time = glfwGetTime();
+        const double delta = time - last_time;
+        last_time = time;
 
         process_input();
 
         glClear(GL_COLOR_BUFFER_BIT);
-        _active->draw();
+        _active->draw(delta);
         auto picker = _active->picker();
         if (picker) {
-            picker->draw();
+            picker->draw(delta);
         }
 
         if (_new_info) {
@@ -111,12 +115,12 @@ void Fractalio::mainloop() {
         _info.draw();
 
         if (time > next_fps) {
-            const double delta_time = time - last_time;
-            last_time = time;
+            const double delta_time = time - last_fps;
+            last_fps = time;
             _fps_text.clear_text();
             auto fps = std::format("FPS: {}", std::size_t(fcnt / delta_time));
             _fps_text.add_text(fps, { 0, 0 });
-            next_fps = last_time + FPS_INTERVAL;
+            next_fps = last_fps + FPS_INTERVAL;
             fcnt = 0;
         }
         fcnt += 1;
@@ -155,6 +159,8 @@ void Fractalio::init_fractals() {
         std::make_unique<fractals::Newton>(s_fun);
     _fractals[fractals::Fractal::Type::BURNING_JULIA] =
         std::make_unique<fractals::BurningJulia>(s_fun, sp_fun);
+    _fractals[fractals::Fractal::Type::DOUBLE_PENDULUM] =
+        std::make_unique<fractals::DoublePendulum>(s_fun);
 
     _active = _fractals[fractals::Fractal::Type::MANDELBROT].get();
     _focus = _active;

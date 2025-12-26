@@ -4,11 +4,13 @@
 #include <string_view>
 
 #include "../gl/buffer.hpp"
+#include "../gl/gl.hpp"
 #include "../gl/texture.hpp"
 #include "../gl/vertex_array.hpp"
 #include "../glsl/preprocess.hpp"
 #include "../gradient.hpp"
 #include "fractal.hpp"
+#include "glad/gl.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/fwd.hpp>
@@ -48,9 +50,6 @@ public:
         );
         glEnableVertexAttribArray(LOCATION);
 
-        _ebo.bind(GL_ELEMENT_ARRAY_BUFFER);
-        gl::buffer_data(GL_ELEMENT_ARRAY_BUFFER, indices());
-
         _texture.bind(GL_TEXTURE_1D);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -71,8 +70,8 @@ public:
 
         const float h = _size.y / _size.x * 2;
         _vertices = {
-            pos.x, pos.y, /* */ -2, h,  // TL
             pos.x, end.y, /* */ -2, -h, // BL
+            pos.x, pos.y, /* */ -2, h,  // TL
             end.x, end.y, /* */ 2,  -h, // BR
             end.x, pos.y, /* */ 2,  h,  // TR
         };
@@ -81,41 +80,17 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    void draw() override {
+    void draw(double) override {
         _program.use();
         _vao.bind();
         _texture.bind(GL_TEXTURE_1D);
 
-        if (_draw_flags & NEW_VERTICES) {
-            _vbo.bind(GL_ARRAY_BUFFER);
-            gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
-            glEnableVertexAttribArray(LOCATION);
-        }
-
         const bool force = _draw_flags & NEW_USE_DOUBLE;
-
-        if (force || _draw_flags & NEW_VERTICES) {
-            _program.uniform(
-                _loc_proj, glm::ortho(0.F, _wsize.x, _wsize.y, 0.F)
-            );
-        }
-
-        if (force || _draw_flags & NEW_CENTER) {
-            _program.uniform(_loc_center, _center);
-        }
-
-        if (force || _draw_flags & NEW_SCALE) {
-            _program.uniform(_loc_scale, _scale);
-        }
-
-        if (force || _draw_flags & NEW_FLAGS) {
-            _program.uniform(_loc_flags, _flags);
-        }
 
         update_parameters(force);
 
         _draw_flags = 0;
-        gl::draw_elements(GL_TRIANGLES, indices().size(), GL_UNSIGNED_INT, 0);
+        gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
     void move(glm::dvec2 delta) override {
@@ -213,7 +188,41 @@ protected:
         return _size.x;
     }
 
-    virtual void update_parameters(bool force) { (void)force; }
+    [[nodiscard]]
+    constexpr glm::dvec2 size() const {
+        return _size;
+    }
+
+    [[nodiscard]]
+    constexpr glm::vec2 wsize() const {
+        return _wsize;
+    }
+
+    virtual void update_parameters(bool force) {
+        if (_draw_flags & NEW_VERTICES) {
+            _vbo.bind(GL_ARRAY_BUFFER);
+            gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
+            glEnableVertexAttribArray(LOCATION);
+        }
+
+        if (force || _draw_flags & NEW_VERTICES) {
+            _program.uniform(
+                _loc_proj, glm::ortho(0.F, _wsize.x, _wsize.y, 0.F)
+            );
+        }
+
+        if (force || _draw_flags & NEW_CENTER) {
+            _program.uniform(_loc_center, _center);
+        }
+
+        if (force || _draw_flags & NEW_SCALE) {
+            _program.uniform(_loc_scale, _scale);
+        }
+
+        if (force || _draw_flags & NEW_FLAGS) {
+            _program.uniform(_loc_flags, _flags);
+        }
+    }
 
     enum DrawFlags {
         NEW_VERTICES = 1,
@@ -231,14 +240,22 @@ protected:
 
     int add_draw_flag(int flag) { return _draw_flags |= flag; }
 
+    int set_draw_flags(int flags) { return _draw_flags = flags; }
+
+    gl::VertexArray &vao() { return _vao; }
+
+    [[nodiscard]]
+    constexpr P::Location loc_proj() const {
+        return _loc_proj;
+    }
+
 private:
     static constexpr const GLuint LOCATION = 0;
 
     P _program;
     gl::VertexArray _vao;
     gl::Buffer _vbo;
-    gl::Buffer _ebo;
-    gl::Texture _texture;
+    gl::Texture _texture; // TODO: remove/move
 
     std::function<glm::mat3x2(glm::vec2)> _s_fun;
 
@@ -257,8 +274,8 @@ private:
     int _draw_flags = 0;
 
     std::array<float, 16> _vertices{
-        0,   0,   /* */ -2, 2,  // TL
         0,   600, /* */ -2, -2, // BL
+        0,   0,   /* */ -2, 2,  // TL
         800, 600, /* */ 2,  -2, // BR,
         800, 0,   /* */ 2,  2,  // TR
     };
@@ -270,14 +287,6 @@ private:
             , 0
         };
         return VERTEX_SHADER;
-    }
-
-    static constexpr std::span<const GLuint> indices() {
-        static constexpr std::array<GLuint, 6> INDICES{
-            0, 1, 2, //
-            0, 2, 3, //
-        };
-        return INDICES;
     }
 };
 

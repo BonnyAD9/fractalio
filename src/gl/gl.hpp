@@ -58,6 +58,14 @@ static inline void buffer_data(
     );
 }
 
+static inline void draw_buffers(std::span<const GLenum> bufs) {
+    glDrawBuffers(GLsizei(bufs.size()), bufs.data());
+}
+
+static inline void draw_buffers(GLenum buf) {
+    glDrawBuffers(1, &buf);
+}
+
 static inline void vertex_attrib_pointer(
     GLuint location,
     GLint st_size,
@@ -115,6 +123,17 @@ static inline void tex_image_2d(
     glTexImage2D(
         GL_TEXTURE_2D, 0, GLint(typ), w, h, 0, typ, GL_UNSIGNED_BYTE, data
     );
+}
+
+static inline void tex_image_2d(
+    const std::uint8_t *data,
+    GLsizei w,
+    GLsizei h,
+    GLint ct,
+    GLenum comp,
+    GLenum typ
+) {
+    glTexImage2D(GL_TEXTURE_2D, 0, ct, w, h, 0, comp, typ, data);
 }
 
 static inline void uniform(GLint location, std::span<glm::vec2> value) {

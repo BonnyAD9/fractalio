@@ -20,7 +20,7 @@ public:
         std::function<glm::mat3x2(glm::vec2)> s_fun
     );
 
-    void draw() override;
+    void draw(double) override;
 
     void scale(double) override { }
     void resize(glm::vec2 size) override;

@@ -27,10 +27,11 @@ public:
         POWERBROT,
         NEWTON,
         BURNING_JULIA,
+        DOUBLE_PENDULUM,
     };
 
     virtual void resize(glm::vec2 size) = 0;
-    virtual void draw() = 0;
+    virtual void draw(double delta) = 0;
 
     void drag_start(int button, int, glm::dvec2) override {
         switch (button) {
