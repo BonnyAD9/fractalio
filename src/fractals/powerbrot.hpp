@@ -3,7 +3,7 @@
 #include <format>
 #include <memory>
 
-#include "../gl/df_shader_program.hpp"
+#include "../glsl/df_shader_program.hpp"
 #include "iterative_fractal.hpp"
 #include "pickers/picker.hpp"
 
@@ -11,7 +11,7 @@
 
 namespace fio::fractals {
 
-class Powerbrot : public IterativeFractal<gl::DFShaderProgram> {
+class Powerbrot : public IterativeFractal<glsl::DFShaderProgram> {
 public:
     Powerbrot(
         std::function<glm::mat3x2(glm::vec2)> s_fun,

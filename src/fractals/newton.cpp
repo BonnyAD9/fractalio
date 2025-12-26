@@ -2,9 +2,8 @@
 
 #include <format>
 #include <functional>
-#include <print>
 
-#include "../gl/process_defines.hpp"
+#include "../glsl/preprocess.hpp"
 
 #include <glm/glm.hpp>
 
@@ -20,7 +19,7 @@ static constexpr char FRAGMENT_SHADER[]{
 
 static std::string prepare_shader(std::size_t root_cnt) {
     std::string res;
-    gl::process_defines(
+    glsl::preprocess_defines(
         res, FRAGMENT_SHADER, { { "max_roots", std::format("{}", root_cnt) } }
     );
     return res;

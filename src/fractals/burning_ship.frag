@@ -15,6 +15,9 @@ uniform double scale;
 uniform uint iterations;
 uniform float color_count;
 
+#include <ploat>
+#include <mb_coloring>
+
 void main() {
     pvec2 c = pvec2(cor * scale + center);
     c = pvec2(c.x, -c.y);
@@ -39,21 +42,12 @@ void main() {
     if (i <= 0) {
         frag_color = vec4(0, 0, 0, 1);
     } else {
-        float brightness = 1;
-        float cidx = iterations - i;
-        switch (flags & 0xFu) {
-        case 0:
-            break;
-        case 1: {
-            cidx += 1 - log(log(float(length(x)))) / 0.6931471805599453;
-            break;
-        }
-        case 2:
-            brightness = 1 - log(log(float(length(x)))) / 0.6931471805599453; 
-            break;
-        }
-        
-        vec3 col = texture(gradient, cidx / color_count).xyz;
-        frag_color = vec4(col * brightness, 1);
+        frag_color = mb_coloring(
+            gradient,
+            flags,
+            iterations - i,
+            color_count,
+            vec2(x)
+        );
     }
 }

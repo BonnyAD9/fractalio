@@ -2,12 +2,12 @@
 
 #include <string_view>
 
-#include "gl.hpp"
-#include "program.hpp"
+#include "../gl/gl.hpp"
+#include "../gl/program.hpp"
 
 #include <glm/glm.hpp>
 
-namespace fio::gl {
+namespace fio::glsl {
 
 class DFShaderProgram {
 public:
@@ -50,8 +50,8 @@ public:
     }
 
 private:
-    Program _float;
-    Program _double;
+    gl::Program _float;
+    gl::Program _double;
 
     bool _is_double = false;
 };

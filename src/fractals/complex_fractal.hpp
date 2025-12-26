@@ -1,11 +1,13 @@
 #pragma once
 
 #include <format>
+#include <print>
 #include <string_view>
 
 #include "../gl/buffer.hpp"
 #include "../gl/texture.hpp"
 #include "../gl/vertex_array.hpp"
+#include "../glsl/preprocess.hpp"
 #include "../gradient.hpp"
 #include "fractal.hpp"
 
@@ -26,7 +28,8 @@ public:
         const char *df_frag, std::function<glm::mat3x2(glm::vec2)> s_fun
     ) :
         _s_fun(std::move(s_fun)) {
-        _program.compile(vertex_shader(), df_frag);
+        auto frag = glsl::preprocess_mylib(df_frag);
+        _program.compile(vertex_shader(), frag.c_str());
         _program.use();
 
         _loc_proj = _program.uniform_location("proj");

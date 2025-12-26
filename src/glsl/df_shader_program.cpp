@@ -2,10 +2,10 @@
 
 #include <unordered_map>
 
-#include "process_defines.hpp"
-#include "shader.hpp"
+#include "preprocess.hpp"
+#include "../gl/shader.hpp"
 
-namespace fio::gl {
+namespace fio::glsl {
 
 void DFShaderProgram::compile(
     const char *vert_src, std::string_view frag_src
@@ -14,7 +14,7 @@ void DFShaderProgram::compile(
     vert.compile(vert_src);
 
     std::string src;
-    process_defines(
+    preprocess_defines(
         src,
         frag_src,
         {
@@ -32,7 +32,7 @@ void DFShaderProgram::compile(
     float_frag.compile(src.c_str());
 
     src.clear();
-    process_defines(
+    preprocess_defines(
         src,
         frag_src,
         {
