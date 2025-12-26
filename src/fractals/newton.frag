@@ -1,7 +1,5 @@
 #version 460 core
 
-#define ploat float
-#define pvec2 vec2
 #define max_roots 8
 
 out vec4 frag_color;
@@ -19,6 +17,8 @@ uniform float color_count; // unused
 uniform uint root_cnt;
 uniform vec2[max_roots + 1] coefs;
 uniform vec2[max_roots] roots;
+
+#include <ploat>
 
 pvec2 newton_raphson(pvec2 z);
 pvec2 cmul(pvec2 a, pvec2 b);
@@ -68,16 +68,16 @@ void main() {
         case 0:
             break;
         case 1:
-            brightness = log(1 + 20 - (i - pow(d, 0.128) * 1.7) / iterations * 20);
+            brightness = log(1 + (iterations - i + pow(d, 0.128) * 1.7) / color_count);
             break;
         case 2:
             brightness = pow((i - pow(d, 0.128) * 1.7) / iterations, 8);
             break;
         case 3:
-            cidx = (iterations - i) / color_count;
+            cidx = (iterations - i + pow(d, 0.128) * 1.7) / color_count;
             break;
         case 4:
-            cidx = log(1 + 20 - (i - pow(d, 0.128) * 1.7) / iterations * 20);
+            cidx = log(1 + (iterations - i + pow(d, 0.128) * 1.7) / color_count);
             break;
         }
         col = texture(gradient, cidx).xyz * brightness;

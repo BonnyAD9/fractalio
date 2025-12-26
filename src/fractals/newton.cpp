@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "../glsl/preprocess.hpp"
+#include "../app/maps.hpp"
 
 #include <glm/glm.hpp>
 
@@ -36,6 +37,7 @@ Newton::Newton(
     _loc_roots = prog.uniform_location("roots");
     _loc_root_cnt = prog.uniform_location("root_cnt");
     set_flags(0xF, 1);
+    map_color_count(app::maps::value(12));
 }
 
 std::string Newton::describe() {
