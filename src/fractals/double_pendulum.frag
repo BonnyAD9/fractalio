@@ -10,32 +10,47 @@ uniform uint action;
 
 uniform dvec2 center;
 uniform double scale;
+uniform float height;
 
 uniform float step_size;
 uniform uint step_cnt;
 
-vec4 step(vec4 state) {
-    return vec4(state.x + 0.1 * step_size, state.yzw);
-}
+const float PI = 3.14159265359;
 
-vec4 stepn(vec4 state) {
-    for (uint i = step_cnt; i > 0; --i) {
-        state = step(state);
-    }
-    return state;
-}
+vec4 init();
+vec4 to_color(vec4 state);
 
 void main() {
     switch (action) {
     case 0: // init
-        frag_color = stepn(vec4(0, 1, 0, 1));
+        // TODO: step
+        frag_color = init();
         break;
     case 1: // step
-        // TODO: solve ratio for texture index
-        frag_color = stepn(texture(state, cor));
+        // TODO: step
+        frag_color = texture(state, cor / vec2(4, height * 2) + 0.5);
         break;
     default: // draw
-        frag_color = texture(state, cor);
+        frag_color = to_color(texture(state, cor / vec2(4, height * 2) + 0.5));
         break;
     }
+}
+
+vec4 init() {
+    const float PO4 = 0.785398163397;
+    vec2 pos = vec2(cor * scale + center);
+    return vec4(pos * PO4 + PI, 0, 0);
+}
+
+vec4 to_color(vec4 s) {
+    const float SQRT2 = 1.414213562373095;
+    const float PO2 = PI / 2;
+    vec2 cps = mod(s.xy, PI) / PO2;
+    if (cps.x > 1) {
+        cps.x = 2 - cps.x;
+    }
+    if (cps.y > 1) {
+        cps.y = 2 - cps.y;
+    }
+    return vec4(cps, 1 - length(cps) / SQRT2, 1);
 }

@@ -18,6 +18,7 @@ DoublePendulum::DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun) :
     _loc_step_cnt = prog.uniform_location("step_cnt");
     _loc_step_size = prog.uniform_location("step_size");
     _loc_action = prog.uniform_location("action");
+    _loc_height = prog.uniform_location("height");
 
     _state.bind(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -38,6 +39,7 @@ void DoublePendulum::draw(double delta) {
     vao().bind();
 
     const bool force = draw_flags() & NEW_USE_DOUBLE;
+    const bool reset = draw_flags() & (NEW_VERTICES | NEW_CENTER | NEW_SCALE);
 
     update_parameters(force);
 
@@ -62,16 +64,24 @@ void DoublePendulum::draw(double delta) {
             GL_RGBA,
             GL_FLOAT
         );
+    } else {
+        _state.bind(GL_TEXTURE_2D);
+    }
+    
+    if (reset) {
         action = 0;
         step_cnt = 1;
         delta = 0.1;
-    } else {
-        _state.bind(GL_TEXTURE_2D);
+    }
+    
+    if (force || draw_flags() & NEW_VERTICES) {
+        prog.uniform(_loc_height, float(size().y / size().x * 2));
     }
 
     set_draw_flags(0);
 
     // draw the state
+    glBlendFunc(GL_ONE, GL_ZERO);
     prog.uniform(_loc_action, action);
     prog.uniform(_loc_step_cnt, step_cnt);
     prog.uniform(_loc_step_size, float(delta));
@@ -90,6 +100,7 @@ void DoublePendulum::draw(double delta) {
     gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // draw to screen
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, GLsizei(wsize().x), GLsizei(wsize().y));
     std::swap(_tmp, _state);

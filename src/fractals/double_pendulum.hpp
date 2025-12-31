@@ -25,6 +25,7 @@ private:
     GLint _loc_step_size;
     GLint _loc_step_cnt;
     GLint _loc_action;
+    GLint _loc_height;
 };
 
 } // namespace fio::fractals
