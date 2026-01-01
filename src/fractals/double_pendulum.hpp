@@ -21,6 +21,8 @@ private:
     gl::Texture _state;
     gl::Texture _tmp;
     gl::Framebuffer _fbuf;
+    
+    double _time;
 
     GLint _loc_step_size;
     GLint _loc_step_cnt;

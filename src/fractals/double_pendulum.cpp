@@ -20,6 +20,11 @@ DoublePendulum::DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun) :
     _loc_action = prog.uniform_location("action");
     _loc_height = prog.uniform_location("height");
     
+    _fbuf.bind();
+    std::array<GLenum, 2> dbufs{ GL_NONE, GL_COLOR_ATTACHMENT0 };
+    gl::draw_buffers(dbufs);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
     for (auto s : { &_state, &_tmp }) {
         s->bind(GL_TEXTURE_2D);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -57,10 +62,18 @@ void DoublePendulum::draw(double delta) {
         _state.bind(GL_TEXTURE_2D);
     }
     
+    _time += delta;
+    
     if (reset) {
         action = 0;
         step_cnt = 1;
-        delta = 0.1;
+        delta = _time;
+    }
+    
+    constexpr double MAX_DELTA = 0.005;
+    if (delta > MAX_DELTA) {
+        step_cnt = std::size_t(delta / MAX_DELTA);
+        delta = delta / step_cnt;
     }
     
     if (force || draw_flags() & NEW_VERTICES) {
@@ -78,8 +91,6 @@ void DoublePendulum::draw(double delta) {
         loc_proj(), glm::ortho(0.F, float(size().x), float(size().y), 0.F)
     );
     _fbuf.bind();
-    std::array<GLenum, 2> dbufs{ GL_NONE, GL_COLOR_ATTACHMENT0 };
-    gl::draw_buffers(dbufs);
     _fbuf.texture_2d(_tmp, GL_COLOR_ATTACHMENT0);
     glViewport(0, 0, GLsizei(size().x), GLsizei(size().y));
     auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
