@@ -1,11 +1,13 @@
 #include "fractalio.hpp"
 
+#include <cmath>
 #include <format>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <optional>
 #include <print>
+#include <thread>
 #include <utility>
 
 #include <GLFW/glfw3.h>
@@ -91,8 +93,13 @@ void Fractalio::mainloop() {
     double next_fps = 0;
     int fcnt = 0;
     while (!_window->should_close()) {
-        const double time = glfwGetTime();
-        const double delta = time - last_time;
+        double time = glfwGetTime();
+        double delta = time - last_time;
+        if (delta < _min_interval) {
+            std::this_thread::sleep_for(std::chrono::duration<double>(_min_interval - delta));
+            time = glfwGetTime();
+            delta = time - last_time;
+        }
         last_time = time;
 
         process_input();
@@ -118,7 +125,7 @@ void Fractalio::mainloop() {
             const double delta_time = time - last_fps;
             last_fps = time;
             _fps_text.clear_text();
-            auto fps = std::format("FPS: {}", std::size_t(fcnt / delta_time));
+            auto fps = std::format("FPS: {}", std::size_t(std::round(fcnt / delta_time)));
             _fps_text.add_text(fps, { 0, 0 });
             next_fps = last_fps + FPS_INTERVAL;
             fcnt = 0;

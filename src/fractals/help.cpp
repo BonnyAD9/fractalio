@@ -41,8 +41,10 @@ constexpr std::string_view HELP_TEXT = R".(HELP
     `c`    Set number of colors.
     `x`    Set x (real) coordinate.
     `y`    Set y (imaginary) coordinate.
-    `:vsync`  `on`/`off`
-           Enable/disable vsync.
+    `:vsync`  <int>
+           Enable/disable vsync. (0 disable, 1 enable)
+    `:fps` <int>
+           Limit the fps.
     `g`<char>
            Go to the given fractal:
              `h`: Help

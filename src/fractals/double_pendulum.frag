@@ -1,6 +1,7 @@
 #version 460 core
 
 out vec4 frag_color;
+layout (location = 1) out vec4 state_out;
 
 uniform sampler2D state;
 in vec2 cor;
@@ -22,15 +23,13 @@ vec4 to_color(vec4 state);
 
 void main() {
     switch (action) {
-    case 0: // init
-        // TODO: step
-        frag_color = init();
+    case 0:
+        state_out = init();
         break;
-    case 1: // step
-        // TODO: step
-        frag_color = texture(state, cor / vec2(4, height * 2) + 0.5);
+    case 1:
+        state_out = texture(state, cor / vec2(4, height * 2) + 0.5);
         break;
-    default: // draw
+    default:
         frag_color = to_color(texture(state, cor / vec2(4, height * 2) + 0.5));
         break;
     }

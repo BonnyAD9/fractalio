@@ -43,6 +43,7 @@ private:
     bool _new_info = true;
     gui::Text _fps_text;
     Commander _commander;
+    double _min_interval = 0;
 
     glm::vec2 _wsize;
 

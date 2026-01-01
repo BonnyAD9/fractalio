@@ -161,11 +161,14 @@ void Commander::long_command(std::string_view cmd) {
         if (args.empty()) {
             glfwSwapInterval(1);
         } else {
-            glfwSwapInterval(
-                args.next_arg<bool, std::string_view, std::string_view>(
-                    "on", "off"
-                )
-            );
+            glfwSwapInterval(args.next_arg<int>());
+        }
+    } else if (cmd == ":fps") {
+        if (args.empty()) {
+            _app._min_interval = 0;
+        } else {
+            auto fps = args.next_arg<double>();
+            _app._min_interval = fps == 0 ? 0 : 1 / fps;
         }
     } else if (cmd == ":flags") {
         auto mask = args.next_arg<GLuint>();

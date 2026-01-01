@@ -19,18 +19,14 @@ DoublePendulum::DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun) :
     _loc_step_size = prog.uniform_location("step_size");
     _loc_action = prog.uniform_location("action");
     _loc_height = prog.uniform_location("height");
-
-    _state.bind(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    _tmp.bind(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    
+    for (auto s : { &_state, &_tmp }) {
+        s->bind(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
 }
 
 void DoublePendulum::draw(double delta) {
@@ -46,24 +42,17 @@ void DoublePendulum::draw(double delta) {
     GLuint action = 1;
     GLuint step_cnt = 1;
     if (draw_flags() & NEW_VERTICES) {
-        _tmp.bind(GL_TEXTURE_2D);
-        gl::tex_image_2d(
-            nullptr,
-            GLsizei(size().x),
-            GLsizei(size().y),
-            GL_RGBA32F,
-            GL_RGBA,
-            GL_FLOAT
-        );
-        _state.bind(GL_TEXTURE_2D);
-        gl::tex_image_2d(
-            nullptr,
-            GLsizei(size().x),
-            GLsizei(size().y),
-            GL_RGBA32F,
-            GL_RGBA,
-            GL_FLOAT
-        );
+        for (auto s : { &_tmp, &_state }) {
+            s->bind(GL_TEXTURE_2D);
+            gl::tex_image_2d(
+                nullptr,
+                GLsizei(size().x),
+                GLsizei(size().y),
+                GL_RGBA32F,
+                GL_RGBA,
+                GL_FLOAT
+            );
+        }
     } else {
         _state.bind(GL_TEXTURE_2D);
     }
@@ -89,10 +78,10 @@ void DoublePendulum::draw(double delta) {
         loc_proj(), glm::ortho(0.F, float(size().x), float(size().y), 0.F)
     );
     _fbuf.bind();
-    _fbuf.texture_2d(_tmp);
-    _fbuf.bind();
+    std::array<GLenum, 2> dbufs{ GL_NONE, GL_COLOR_ATTACHMENT0 };
+    gl::draw_buffers(dbufs);
+    _fbuf.texture_2d(_tmp, GL_COLOR_ATTACHMENT0);
     glViewport(0, 0, GLsizei(size().x), GLsizei(size().y));
-    gl::draw_buffers(GL_COLOR_ATTACHMENT0);
     auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         std::println("Invalid config.");

@@ -62,8 +62,8 @@ static inline void draw_buffers(std::span<const GLenum> bufs) {
     glDrawBuffers(GLsizei(bufs.size()), bufs.data());
 }
 
-static inline void draw_buffers(GLenum buf) {
-    glDrawBuffers(1, &buf);
+static inline void draw_buffer(GLenum buf) {
+    glDrawBuffer(buf);
 }
 
 static inline void vertex_attrib_pointer(
