@@ -14,6 +14,8 @@ uniform float color_count;
 
 uniform dvec2 par;
 
+const float PI = 3.14159265359;
+
 #include <ploat>
 #include <mb_coloring>
 
@@ -143,14 +145,15 @@ pvec2 from_polar(pvec2 num) {
 void main() {
     pvec2 c = pvec2(cor * scale + center);
     pvec2 x = c;
-    pvec2 p = pvec2(ploat(float(par.x)), par.y);
+    pvec2 p = pvec2(par.x, par.y);
+    
+    ploat mz = max(ploat(par.x * par.x + par.y * par.y), 4);
 
     uint i = iterations;
     for (; i > 0; --i) {
         x = to_polar(x);
 
-        // |x| > 2
-        if (x.x > 16) {
+        if (x.x > mz) {
             break;
         }
 
