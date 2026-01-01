@@ -31,17 +31,19 @@ const float L2 = 1;
 vec4 get_state();
 vec4 init();
 vec4 to_color(vec4 s);
-vec4 step(vec4 s);
+vec4 step_rk1(vec4 s);
 vec2 get_acceleration(vec4 s);
-vec4 stepn(vec4 s, uint n);
+vec4 derive(vec4 s, float t);
+vec4 stepn_rk1(vec4 s);
+vec4 stepn_rk4(vec4 s);
 
 void main() {
     switch (action) {
     case 0:
-        state_out = stepn(init(), step_cnt);
+        state_out = stepn_rk4(init());
         break;
     case 1:
-        state_out = stepn(texture(state, cor / vec2(4, height * 2) + 0.5), step_cnt);
+        state_out = stepn_rk4(texture(state, cor / vec2(4, height * 2) + 0.5));
         break;
     default:
         frag_color = to_color(texture(state, cor / vec2(4, height * 2) + 0.5));
@@ -62,6 +64,14 @@ vec4 init() {
 vec4 to_color(vec4 s) {
     const float SQRT2 = 1.414213562373095;
     vec2 cps = mod(s.xy, PI) / PO2;
+    switch (flags & 0xFu) {
+    case 1:
+        cps = s.zw;
+        break;
+    case 2:
+        cps = (get_acceleration(s) + 4) / 8;
+        break;
+    }
     if (cps.x > 1) {
         cps.x = 2 - cps.x;
     }
@@ -71,10 +81,19 @@ vec4 to_color(vec4 s) {
     return vec4(cps, 1 - length(cps) / SQRT2, 1);
 }
 
-vec4 step(vec4 s) {
-    s.zw += get_acceleration(s) * step_size;
-    s.xy += s.zw * step_size;
-    return s;
+vec4 step_rk1(vec4 x, float h) {
+    return x + derive(x, h) * h;
+}
+
+vec4 step_rk4(vec4 x, float h) {
+    float ho2 = h / 2;
+    
+    vec4 k1 = derive(x, 0);
+    vec4 k2 = derive(x + k1 * ho2, ho2);
+    vec4 k3 = derive(x + k2 * ho2, ho2);
+    vec4 k4 = derive(x + h * k3, h);
+    
+    return x + h * (k1 + 2 * k2 + 2 * k3 + k4) / 6;
 }
 
 vec2 get_acceleration(vec4 s) {
@@ -105,9 +124,22 @@ vec2 get_acceleration(vec4 s) {
     return vec2(dw1, dw2);
 }
 
-vec4 stepn(vec4 state, uint n) {
-    for (; n > 0; --n) {
-        state = step(state);
+vec4 derive(vec4 s, float t) {
+    vec2 acc = get_acceleration(s);
+    s.zw += acc * t;
+    return vec4(s.zw, acc);
+}
+
+vec4 stepn_rk1(vec4 state) {
+    for (uint n = step_cnt; n > 0; --n) {
+        state = step_rk1(state, step_size);
+    }
+    return state;
+}
+
+vec4 stepn_rk4(vec4 state) {
+    for (uint n = step_cnt; n > 0; --n) {
+        state = step_rk4(state, step_size);
     }
     return state;
 }

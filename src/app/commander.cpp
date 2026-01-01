@@ -216,6 +216,8 @@ void Commander::execute_command(std::string_view whole_cmd) {
         _app.activate(fractals::Fractal::Type::BURNING_SHIP);
     } else if (cmd == "gn") {
         _app.activate(fractals::Fractal::Type::NEWTON);
+    } else if (cmd == "gp") {
+        _app.activate(fractals::Fractal::Type::DOUBLE_PENDULUM);
     } else if (cmd == "G") {
         _app.activate(fractals::Fractal::Type(std::size_t(num.value_or(0))));
     } else if (cmd == " ") {
@@ -294,6 +296,10 @@ void Commander::execute_command(std::string_view whole_cmd) {
             return p - _app._active->scale() * 0.1;
         }));
         _app._new_info = true;
+    } else if (cmd == "t") {
+        _app._focus->map_time(maps::modified<double>(mod, num, [&](double p) {
+            return p;
+        }));
     } else if (cmd == "ri") {
         _app._focus->map_iterations(maps::reset<float>);
         _app._new_info = true;

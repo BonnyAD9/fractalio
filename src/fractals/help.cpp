@@ -41,6 +41,7 @@ constexpr std::string_view HELP_TEXT = R".(HELP
     `c`    Set number of colors.
     `x`    Set x (real) coordinate.
     `y`    Set y (imaginary) coordinate.
+    `t`    Set time.
     `:vsync`  <int>
            Enable/disable vsync. (0 disable, 1 enable)
     `:fps` <int>
@@ -52,6 +53,7 @@ constexpr std::string_view HELP_TEXT = R".(HELP
              `j`: Julia set
              `s`: Burning ship
              `n`: Newton fractal
+             `p`: Double pendulum
     <number>`G`
            Go to fractal/page identified by number:
              0: Help
@@ -61,6 +63,7 @@ constexpr std::string_view HELP_TEXT = R".(HELP
              4: Powerbrot
              5: Newton fractal
              6: Burning julia
+             7: Double pendulum
     :flags <mask> <value>
            Set flags of the current fractal. Mask is bit mask of bits that will
            be set, value is the value of the bits. The meaning of the bits is
