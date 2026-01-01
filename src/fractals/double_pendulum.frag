@@ -34,6 +34,7 @@ vec4 to_color(vec4 s);
 vec4 step_rk1(vec4 s);
 vec2 get_acceleration(vec4 s);
 vec4 derive(vec4 s, float t);
+vec4 stepn(vec4 s);
 vec4 stepn_rk1(vec4 s);
 vec4 stepn_rk4(vec4 s);
 
@@ -58,7 +59,11 @@ vec4 get_state() {
 
 vec4 init() {
     vec2 pos = vec2(cor * scale + center);
-    return vec4(pos * PO2, 0, 0);
+    if ((flags & 0x100u) == 0) {
+        return vec4(pos * PO2, 0, 0);
+    } else {
+        return vec4(0, 0, pos);
+    }
 }
 
 vec4 to_color(vec4 s) {
@@ -128,6 +133,15 @@ vec4 derive(vec4 s, float t) {
     vec2 acc = get_acceleration(s);
     s.zw += acc * t;
     return vec4(s.zw, acc);
+}
+
+vec4 stepn(vec4 s) {
+    switch ((flags >> 4) & 0xFu) {
+    case 1:
+        return stepn_rk4(s);
+    default:
+        return stepn_rk1(s);
+    }
 }
 
 vec4 stepn_rk1(vec4 state) {

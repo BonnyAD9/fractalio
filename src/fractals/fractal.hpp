@@ -126,6 +126,10 @@ public:
         (void)map;
     }
 
+    virtual void map_step(const std::function<double(double)> &map) {
+        (void)map;
+    }
+
     virtual Fractal *picker() { return nullptr; }
 
     virtual std::string describe() = 0;

@@ -71,9 +71,8 @@ void DoublePendulum::draw(double delta) {
         delta = _time;
     }
 
-    constexpr double MAX_DELTA = 0.001;
-    if (delta > MAX_DELTA) {
-        step_cnt = std::size_t(delta / MAX_DELTA);
+    if (delta > _max_step) {
+        step_cnt = std::size_t(delta / _max_step);
         delta = delta / step_cnt;
     }
 
@@ -118,6 +117,13 @@ void DoublePendulum::map_time(const std::function<double(double)> &map) {
         _time = 0;
     }
     _draw_flags |= NEW_TIME;
+}
+
+void DoublePendulum::map_step(const std::function<double(double)> &map) {
+    _max_step = map(_max_step);
+    if (std::isnan(_max_step)) {
+        _max_step = 0.005;
+    }
 }
 
 } // namespace fio::fractals

@@ -300,6 +300,17 @@ void Commander::execute_command(std::string_view whole_cmd) {
         _app._focus->map_time(maps::modified<double>(mod, num, [&](double p) {
             return p;
         }));
+        _app._new_info = true;
+    } else if (cmd == "s") {
+        _app._focus->map_step(
+            maps::modified<double>(mod, num, maps::half<double>)
+        );
+        _app._new_info = true;
+    } else if (cmd == "S") {
+        _app._focus->map_step(
+            maps::modified<double>(mod, num, maps::dble<double>)
+        );
+        _app._new_info = true;
     } else if (cmd == "ri") {
         _app._focus->map_iterations(maps::reset<float>);
         _app._new_info = true;

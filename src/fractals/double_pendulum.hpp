@@ -14,12 +14,15 @@ public:
     std::string describe() override {
         auto res = describe_part("Double pendulum");
         res += std::format("\n  time: {}s\n", int(_time));
+        res += std::format("  step: {:f}s\n", _max_step);
         return res;
     }
 
     void draw(double delta) override;
 
     void map_time(const std::function<double(double)> &map) override;
+
+    void map_step(const std::function<double(double)> &map) override;
 
 private:
     enum DrawFlags { NEW_TIME = 1 };
@@ -29,6 +32,7 @@ private:
     gl::Framebuffer _fbuf;
 
     double _time;
+    double _max_step = 0.005;
 
     GLint _loc_step_size;
     GLint _loc_step_cnt;
