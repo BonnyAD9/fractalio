@@ -135,8 +135,7 @@ protected:
         NEW_SCALE = NEW_CENTER << 1,
         NEW_FLAGS = NEW_SCALE << 1,
 
-        LAST_DRAW_FLAG = NEW_FLAGS << 1,
-        ALL = LAST_DRAW_FLAG - 1,
+        NEXT_DRAW_FLAG = NEW_FLAGS << 1,
     };
 
     virtual std::string describe_part(std::string_view name) {
@@ -168,7 +167,7 @@ protected:
         const glm::dvec2 zw{ sr.z, sr.w };
         return xy + pos * (zw - xy);
     }
-    
+
     [[nodiscard]]
     glm::dvec2 to_space(glm::dvec2 pos) const {
         return (pos - glm::dvec2(_center)) / double(_scale);
@@ -254,7 +253,7 @@ private:
     F _scale = 1.;
     GLuint _flags = 0;
 
-    int _draw_flags = ALL;
+    int _draw_flags = ~0;
 
     std::array<float, 16> _vertices{
         0,   600, /* */ -1, -1, // BL

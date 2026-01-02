@@ -180,7 +180,7 @@ void Fractalio::init_fractals() {
     _fractals[fractals::Fractal::Type::BURNING_JULIA] =
         std::make_unique<fractals::BurningJulia>(s_fun, sp_fun, _gradient_1d);
     _fractals[fractals::Fractal::Type::DOUBLE_PENDULUM] =
-        std::make_unique<fractals::DoublePendulum>(s_fun, _gradient_1d);
+        std::make_unique<fractals::DoublePendulum>(s_fun);
 
     _active = _fractals[fractals::Fractal::Type::MANDELBROT].get();
     _focus = _active;

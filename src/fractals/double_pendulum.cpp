@@ -1,10 +1,5 @@
 #include "double_pendulum.hpp"
 
-#include <cmath>
-#include <print>
-
-#include "glad/gl.h"
-
 namespace fio::fractals {
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
@@ -13,121 +8,7 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-DoublePendulum::DoublePendulum(
-    std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
-) :
-    ComplexFractal(FRAGMENT_SHADER, std::move(s_fun), gradient) {
-    auto &prog = program();
-    _loc_step_cnt = prog.uniform_location("step_cnt");
-    _loc_step_size = prog.uniform_location("step_size");
-    _loc_action = prog.uniform_location("action");
-    _loc_height = prog.uniform_location("height");
-
-    _fbuf.bind();
-    std::array<GLenum, 2> dbufs{ GL_NONE, GL_COLOR_ATTACHMENT0 };
-    gl::draw_buffers(dbufs);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    for (auto s : { &_state, &_tmp }) {
-        s->bind(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    }
-}
-
-void DoublePendulum::draw(double delta) {
-    auto &prog = program();
-    prog.use();
-    vao().bind();
-
-    const bool force = draw_flags() & NEW_USE_DOUBLE;
-    const bool reset = draw_flags() & (NEW_VERTICES | NEW_CENTER | NEW_SCALE);
-
-    update_parameters(force);
-
-    GLuint action = 1;
-    GLuint step_cnt = 1;
-    if (draw_flags() & NEW_VERTICES) {
-        for (auto s : { &_tmp, &_state }) {
-            s->bind(GL_TEXTURE_2D);
-            gl::tex_image_2d(
-                nullptr,
-                GLsizei(size().x),
-                GLsizei(size().y),
-                GL_RGBA32F,
-                GL_RGBA,
-                GL_FLOAT
-            );
-        }
-    } else {
-        _state.bind(GL_TEXTURE_2D);
-    }
-
-    _time += delta;
-
-    if (reset || _draw_flags & NEW_TIME) {
-        action = 0;
-        step_cnt = 1;
-        delta = _time;
-    }
-
-    if (delta > _max_step) {
-        step_cnt = std::size_t(delta / _max_step);
-        delta = delta / step_cnt;
-    }
-
-    if (force || draw_flags() & NEW_VERTICES) {
-        prog.uniform(_loc_height, float(size().y / size().x * 2));
-    }
-
-    set_draw_flags(0);
-    _draw_flags = 0;
-
-    // draw the state
-    glBlendFunc(GL_ONE, GL_ZERO);
-    prog.uniform(_loc_action, action);
-    prog.uniform(_loc_step_cnt, step_cnt);
-    prog.uniform(_loc_step_size, float(delta));
-    prog.uniform(
-        loc_proj(), glm::ortho(0.F, float(size().x), float(size().y), 0.F)
-    );
-    _fbuf.bind();
-    _fbuf.texture_2d(_tmp, GL_COLOR_ATTACHMENT0);
-    glViewport(0, 0, GLsizei(size().x), GLsizei(size().y));
-    auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        std::println("Invalid config.");
-    }
-    gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    // draw to screen
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, GLsizei(wsize().x), GLsizei(wsize().y));
-    std::swap(_tmp, _state);
-    _state.bind(GL_TEXTURE_2D);
-    prog.uniform<GLuint>(_loc_action, 2);
-    prog.uniform(
-        loc_proj(), glm::ortho(0.F, float(wsize().x), float(wsize().y), 0.F)
-    );
-    gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
-void DoublePendulum::map_time(const std::function<double(double)> &map) {
-    _time = map(_time);
-    if (std::isnan(_time)) {
-        _time = 0;
-    }
-    _draw_flags |= NEW_TIME;
-}
-
-void DoublePendulum::map_step(const std::function<double(double)> &map) {
-    _max_step = map(_max_step);
-    if (std::isnan(_max_step)) {
-        _max_step = 0.005;
-    }
-}
+DoublePendulum::DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun) :
+    ChaoticFractal(FRAGMENT_SHADER, std::move(s_fun)) { }
 
 } // namespace fio::fractals

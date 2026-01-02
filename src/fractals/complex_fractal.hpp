@@ -12,15 +12,11 @@
 
 namespace fio::fractals {
 
-namespace pickers {
-class PickerImpl;
-}
-
 template<typename P, typename F>
 class ComplexFractal : public SpaceFractal<P, F> {
 public:
     ComplexFractal(
-        const char *frag,
+        std::string_view frag,
         std::function<glm::mat3x2(glm::vec2)> s_fun,
         gl::Texture &gradient
     ) :
@@ -52,7 +48,7 @@ private:
     make_program(std::string_view frag_src) {
         // NOLINTNEXTLINE(modernize-avoid-c-arrays)
         static constexpr char VERTEX_SHADER[]{
-#embed "complex_fractal.vert"
+#embed "space_fractal.vert"
             , 0
         };
 

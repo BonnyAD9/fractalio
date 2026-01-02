@@ -52,7 +52,7 @@ public:
 
 protected:
     enum DrawFlags {
-        NEW_ITERATIONS = ComplexFractal<P, F>::LAST_DRAW_FLAG << 1,
+        NEW_ITERATIONS = ComplexFractal<P, F>::NEXT_DRAW_FLAG << 1,
         NEW_COLOR_COUNT = NEW_ITERATIONS << 1,
     };
 

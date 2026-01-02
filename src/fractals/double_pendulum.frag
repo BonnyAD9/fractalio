@@ -12,7 +12,7 @@ uniform uint action;
 
 uniform dvec2 center;
 uniform double scale;
-uniform float height;
+uniform float aspect;
 
 uniform float step_size;
 uniform uint step_cnt;
@@ -44,23 +44,23 @@ void main() {
         state_out = stepn_rk4(init());
         break;
     case 1:
-        state_out = stepn_rk4(texture(state, cor / vec2(4, height * 2) + 0.5));
+        state_out = stepn_rk4(get_state());
         break;
     default:
-        frag_color = to_color(texture(state, cor / vec2(4, height * 2) + 0.5));
+        frag_color = to_color(get_state());
         break;
     }
 }
 
 vec4 get_state() {
-    vec2 pos = vec2(cor) / vec2(4, height * 2) + 0.5;
+    vec2 pos = vec2(cor) / vec2(2, aspect * 2) + 0.5;
     return texture(state, pos);
 }
 
 vec4 init() {
     vec2 pos = vec2(cor * scale + center);
     if ((flags & 0x100u) == 0) {
-        return vec4(pos * PO2, 0, 0);
+        return vec4(pos * PI, 0, 0);
     } else {
         return vec4(0, 0, pos);
     }
