@@ -7,7 +7,7 @@
 
 namespace fio::fractals {
 
-class DoublePendulum : public ComplexFractal<gl::Program> {
+class DoublePendulum : public ComplexFractal<gl::Program, double> {
 public:
     DoublePendulum(
         std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient

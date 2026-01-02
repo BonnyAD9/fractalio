@@ -109,7 +109,9 @@ void DoublePendulum::draw(double delta) {
     std::swap(_tmp, _state);
     _state.bind(GL_TEXTURE_2D);
     prog.uniform<GLuint>(_loc_action, 2);
-    prog.uniform(loc_proj(), glm::ortho(0.F, wsize().x, wsize().y, 0.F));
+    prog.uniform(
+        loc_proj(), glm::ortho(0.F, float(wsize().x), float(wsize().y), 0.F)
+    );
     gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 

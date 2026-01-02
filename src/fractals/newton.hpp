@@ -10,7 +10,7 @@
 
 namespace fio::fractals {
 
-class Newton : public IterativeFractal<glsl::DFShaderProgram> {
+class Newton : public IterativeFractal<glsl::DFShaderProgram, double> {
 public:
     static constexpr std::size_t DEFAULT_MAX_ROOTS = 15;
 

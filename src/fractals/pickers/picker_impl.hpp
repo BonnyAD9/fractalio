@@ -56,12 +56,13 @@ public:
         return _max_size;
     }
 
-    template<typename P> glm::dvec2 par_space(ComplexFractal<P> &frac) {
+    template<typename P, typename F>
+    glm::dvec2 par_space(SpaceFractal<P, F> &frac) {
         return to_space(_pars[0], frac);
     }
 
-    template<typename P>
-    std::vector<glm::vec2> pars_space(ComplexFractal<P> &frac) {
+    template<typename P, typename F>
+    std::vector<glm::vec2> pars_space(SpaceFractal<P, F> &frac) {
         std::vector<glm::vec2> res(_pars.size());
         for (auto &a : _pars) {
             res.emplace_back(to_space(a, frac));
@@ -69,13 +70,13 @@ public:
         return res;
     }
 
-    template<typename P>
+    template<typename P, typename F>
     void drag_start(
-        int button, int mod, glm::dvec2 pos, ComplexFractal<P> &frac
+        int button, int mod, glm::dvec2 pos, SpaceFractal<P, F> &frac
     ) {
         switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: {
-            auto pc = frac.to_part_complex(pos);
+            auto pc = frac.to_part_space(pos);
             auto close = par_below(pc, frac);
             if (!close) {
                 frac.drag_mode(DragMode::MOVE);
@@ -93,7 +94,7 @@ public:
                 return;
             }
             _draw_flags |= NEW_PAR;
-            auto pc = frac.to_part_complex(pos);
+            auto pc = frac.to_part_space(pos);
             auto close = par_below(pc, frac);
             if (close) {
                 _pars.erase(_pars.begin() + *close);
@@ -109,8 +110,8 @@ public:
         }
     }
 
-    template<typename P>
-    void drag(glm::dvec2, glm::dvec2 delta, ComplexFractal<P> &frac) {
+    template<typename P, typename F>
+    void drag(glm::dvec2, glm::dvec2 delta, SpaceFractal<P, F> &frac) {
         auto dm = frac.drag_mode();
         switch (dm) {
         case DragMode::MOVE:
@@ -129,14 +130,16 @@ public:
             }
             delta.y = -delta.y;
             const std::size_t idx = int(dm) - int(DragMode::PARAMETER);
-            _pars[idx] += delta / frac.wsizex() * 4. * frac.scale();
+            _pars[idx] += delta / frac.size().x * 4. * frac.scale();
             _draw_flags |= NEW_PAR;
         }
         }
     }
 
-    template<typename P>
-    std::string describe_part(std::string_view name, ComplexFractal<P> &frac) {
+    template<typename P, typename F>
+    std::string describe_part(
+        std::string_view name, SpaceFractal<P, F> &frac
+    ) {
         auto desc = frac.describe_part(name);
         desc += "\n  parameters:\n";
         for (auto &p : _pars) {
@@ -169,10 +172,10 @@ public:
         _draw_flags |= NEW_PAR;
     }
 
-    template<typename P>
-    bool update_parameter(bool force, ComplexFractal<P> &frac) {
+    template<typename P, typename F>
+    bool update_parameter(bool force, SpaceFractal<P, F> &frac) {
         constexpr int REDRAW_FLAGS =
-            ComplexFractal<P>::NEW_CENTER | ComplexFractal<P>::NEW_SCALE;
+            SpaceFractal<P, F>::NEW_CENTER | SpaceFractal<P, F>::NEW_SCALE;
 
         auto res =
             force || _draw_flags & NEW_PAR || frac.draw_flags() & REDRAW_FLAGS;
@@ -190,14 +193,14 @@ private:
     bool _x_only;
     std::size_t _max_size;
 
-    template<typename P>
-    static glm::dvec2 to_space(glm::dvec2 p, ComplexFractal<P> &frac) {
+    template<typename P, typename F>
+    static glm::dvec2 to_space(glm::dvec2 p, SpaceFractal<P, F> &frac) {
         return (p - frac.center()) / frac.scale();
     }
 
-    template<typename P>
+    template<typename P, typename F>
     std::optional<std::size_t> par_below(
-        glm::dvec2 pos, ComplexFractal<P> &frac
+        glm::dvec2 pos, SpaceFractal<P, F> &frac
     ) {
         for (std::size_t i = 0; i < _pars.size(); ++i) {
             auto d = pos - to_space(_pars[i], frac);

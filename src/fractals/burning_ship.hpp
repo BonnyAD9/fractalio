@@ -5,7 +5,7 @@
 
 namespace fio::fractals {
 
-class BurningShip : public IterativeFractal<glsl::DFShaderProgram> {
+class BurningShip : public IterativeFractal<glsl::DFShaderProgram, double> {
 public:
     BurningShip(
         std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient

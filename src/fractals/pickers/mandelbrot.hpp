@@ -9,7 +9,8 @@
 
 namespace fio::fractals::pickers {
 
-class Mandelbrot : public IterativeFractal<gl::Program>, public Picker {
+class Mandelbrot : public IterativeFractal<gl::Program, double>,
+                   public Picker {
 public:
     Mandelbrot(
         std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient

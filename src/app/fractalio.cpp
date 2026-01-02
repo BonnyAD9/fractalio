@@ -22,6 +22,7 @@
 #include "../fractals/powerbrot.hpp"
 #include "../ft/font.hpp"
 #include "../gl/gl.hpp"
+#include "../gradient.hpp"
 #include "commander.hpp"
 #include "maps.hpp"
 

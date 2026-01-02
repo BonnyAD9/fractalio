@@ -111,15 +111,19 @@ public:
     virtual void map_parameter_x(
         std::size_t idx, const std::function<double(double)> &map
     ) {
-        (void)idx;
-        (void)map;
+        auto p = picker();
+        if (p) {
+            p->map_parameter_x(idx, map);
+        }
     }
 
     virtual void map_parameter_y(
         std::size_t idx, const std::function<double(double)> &map
     ) {
-        (void)idx;
-        (void)map;
+        auto p = picker();
+        if (p) {
+            p->map_parameter_y(idx, map);
+        }
     }
 
     virtual void map_time(const std::function<double(double)> &map) {

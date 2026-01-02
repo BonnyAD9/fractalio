@@ -11,7 +11,7 @@
 
 namespace fio::fractals {
 
-class Julia : public IterativeFractal<glsl::DFShaderProgram> {
+class Julia : public IterativeFractal<glsl::DFShaderProgram, double> {
 public:
     Julia(
         std::function<glm::mat3x2(glm::vec2)> s_fun,

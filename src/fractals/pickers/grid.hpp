@@ -6,7 +6,7 @@
 
 namespace fio::fractals::pickers {
 
-class Grid : public ComplexFractal<gl::Program>, public Picker {
+class Grid : public ComplexFractal<gl::Program, double>, public Picker {
 public:
     Grid(std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient);
 

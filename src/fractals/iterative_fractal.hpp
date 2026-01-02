@@ -4,7 +4,8 @@
 
 namespace fio::fractals {
 
-template<typename P> class IterativeFractal : public ComplexFractal<P> {
+template<typename P, typename F>
+class IterativeFractal : public ComplexFractal<P, F> {
 public:
     static constexpr GLuint DEFAULT_ITERATIONS = 256;
     static constexpr float DEFAULT_COLOR_COUNT = 256;
@@ -14,8 +15,8 @@ public:
         std::function<glm::mat3x2(glm::vec2)> s_fun,
         gl::Texture &gradient
     ) :
-        ComplexFractal<P>(df_frag, std::move(s_fun), gradient) {
-        auto &prog = ComplexFractal<P>::program();
+        ComplexFractal<P, F>(df_frag, std::move(s_fun), gradient) {
+        auto &prog = ComplexFractal<P, F>::program();
         prog.use();
 
         _loc_iterations = prog.uniform_location("iterations");
@@ -34,7 +35,7 @@ public:
                           it, 0.F, float(std::numeric_limits<GLuint>::max())
                       )
                   );
-        ComplexFractal<P>::add_draw_flag(NEW_ITERATIONS);
+        ComplexFractal<P, F>::add_draw_flag(NEW_ITERATIONS);
     }
 
     void map_color_count(const std::function<float(float)> &map) override {
@@ -46,12 +47,12 @@ public:
         } else {
             _color_count = cc;
         }
-        ComplexFractal<P>::add_draw_flag(NEW_COLOR_COUNT);
+        ComplexFractal<P, F>::add_draw_flag(NEW_COLOR_COUNT);
     }
 
 protected:
     enum DrawFlags {
-        NEW_ITERATIONS = ComplexFractal<P>::LAST_DRAW_FLAG << 1,
+        NEW_ITERATIONS = ComplexFractal<P, F>::LAST_DRAW_FLAG << 1,
         NEW_COLOR_COUNT = NEW_ITERATIONS << 1,
     };
 
@@ -60,17 +61,17 @@ protected:
             R".({}  iterations: {}
   color count: {}
 ).",
-            ComplexFractal<P>::describe_part(name),
+            ComplexFractal<P, F>::describe_part(name),
             _iterations,
             _color_count
         );
     }
 
     void update_parameters(bool force) override {
-        ComplexFractal<P>::update_parameters(force);
+        ComplexFractal<P, F>::update_parameters(force);
 
-        auto flags = ComplexFractal<P>::draw_flags();
-        auto &prog = ComplexFractal<P>::program();
+        auto flags = ComplexFractal<P, F>::draw_flags();
+        auto &prog = ComplexFractal<P, F>::program();
 
         if (force || flags & NEW_ITERATIONS) {
             prog.uniform(_loc_iterations, _iterations);

@@ -5,7 +5,7 @@
 
 namespace fio::fractals {
 
-class Mandelbrot : public IterativeFractal<glsl::DFShaderProgram> {
+class Mandelbrot : public IterativeFractal<glsl::DFShaderProgram, double> {
 public:
     Mandelbrot(
         std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient

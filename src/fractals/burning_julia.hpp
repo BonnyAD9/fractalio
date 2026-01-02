@@ -11,7 +11,7 @@
 
 namespace fio::fractals {
 
-class BurningJulia : public IterativeFractal<glsl::DFShaderProgram> {
+class BurningJulia : public IterativeFractal<glsl::DFShaderProgram, double> {
 public:
     BurningJulia(
         std::function<glm::mat3x2(glm::vec2)> s_fun,

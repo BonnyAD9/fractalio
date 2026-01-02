@@ -11,7 +11,7 @@
 
 namespace fio::fractals {
 
-class Powerbrot : public IterativeFractal<glsl::DFShaderProgram> {
+class Powerbrot : public IterativeFractal<glsl::DFShaderProgram, double> {
 public:
     Powerbrot(
         std::function<glm::mat3x2(glm::vec2)> s_fun,
