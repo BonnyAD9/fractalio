@@ -58,7 +58,7 @@ public:
 
     template<typename P, typename F>
     glm::dvec2 par_space(SpaceFractal<P, F> &frac) {
-        return to_space(_pars[0], frac);
+        return frac.to_space(_pars[0]);
     }
 
     template<typename P, typename F>
@@ -130,7 +130,8 @@ public:
             }
             delta.y = -delta.y;
             const std::size_t idx = int(dm) - int(DragMode::PARAMETER);
-            _pars[idx] += delta / frac.size().x * 4. * frac.scale();
+            auto sr = frac.space_rect();
+            _pars[idx] += delta / frac.size().x * (sr.y - sr.x) * frac.scale();
             _draw_flags |= NEW_PAR;
         }
         }
@@ -194,16 +195,11 @@ private:
     std::size_t _max_size;
 
     template<typename P, typename F>
-    static glm::dvec2 to_space(glm::dvec2 p, SpaceFractal<P, F> &frac) {
-        return (p - frac.center()) / frac.scale();
-    }
-
-    template<typename P, typename F>
     std::optional<std::size_t> par_below(
         glm::dvec2 pos, SpaceFractal<P, F> &frac
     ) {
         for (std::size_t i = 0; i < _pars.size(); ++i) {
-            auto d = pos - to_space(_pars[i], frac);
+            auto d = pos - frac.to_space(_pars[i]);
             if (d.x * d.x + d.y * d.y < 0.004) {
                 return i;
             }

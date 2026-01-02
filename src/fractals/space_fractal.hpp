@@ -168,6 +168,11 @@ protected:
         const glm::dvec2 zw{ sr.z, sr.w };
         return xy + pos * (zw - xy);
     }
+    
+    [[nodiscard]]
+    glm::dvec2 to_space(glm::dvec2 pos) const {
+        return (pos - glm::dvec2(_center)) / double(_scale);
+    }
 
     [[nodiscard]]
     constexpr glm::dvec4 space_rect() const {
