@@ -44,6 +44,7 @@ public:
         auto res = SpaceFractal<P, F>::describe_part(name);
         res += std::format("  time: {}s\n", int(_time));
         res += std::format("  step: {:f}s\n", _max_step);
+        res += std::format("  speed: {:.2f}s\n", _speed);
         return res;
     }
 
@@ -77,6 +78,7 @@ public:
             _state.bind(GL_TEXTURE_2D);
         }
 
+        delta *= _speed;
         _time += delta;
 
         if (reset) {
@@ -84,8 +86,8 @@ public:
             delta = _time;
         }
 
-        if (delta > _max_step) {
-            step_cnt = std::size_t(std::ceil(delta / _max_step));
+        if (std::abs(delta) > std::abs(_max_step)) {
+            step_cnt = std::size_t(std::abs(std::ceil(delta / _max_step)));
             delta = delta / step_cnt;
         }
 
@@ -137,6 +139,13 @@ public:
         }
     }
 
+    void map_speed(const std::function<double(double)> &map) override {
+        _speed = map(_speed);
+        if (std::isnan(_speed)) {
+            _speed = 1;
+        }
+    }
+
 protected:
     enum DrawFlags {
         NEW_TIME = SpaceFractal<P, F>::NEXT_DRAW_FLAG,
@@ -163,6 +172,7 @@ private:
 
     double _time = 0;
     double _max_step = 0.005;
+    double _speed = 1;
 
     P::Location _loc_step_size;
     P::Location _loc_step_cnt;

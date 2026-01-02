@@ -42,6 +42,8 @@ constexpr std::string_view HELP_TEXT = R".(HELP
     `x`    Set x (real) coordinate.
     `y`    Set y (imaginary) coordinate.
     `t`    Set time.
+    `s`    Set maximum step size.
+    `v`    Set simulation speed.
     `:vsync`  <int>
            Enable/disable vsync. (0 disable, 1 enable)
     `:fps` <int>

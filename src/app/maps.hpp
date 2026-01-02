@@ -11,7 +11,7 @@ template<typename T> static inline std::function<T(T)> value(T v) {
 }
 
 template<typename T> static inline T dble(T v) {
-    return std::max(T(v * 2), T(1));
+    return v == 0 ? T(1) : T(v * 2);
 }
 
 template<typename T> static inline T half(T v) {

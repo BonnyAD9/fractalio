@@ -334,6 +334,16 @@ void Commander::execute_command(std::string_view whole_cmd) {
             maps::modified<double>(mod, num, maps::dble<double>)
         );
         _app._new_info = true;
+    } else if (cmd == "v") {
+        _app._focus->map_speed(
+            maps::modified<double>(mod, num, maps::half<double>)
+        );
+        _app._new_info = true;
+    } else if (cmd == "V") {
+        _app._focus->map_speed(
+            maps::modified<double>(mod, num, maps::dble<double>)
+        );
+        _app._new_info = true;
     } else if (cmd == "ri") {
         _app._focus->map_iterations(maps::reset<float>);
         _app._new_info = true;
