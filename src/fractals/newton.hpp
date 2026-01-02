@@ -16,6 +16,7 @@ public:
 
     Newton(
         std::function<glm::mat3x2(glm::vec2)> s_fun,
+        gl::Texture &gradient,
         std::size_t root_cnt = DEFAULT_MAX_ROOTS
     );
 

@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "../glsl/df_shader_program.hpp"
-#include "complex_fractal.hpp"
 #include "iterative_fractal.hpp"
 #include "pickers/picker.hpp"
 
@@ -16,7 +15,8 @@ class Julia : public IterativeFractal<glsl::DFShaderProgram> {
 public:
     Julia(
         std::function<glm::mat3x2(glm::vec2)> s_fun,
-        std::function<glm::mat3x2(glm::vec2)> sp_fun
+        std::function<glm::mat3x2(glm::vec2)> sp_fun,
+        gl::Texture &gradient
     );
 
     std::string describe() override {

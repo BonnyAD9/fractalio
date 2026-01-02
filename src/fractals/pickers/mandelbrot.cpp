@@ -8,8 +8,10 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-Mandelbrot::Mandelbrot(std::function<glm::mat3x2(glm::vec2)> s_fun) :
-    IterativeFractal(FRAGMENT_SHADER, std::move(s_fun)) {
+Mandelbrot::Mandelbrot(
+    std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
+) :
+    IterativeFractal(FRAGMENT_SHADER, std::move(s_fun), gradient) {
     auto &prog = program();
     _par_loc = prog.uniform_location("par");
 }

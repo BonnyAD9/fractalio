@@ -38,6 +38,7 @@ private:
     fractals::Fractal *_focus = nullptr;
     glm::dvec2 _last_mouse_pos;
     ft::Font _font;
+    gl::Texture _gradient_1d;
 
     gui::Text _info;
     bool _new_info = true;

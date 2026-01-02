@@ -9,7 +9,9 @@ namespace fio::fractals {
 
 class DoublePendulum : public ComplexFractal<gl::Program> {
 public:
-    DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun);
+    DoublePendulum(
+        std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
+    );
 
     std::string describe() override {
         auto res = describe_part("Double pendulum");

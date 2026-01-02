@@ -3,13 +3,18 @@
 #include <charconv>
 #include <concepts>
 #include <format>
+#include <print>
+#include <ranges>
 #include <stdexcept>
 #include <string_view>
 #include <utility>
+#include <vector>
+
+#include <glm/glm.hpp>
 
 namespace mdt::pareg {
 
-template<typename T> struct Parse {
+template<typename T, typename... TArgs> struct Parse {
     T parse(std::string_view) {
         static_assert(false, "Parse not implemented.");
     }
@@ -74,6 +79,99 @@ inline bool from_arg<bool, std::string_view, std::string_view>(
             "Invalid boolean value `{}`. Expected `{}` or `{}`", arg, t, f
         )
     );
+}
+
+template<typename T> T to_digit_base(char c, int base) {
+    T res = 0;
+    if (c >= '0' && c <= '9') {
+        res = c - '0';
+    } else if (c >= 'a' && c <= 'z') {
+        res = c - 'a' + 10;
+    } else if (c >= 'A' && c <= 'Z') {
+        res = c - 'A' + 10;
+    } else {
+        throw std::runtime_error(std::format("Invalid digit `{}`.", c));
+    }
+    if (res >= base) {
+        throw std::runtime_error(std::format("Invalid digit `{}`.", c));
+    }
+    return res;
+}
+
+template<typename T> T parse_int_base(std::string_view arg, int base) {
+    T res = 0;
+    for (auto d : arg) {
+        res = res * base + to_digit_base<T>(d, base);
+    }
+    return res;
+}
+
+template<> inline glm::u8vec3 from_arg<glm::u8vec3>(std::string_view arg) {
+    if (!arg.starts_with('#')) {
+        throw std::runtime_error(
+            std::format("Expected # to start color but got `{}`", arg)
+        );
+    }
+    arg = arg.substr(1);
+    if (arg.size() != 6) {
+        throw std::runtime_error(
+            "Expected color to have 3 two digit components."
+        );
+    }
+    return {
+        parse_int_base<std::uint8_t>(arg.substr(0, 2), 16),
+        parse_int_base<std::uint8_t>(arg.substr(2, 2), 16),
+        parse_int_base<std::uint8_t>(arg.substr(4, 2), 16),
+    };
+}
+
+template<Parsable A, Parsable B> struct Parse<std::pair<A, B>, A, B> {
+    Parse() : _sep(":") { }
+    Parse(std::string_view sep) : _sep(sep) { }
+
+    std::pair<A, B> parse(std::string_view arg) {
+        auto pos = arg.find(_sep);
+        if (pos == std::string_view::npos) {
+            throw std::runtime_error("Missing pair separator");
+        }
+        return {
+            from_arg<A>(arg.substr(0, pos)),
+            from_arg<B>(arg.substr(pos + _sep.size())),
+        };
+    }
+
+private:
+    std::string_view _sep;
+};
+
+template<typename T> struct Parse<std::vector<T>, T> {
+    Parse() : _sep(",") { }
+    Parse(std::string_view sep) : _sep(sep) { }
+
+    std::vector<T> parse(std::string_view arg) {
+        std::vector<T> res;
+        for (auto v : std::ranges::split_view(arg, _sep)) {
+            std::string_view s{ v };
+            res.push_back(from_arg<T>(s));
+        }
+        return res;
+    }
+
+private:
+    std::string_view _sep;
+};
+
+template<>
+inline std::vector<std::pair<float, glm::u8vec3>>
+from_arg<std::vector<std::pair<float, glm::u8vec3>>>(std::string_view arg) {
+    std::vector<std::pair<float, glm::u8vec3>> res;
+    for (auto v : std::ranges::views::split(arg, ',')) {
+        const std::string_view s{ v };
+        res.push_back(
+            Parse<std::pair<float, glm::u8vec3>, float, glm::u8vec3>().parse(s)
+        );
+    }
+    return res;
 }
 
 } // namespace mdt::pareg

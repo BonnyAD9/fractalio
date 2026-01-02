@@ -15,13 +15,14 @@ static constexpr char FRAGMENT_SHADER[]{
 
 Powerbrot::Powerbrot(
     std::function<glm::mat3x2(glm::vec2)> s_fun,
-    std::function<glm::mat3x2(glm::vec2)> sp_fun
+    std::function<glm::mat3x2(glm::vec2)> sp_fun,
+    gl::Texture &gradient
 ) :
-    IterativeFractal(FRAGMENT_SHADER, std::move(s_fun)) {
+    IterativeFractal(FRAGMENT_SHADER, std::move(s_fun), gradient) {
     auto &prog = program();
     prog.use();
     _loc_par = prog.uniform_location("par");
-    _picker = std::make_unique<pickers::Grid>(std::move(sp_fun));
+    _picker = std::make_unique<pickers::Grid>(std::move(sp_fun), gradient);
     _picker->as_fractal().map_parameter_x(0, app::maps::value(3));
     _picker->as_fractal().map_x(app::maps::value(3));
 }

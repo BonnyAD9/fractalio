@@ -13,8 +13,10 @@ static constexpr char FRAGMENT_SHADER[]{
     , 0
 };
 
-DoublePendulum::DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun) :
-    ComplexFractal(FRAGMENT_SHADER, std::move(s_fun)) {
+DoublePendulum::DoublePendulum(
+    std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
+) :
+    ComplexFractal(FRAGMENT_SHADER, std::move(s_fun), gradient) {
     auto &prog = program();
     _loc_step_cnt = prog.uniform_location("step_cnt");
     _loc_step_size = prog.uniform_location("step_size");

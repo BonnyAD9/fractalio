@@ -15,7 +15,8 @@ class BurningJulia : public IterativeFractal<glsl::DFShaderProgram> {
 public:
     BurningJulia(
         std::function<glm::mat3x2(glm::vec2)> s_fun,
-        std::function<glm::mat3x2(glm::vec2)> sp_fun
+        std::function<glm::mat3x2(glm::vec2)> sp_fun,
+        gl::Texture &gradient
     );
 
     std::string describe() override {

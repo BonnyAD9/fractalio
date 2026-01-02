@@ -11,7 +11,9 @@ namespace fio::fractals::pickers {
 
 class BurningShip : public IterativeFractal<gl::Program>, public Picker {
 public:
-    BurningShip(std::function<glm::mat3x2(glm::vec2)> s_fun);
+    BurningShip(
+        std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
+    );
 
     USE_PICKER_FULL(_picker, "Burning ship picker", _par_loc, IterativeFractal)
 

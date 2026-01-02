@@ -10,9 +10,11 @@ public:
     static constexpr float DEFAULT_COLOR_COUNT = 256;
 
     IterativeFractal(
-        const char *df_frag, std::function<glm::mat3x2(glm::vec2)> s_fun
+        const char *df_frag,
+        std::function<glm::mat3x2(glm::vec2)> s_fun,
+        gl::Texture &gradient
     ) :
-        ComplexFractal<P>(df_frag, std::move(s_fun)) {
+        ComplexFractal<P>(df_frag, std::move(s_fun), gradient) {
         auto &prog = ComplexFractal<P>::program();
         prog.use();
 

@@ -7,7 +7,9 @@ namespace fio::fractals {
 
 class Mandelbrot : public IterativeFractal<glsl::DFShaderProgram> {
 public:
-    Mandelbrot(std::function<glm::mat3x2(glm::vec2)> s_fun);
+    Mandelbrot(
+        std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
+    );
 
     std::string describe() override { return describe_part("Mandelbrot set"); }
 };

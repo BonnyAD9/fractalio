@@ -40,6 +40,21 @@ public:
         );
     }
 
+    template<typename T, typename B, typename... Args>
+        requires Parsable<T, Args...>
+    T next_arg(Args... args) {
+        if (_cur == _end) {
+            throw std::runtime_error("Expected next argument.");
+        }
+        ++_cur;
+        if (_cur == _end) {
+            throw std::runtime_error("Expected next argument.");
+        }
+        return from_arg<T, Args...>(
+            std::string_view(*_cur), std::forward<Args>(args)...
+        );
+    }
+
     template<typename T, typename... Args>
         requires Parsable<T, Args...>
     T cur(Args... args) {

@@ -62,6 +62,14 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
         mouse_press_callback(b, a, m);
     });
 
+    _gradient_1d.bind(GL_TEXTURE_1D);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    std::vector<glm::u8vec3> grad(256);
+    gradient::ultra_fractal(grad);
+    gl::tex_image_1d(grad);
+
     init_fractals();
 
     _active->resize(size);
@@ -159,19 +167,19 @@ void Fractalio::init_fractals() {
     _fractals[fractals::Fractal::Type::HELP] =
         std::make_unique<fractals::Help>(_info);
     _fractals[fractals::Fractal::Type::MANDELBROT] =
-        std::make_unique<fractals::Mandelbrot>(s_fun);
+        std::make_unique<fractals::Mandelbrot>(s_fun, _gradient_1d);
     _fractals[fractals::Fractal::Type::JULIA] =
-        std::make_unique<fractals::Julia>(s_fun, sp_fun);
+        std::make_unique<fractals::Julia>(s_fun, sp_fun, _gradient_1d);
     _fractals[fractals::Fractal::Type::BURNING_SHIP] =
-        std::make_unique<fractals::BurningShip>(s_fun);
+        std::make_unique<fractals::BurningShip>(s_fun, _gradient_1d);
     _fractals[fractals::Fractal::Type::POWERBROT] =
-        std::make_unique<fractals::Powerbrot>(s_fun, sp_fun);
+        std::make_unique<fractals::Powerbrot>(s_fun, sp_fun, _gradient_1d);
     _fractals[fractals::Fractal::Type::NEWTON] =
-        std::make_unique<fractals::Newton>(s_fun);
+        std::make_unique<fractals::Newton>(s_fun, _gradient_1d);
     _fractals[fractals::Fractal::Type::BURNING_JULIA] =
-        std::make_unique<fractals::BurningJulia>(s_fun, sp_fun);
+        std::make_unique<fractals::BurningJulia>(s_fun, sp_fun, _gradient_1d);
     _fractals[fractals::Fractal::Type::DOUBLE_PENDULUM] =
-        std::make_unique<fractals::DoublePendulum>(s_fun);
+        std::make_unique<fractals::DoublePendulum>(s_fun, _gradient_1d);
 
     _active = _fractals[fractals::Fractal::Type::MANDELBROT].get();
     _focus = _active;

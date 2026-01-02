@@ -14,14 +14,16 @@ static constexpr char FRAGMENT_SHADER[]{
 
 BurningJulia::BurningJulia(
     std::function<glm::mat3x2(glm::vec2)> s_fun,
-    std::function<glm::mat3x2(glm::vec2)> sp_fun
+    std::function<glm::mat3x2(glm::vec2)> sp_fun,
+    gl::Texture &gradient
 ) :
-    IterativeFractal(FRAGMENT_SHADER, std::move(s_fun)) {
+    IterativeFractal(FRAGMENT_SHADER, std::move(s_fun), gradient) {
     auto &prog = program();
     prog.use();
     _loc_par = prog.uniform_location("par");
 
-    _picker = std::make_unique<pickers::BurningShip>(std::move(sp_fun));
+    _picker =
+        std::make_unique<pickers::BurningShip>(std::move(sp_fun), gradient);
 }
 
 } // namespace fio::fractals

@@ -27,9 +27,13 @@ static std::string prepare_shader(std::size_t root_cnt) {
 }
 
 Newton::Newton(
-    std::function<glm::mat3x2(glm::vec2)> s_fun, std::size_t root_cnt
+    std::function<glm::mat3x2(glm::vec2)> s_fun,
+    gl::Texture &gradient,
+    std::size_t root_cnt
 ) :
-    IterativeFractal(prepare_shader(root_cnt).c_str(), std::move(s_fun)),
+    IterativeFractal(
+        prepare_shader(root_cnt).c_str(), std::move(s_fun), gradient
+    ),
     _picker({ { 1, 0 }, { -.5, -SQRT3O2 }, { -.5, SQRT3O2 } }, root_cnt) {
     auto &prog = program();
     prog.use();

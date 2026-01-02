@@ -8,6 +8,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../gradient.hpp"
 #include "../pareg/pareg.hpp"
 #include "../pareg/split_on_whitespace.hpp"
 #include "fractalio.hpp"
@@ -139,6 +140,7 @@ void Commander::consume() {
     _text.clear();
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void Commander::long_command(std::string_view cmd) {
     auto arg = mdt::pareg::SplitWhitespace(cmd);
     auto args = mdt::pareg::Pareg(arg.begin(), arg.end());
@@ -181,6 +183,27 @@ void Commander::long_command(std::string_view cmd) {
         _app._focus->map_parameter_x(0, maps::value(x));
         _app._focus->map_parameter_y(0, maps::value(y));
         _app._new_info = true;
+    } else if (cmd == ":grad1" || cmd == ":gradient1") {
+        auto v = args.next_arg<std::string_view>();
+        std::vector<glm::u8vec3> grad(256);
+        if (v == "ultra-fractal") {
+            gradient::ultra_fractal(grad);
+        } else if (v == "grayscale") {
+            gradient::grayscale(grad);
+        } else if (v == "burn") {
+            gradient::burn(grad);
+        } else if (v == "monokai") {
+            gradient::monokai(grad);
+        } else {
+            auto siz = args.cur<std::size_t>();
+            grad.resize(siz);
+            auto pts = args.next_arg<
+                std::vector<std::pair<float, glm::u8vec3>>,
+                float>();
+            gradient::linear_gradient(pts, grad);
+        }
+        _app._gradient_1d.bind(GL_TEXTURE_1D);
+        gl::tex_image_1d(grad);
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
         return;

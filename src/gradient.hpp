@@ -17,4 +17,10 @@ void linear_gradient(
 
 void ultra_fractal(std::span<glm::u8vec3> dst);
 
+void grayscale(std::span<glm::u8vec3> dst);
+
+void burn(std::span<glm::u8vec3> dst);
+
+void monokai(std::span<glm::u8vec3> dst);
+
 } // namespace fio::gradient

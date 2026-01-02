@@ -71,4 +71,37 @@ void ultra_fractal(std::span<glm::u8vec3> dst) {
     linear_gradient(pts, dst);
 }
 
+void grayscale(std::span<glm::u8vec3> dst) {
+    std::array<std::pair<float, glm::u8vec3>, 2> pts{ {
+        { 0, { 0, 0, 0 } },
+        { 0.5, { 255, 255, 255 } },
+    } };
+
+    linear_gradient(pts, dst);
+}
+
+void burn(std::span<glm::u8vec3> dst) {
+    std::array<std::pair<float, glm::u8vec3>, 4> pts{ {
+        { 0, { 0, 0, 0 } },
+        { 0.25, { 255, 0, 0 } },
+        { 0.5, { 255, 255, 0 } },
+        { 0.75, { 255, 255, 255 } },
+    } };
+
+    linear_gradient(pts, dst);
+}
+
+void monokai(std::span<glm::u8vec3> dst) {
+    std::array<std::pair<float, glm::u8vec3>, 6> pts{ {
+        { 0, { 0xFC, 0x5D, 0x7C } },
+        { 0.17, { 0xF3, 0x96, 0x60 } },
+        { 0.33, { 0xE7, 0xC6, 0x64 } },
+        { 0.5, { 0x9E, 0xD0, 0x72 } },
+        { 0.67, { 0x76, 0xCC, 0xE0 } },
+        { 0.83, { 0xB3, 0x9D, 0xF3 } },
+    } };
+
+    linear_gradient(pts, dst);
+}
+
 } // namespace fio::gradient

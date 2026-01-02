@@ -26,9 +26,11 @@ template<typename P> class ComplexFractal : public Fractal {
 
 public:
     ComplexFractal(
-        const char *df_frag, std::function<glm::mat3x2(glm::vec2)> s_fun
+        const char *df_frag,
+        std::function<glm::mat3x2(glm::vec2)> s_fun,
+        gl::Texture &gradient
     ) :
-        _s_fun(std::move(s_fun)) {
+        _gradient(gradient), _s_fun(std::move(s_fun)) {
         auto frag = glsl::preprocess_mylib(df_frag);
         _program.compile(vertex_shader(), frag);
         _program.use();
@@ -49,14 +51,6 @@ public:
             LOCATION, 4, GL_FLOAT, false, 4 * sizeof(float), 0
         );
         glEnableVertexAttribArray(LOCATION);
-
-        _texture.bind(GL_TEXTURE_1D);
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        std::vector<glm::u8vec3> grad(256);
-        gradient::ultra_fractal(grad);
-        gl::tex_image_1d(grad);
     };
 
     void resize(glm::vec2 size) override {
@@ -83,7 +77,7 @@ public:
     void draw(double) override {
         _program.use();
         _vao.bind();
-        _texture.bind(GL_TEXTURE_1D);
+        _gradient.bind(GL_TEXTURE_1D);
 
         const bool force = _draw_flags & NEW_USE_DOUBLE;
 
@@ -255,7 +249,7 @@ private:
     P _program;
     gl::VertexArray _vao;
     gl::Buffer _vbo;
-    gl::Texture _texture; // TODO: remove/move
+    gl::Texture &_gradient;
 
     std::function<glm::mat3x2(glm::vec2)> _s_fun;
 

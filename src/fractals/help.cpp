@@ -69,6 +69,10 @@ constexpr std::string_view HELP_TEXT = R".(HELP
            be set, value is the value of the bits. The meaning of the bits is
            dependant on the fractal, but usually the lowest 4 bits are coloring
            type.
+    :gradient1 <gradient-name>
+           Select gradient.
+    :gradient1 <size> <color-points>
+           Define gradient.
 ).";
 
 Help::Help(const gui::Text &text_cfg) : _text(text_cfg) {
