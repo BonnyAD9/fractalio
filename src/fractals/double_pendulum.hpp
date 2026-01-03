@@ -1,8 +1,6 @@
 #pragma once
 
-#include "../gl/framebuffer.hpp"
 #include "../gl/program.hpp"
-#include "../gl/texture.hpp"
 #include "chaotic_fractal.hpp"
 
 namespace fio::fractals {

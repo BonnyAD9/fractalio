@@ -66,6 +66,7 @@ constexpr std::string_view HELP_TEXT = R".(HELP
              5: Newton fractal
              6: Burning julia
              7: Double pendulum
+             8: Three body
     :flags <mask> <value>
            Set flags of the current fractal. Mask is bit mask of bits that will
            be set, value is the value of the bits. The meaning of the bits is

@@ -1,12 +1,15 @@
 #pragma once
 
+#include <generator>
 #include <iostream>
 #include <print>
+#include <ranges>
 
 #include "../gl/framebuffer.hpp"
 #include "../gl/gl.hpp"
 #include "../gl/texture.hpp"
 #include "../glsl/preprocess.hpp"
+#include "glad/gl.h"
 #include "space_fractal.hpp"
 
 namespace fio::fractals {
@@ -17,9 +20,15 @@ public:
     ChaoticFractal(
         std::string_view frag,
         std::function<glm::mat3x2(glm::vec2)> s_fun,
-        glm::dvec4 space = { -1, 1, 1, -1 }
+        glm::dvec4 space = { -1, 1, 1, -1 },
+        std::size_t state_cnt = 1,
+        std::tuple<GLint, GLenum, GLenum> state_type = { GL_RGBA32F,
+                                                         GL_RGBA,
+                                                         GL_FLOAT }
     ) :
-        ChaoticFractal(make_program(frag), std::move(s_fun), space) {
+        ChaoticFractal(
+            make_program(frag), std::move(s_fun), space, state_cnt, state_type
+        ) {
         auto &prog = SpaceFractal<P, F>::program();
         _loc_step_cnt = prog.uniform_location("step_cnt");
         _loc_step_size = prog.uniform_location("step_size");
@@ -27,12 +36,19 @@ public:
         _loc_aspect = prog.uniform_location("aspect");
 
         _fbuf.bind();
-        std::array<GLenum, 2> dbufs{ GL_NONE, GL_COLOR_ATTACHMENT0 };
+        std::vector<GLenum> dbufs{ GL_NONE };
+        for (GLenum i = 0; i < GLenum(state_cnt); ++i) {
+            dbufs.push_back(GL_COLOR_ATTACHMENT0 + i);
+        }
         gl::draw_buffers(dbufs);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        for (auto s : { &_state, &_tmp }) {
-            s->bind(GL_TEXTURE_2D);
+        std::array<std::vector<gl::Texture> *, 2> textures{ &_states, &_tmps };
+        for (auto &s :
+             std::ranges::views::transform(textures, [](auto a) -> auto & {
+                 return *a;
+             }) | std::ranges::views::join) {
+            s.bind(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -68,15 +84,25 @@ public:
         GLuint step_cnt = 1;
 
         if (dflags & SpaceFractal<P, F>::NEW_VERTICES) {
-            for (auto s : { &_tmp, &_state }) {
-                s->bind(GL_TEXTURE_2D);
+            std::array<std::vector<gl::Texture> *, 2> textures{ &_states,
+                                                                &_tmps };
+            for (auto &s :
+                 std::ranges::views::transform(textures, [](auto a) -> auto & {
+                     return *a;
+                 }) | std::ranges::views::join) {
+                s.bind(GL_TEXTURE_2D);
                 gl::tex_image_2d(
-                    nullptr, isize.x, isize.y, GL_RGBA32F, GL_RGBA, GL_FLOAT
+                    nullptr,
+                    isize.x,
+                    isize.y,
+                    std::get<0>(_state_type),
+                    std::get<1>(_state_type),
+                    std::get<2>(_state_type)
                 );
             }
-        } else {
-            _state.bind(GL_TEXTURE_2D);
         }
+
+        bind_textures();
 
         delta *= _speed;
         _time += delta;
@@ -102,7 +128,9 @@ public:
         prog.uniform(_loc_step_size, float(delta));
         prog.uniform(lproj, glm::ortho(0.F, fsize.x, fsize.y, 0.F));
         _fbuf.bind();
-        _fbuf.texture_2d(_tmp, GL_COLOR_ATTACHMENT0);
+        for (auto [i, t] : std::ranges::views::enumerate(_tmps)) {
+            _fbuf.texture_2d(t, GL_COLOR_ATTACHMENT0 + i);
+        }
         glViewport(0, 0, isize.x, isize.y);
         auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -117,11 +145,14 @@ public:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, iwsize.x, iwsize.y);
-        std::swap(_tmp, _state);
-        _state.bind(GL_TEXTURE_2D);
+        for (auto [s, t] : std::ranges::views::zip(_states, _tmps)) {
+            std::swap(s, t);
+        }
+        bind_textures();
         prog.uniform(_loc_action, GLuint(2)); // draw
         prog.uniform(lproj, glm::ortho(0.F, fwsize.x, fwsize.y, 0.F));
         gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
+        glActiveTexture(GL_TEXTURE0);
     }
 
     void map_time(const std::function<double(double)> &map) override {
@@ -166,8 +197,9 @@ protected:
     }
 
 private:
-    gl::Texture _state;
-    gl::Texture _tmp;
+    std::tuple<GLint, GLenum, GLenum> _state_type;
+    std::vector<gl::Texture> _states;
+    std::vector<gl::Texture> _tmps;
     gl::Framebuffer _fbuf;
 
     double _time = 0;
@@ -182,11 +214,23 @@ private:
     ChaoticFractal(
         std::pair<P, SpaceLocations<typename P::Location>> prog,
         std::function<glm::mat3x2(glm::vec2)> s_fun,
-        glm::dvec4 space
+        glm::dvec4 space,
+        std::size_t state_cnt,
+        std::tuple<GLint, GLenum, GLenum> state_type
     ) :
         SpaceFractal<P, F>(
             std::move(prog.first), prog.second, space, std::move(s_fun)
-        ) { }
+        ),
+        _state_type(state_type),
+        _states(state_cnt),
+        _tmps(state_cnt) { }
+
+    void bind_textures() {
+        for (auto [i, s] : std::ranges::views::enumerate(_states)) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            s.bind(GL_TEXTURE_2D);
+        }
+    }
 
     static constexpr std::pair<P, SpaceLocations<typename P::Location>>
     make_program(std::string_view frag_src) {

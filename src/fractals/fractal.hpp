@@ -28,6 +28,7 @@ public:
         NEWTON,
         BURNING_JULIA,
         DOUBLE_PENDULUM,
+        THREE_BODY,
     };
 
     virtual void resize(glm::vec2 size) = 0;
