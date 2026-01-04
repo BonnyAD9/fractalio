@@ -11,7 +11,7 @@ public:
     static constexpr float DEFAULT_COLOR_COUNT = 256;
 
     IterativeFractal(
-        const char *df_frag,
+        std::string_view df_frag,
         std::function<glm::mat3x2(glm::vec2)> s_fun,
         gl::Texture &gradient
     ) :

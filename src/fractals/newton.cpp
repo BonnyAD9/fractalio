@@ -32,7 +32,7 @@ Newton::Newton(
     std::size_t root_cnt
 ) :
     IterativeFractal(
-        prepare_shader(root_cnt).c_str(), std::move(s_fun), gradient
+        prepare_shader(root_cnt), std::move(s_fun), gradient
     ),
     _picker({ { 1, 0 }, { -.5, -SQRT3O2 }, { -.5, SQRT3O2 } }, root_cnt) {
     auto &prog = program();

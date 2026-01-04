@@ -29,6 +29,7 @@ public:
         BURNING_JULIA,
         DOUBLE_PENDULUM,
         THREE_BODY,
+        GRAVITY_BASINS,
     };
 
     virtual void resize(glm::vec2 size) = 0;
