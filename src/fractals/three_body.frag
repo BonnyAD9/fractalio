@@ -28,7 +28,10 @@ void set_state(mat3x4 s);
 mat3x4 init();
 vec4 to_color(mat3x4 s);
 mat3x4 stepn(mat3x4 s);
-mat3x4 step(mat3x4 s, float h);
+mat3x4 stepn_euler(mat3x4 s);
+mat3x4 step_euler(mat3x4 s, float h);
+mat3x4 stepn_rk4(mat3x4 s);
+mat3x4 step_rk4(mat3x4 s, float h);
 vec2 force(vec2 a, float am, vec2 b, float bm);
 vec4 close_col(vec4 def);
 
@@ -151,27 +154,65 @@ vec4 to_color(mat3x4 s) {
     return vec4(col, 1);
 }
 
-mat3x4 stepn(mat3x4 s) {
+mat3x4 stepn_euler(mat3x4 s) {
     for (uint i = step_cnt; i > 0; --i) {
-        s = step(s, step_size);
+        s = step_euler(s, step_size);
     }
     return s;
 }
 
-mat3x4 step(mat3x4 s, float h) {
+mat3x4 stepn_rk4(mat3x4 s) {
+    for (uint i = step_cnt; i > 0; --i) {
+        s = step_rk4(s, step_size);
+    }
+    return s;
+}
+
+mat3x4 stepn(mat3x4 s) {
+    switch ((flags >> 4) & 0xFu) {
+    default:
+        return stepn_euler(s);
+    case 1:
+        return stepn_rk4(s);
+    }
+}
+
+mat3x2 get_acceleration(mat3x4 s) {
     vec2 fab = force(s[0].xy, M0, s[1].xy, M1);
     vec2 fbc = force(s[1].xy, M1, s[2].xy, M2);
     vec2 fca = force(s[2].xy, M2, s[0].xy, M0);
-    vec2 acca = (fab - fca) / M0;
-    vec2 accb = (fbc - fab) / M1;
-    vec2 accc = (fca - fbc) / M2;
-    s[0].zw += acca * h;
-    s[1].zw += accb * h;
-    s[2].zw += accc * h;
-    s[0].xy += s[0].zw * h;
-    s[1].xy += s[1].zw * h;
-    s[2].xy += s[2].zw * h;
-    return s;
+    return mat3x2(
+        (fab - fca) / M0,
+        (fbc - fab) / M1,
+        (fca - fbc) / M2
+    );
+}
+
+mat3x4 derive(mat3x4 s, float h) {
+    mat3x2 acc = get_acceleration(s);
+    s[0].zw += acc[0] * h;
+    s[1].zw += acc[1] * h;
+    s[2].zw += acc[2] * h;
+    return mat3x4(
+        vec4(s[0].zw, acc[0]),
+        vec4(s[1].zw, acc[1]),
+        vec4(s[2].zw, acc[2])
+    );
+}
+
+mat3x4 step_euler(mat3x4 s, float h) {
+    return s + derive(s, h) * h;
+}
+
+mat3x4 step_rk4(mat3x4 x, float h) {
+    float ho2 = h / 2;
+    
+    mat3x4 k1 = derive(x, 0);
+    mat3x4 k2 = derive(x + k1 * ho2, ho2);
+    mat3x4 k3 = derive(x + k2 * ho2, ho2);
+    mat3x4 k4 = derive(x + h * k3, h);
+    
+    return x + h * (k1 + 2 * k2 + 2 * k3 + k4) / 6;
 }
 
 vec2 force(vec2 a, float ma, vec2 b, float mb) {
