@@ -79,6 +79,10 @@ mat3x4 init() {
     return s;
 }
 
+float acol(vec2 dir) {
+    return abs(atan(dir.y, dir.x)) / (PI * 2);
+}
+
 vec4 to_color(mat3x4 s) {
     vec3 col = vec3(0, 0, 0);
     bool norm = true;
@@ -121,6 +125,21 @@ vec4 to_color(mat3x4 s) {
             abs(atan(aa.y, aa.x)) / (PI * 2),
             abs(atan(ba.y, ba.x)) / (PI * 2),
             abs(atan(ca.y, ca.x)) / (PI * 2)
+        );
+        norm = false;
+        break;
+    }
+    case 5: {
+        vec2 d01 = s[1].xy - s[0].xy;
+        vec2 d12 = s[2].xy - s[1].xy;
+        vec2 d20 = s[0].xy - s[2].xy;
+        float l01 = length(d01);
+        float l12 = length(d12);
+        float l20 = length(d20);
+        col = vec3(
+            acol(l01 < l20 ? d01 : -d20),
+            acol(l12 < l01 ? d12 : -d01),
+            acol(l20 < l12 ? d20 : -d12)
         );
         norm = false;
         break;
@@ -180,9 +199,13 @@ vec4 close_col(vec4 def) {
         max(a.y, max(b.y, c.y))
     );
     
-    vec2 siz = vec2(tr.x - bl.x, tr.y - bl.y);
-    vec2 cen = vec2(bl + siz / 2);
-    float scl = float(max(siz.x, siz.y * aspect));
+    vec2 cen = vec2(center);
+    float scl = float(scale);
+    if ((flags & 0x100u) == 0) {
+        vec2 siz = vec2(tr.x - bl.x, tr.y - bl.y);
+        cen = vec2(bl + siz / 2);
+        scl = float(max(siz.x, siz.y / aspect));
+    }
     
     vec2 t = vec2(cor * scl + cen);
     
