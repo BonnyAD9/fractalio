@@ -9,12 +9,7 @@ static constexpr char FRAGMENT_SHADER[]{
 };
 
 ThreeBody::ThreeBody(std::function<glm::mat3x2(glm::vec2)> s_fun) :
-    ChaoticFractal(
-        FRAGMENT_SHADER,
-        std::move(s_fun),
-        { -1, 1, 1, -1 },
-        3
-    ) {
+    ChaoticFractal(FRAGMENT_SHADER, std::move(s_fun), { -1, 1, 1, -1 }, 3) {
     auto &prog = program();
     _loc_hover = prog.uniform_location("hover");
 }

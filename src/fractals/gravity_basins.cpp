@@ -31,9 +31,7 @@ GravityBasins::GravityBasins(
     gl::Texture &gradient,
     std::size_t root_cnt
 ) :
-    ComplexFractal(
-        prepare_shader(root_cnt), std::move(s_fun), gradient
-    ),
+    ComplexFractal(prepare_shader(root_cnt), std::move(s_fun), gradient),
     _picker({ { 1, 0 }, { -.5, -SQRT3O2 }, { -.5, SQRT3O2 } }, root_cnt) {
     auto &prog = program();
     prog.use();
@@ -67,11 +65,11 @@ void GravityBasins::update_parameters(bool force) {
         prog.uniform(_loc_bodies, bodies);
         prog.uniform(_loc_body_cnt, GLuint(bodies.size()));
     }
-    
+
     if (flags & NEW_TIME) {
         prog.uniform(_loc_time, float(_time));
     }
-    
+
     if (flags & NEW_STEP_SIZE) {
         prog.uniform(_loc_step_size, float(_step_size));
     }

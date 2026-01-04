@@ -19,7 +19,7 @@ public:
     std::string describe() override;
 
     USE_PICKER(_picker)
-    
+
     void map_time(const std::function<double(double)> &map) override {
         _time = map(_time);
         if (std::isnan(_time)) {
@@ -51,7 +51,6 @@ private:
     double _time = 5;
     GLint _loc_step_size;
     double _step_size = 0.005;
-    
 
     pickers::PickerImpl _picker;
 };

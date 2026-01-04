@@ -3,8 +3,8 @@
 #include <cmath>
 #include <format>
 
-#include "../complex_fractal.hpp"
 #include "../fractal.hpp"
+#include "../space_fractal.hpp"
 
 #include <glm/glm.hpp>
 
@@ -131,7 +131,8 @@ public:
             delta.y = -delta.y;
             const std::size_t idx = int(dm) - int(DragMode::PARAMETER);
             auto sr = frac.space_rect();
-            _pars[idx] += delta / frac.size().x * (sr.y - sr.x) * frac.scale();
+            _pars[idx] += delta / (frac.size().x + frac.size().y) * 2. *
+                          (sr.y - sr.x) * frac.scale();
             _draw_flags |= NEW_PAR;
         }
         }

@@ -31,9 +31,7 @@ Newton::Newton(
     gl::Texture &gradient,
     std::size_t root_cnt
 ) :
-    IterativeFractal(
-        prepare_shader(root_cnt), std::move(s_fun), gradient
-    ),
+    IterativeFractal(prepare_shader(root_cnt), std::move(s_fun), gradient),
     _picker({ { 1, 0 }, { -.5, -SQRT3O2 }, { -.5, SQRT3O2 } }, root_cnt) {
     auto &prog = program();
     prog.use();

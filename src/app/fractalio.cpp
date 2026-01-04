@@ -15,13 +15,13 @@
 #include "../fractals/burning_julia.hpp"
 #include "../fractals/burning_ship.hpp"
 #include "../fractals/double_pendulum.hpp"
+#include "../fractals/gravity_basins.hpp"
 #include "../fractals/help.hpp"
 #include "../fractals/julia.hpp"
 #include "../fractals/mandelbrot.hpp"
 #include "../fractals/newton.hpp"
 #include "../fractals/powerbrot.hpp"
 #include "../fractals/three_body.hpp"
-#include "../fractals/gravity_basins.hpp"
 #include "../ft/font.hpp"
 #include "../gl/gl.hpp"
 #include "../gradient.hpp"
@@ -92,7 +92,7 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _fps_text.set_transform(
         glm::translate(glm::identity<glm::mat4>(), { side_start, 0 })
     );
-    
+
     _drag = _active;
 
     _commander.resize(size);

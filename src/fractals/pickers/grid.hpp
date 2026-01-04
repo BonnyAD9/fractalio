@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../gl/program.hpp"
+#include "../complex_fractal.hpp"
 #include "picker.hpp"
 #include "picker_impl.hpp"
 
