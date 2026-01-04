@@ -91,6 +91,8 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _fps_text.set_transform(
         glm::translate(glm::identity<glm::mat4>(), { side_start, 0 })
     );
+    
+    _drag = _active;
 
     _commander.resize(size);
 }
@@ -317,6 +319,7 @@ void Fractalio::activate(fractals::Fractal::Type typ) {
     }
     _active = _fractals[typ].get();
     _focus = _active;
+    _drag = _active;
     _active->resize(_wsize);
     _new_info = true;
     auto picker = _active->picker();
