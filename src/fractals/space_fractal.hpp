@@ -178,9 +178,8 @@ protected:
     [[nodiscard]]
     constexpr glm::dvec4 space_rect() const {
         const auto sh = _space.w - _space.y;
-        const auto h_offset = _aspect_correction ?
-            (sh - sh * _size.y / _size.x) / 2
-            : 0;
+        const auto h_offset =
+            _aspect_correction ? (sh - sh * _size.y / _size.x) / 2 : 0;
 
         return {
             _space.x, _space.y + h_offset, _space.z, _space.w - h_offset
@@ -239,16 +238,14 @@ protected:
     P::Location loc_proj() const {
         return _loc.proj;
     }
-    
+
     [[nodiscard]]
     const SpaceLocations<typename P::Location> &loc() const {
         return _loc;
     }
-    
-    gl::Buffer &vbo() {
-        return _vbo;
-    }
-    
+
+    gl::Buffer &vbo() { return _vbo; }
+
     [[nodiscard]]
     std::span<const float> vertices() const {
         return _vertices;
@@ -272,7 +269,7 @@ private:
     GLuint _flags = 0;
 
     int _draw_flags = ~0;
-    
+
     bool _aspect_correction;
 
     std::array<float, 16> _vertices{

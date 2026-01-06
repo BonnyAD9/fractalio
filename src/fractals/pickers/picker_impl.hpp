@@ -31,10 +31,8 @@ public:
     bool new_par() const {
         return _draw_flags & NEW_PAR;
     }
-    
-    void reset_flags() {
-        _draw_flags = 0;
-    }
+
+    void reset_flags() { _draw_flags = 0; }
 
     constexpr void par(glm::dvec2 p) {
         _pars[0] = p;

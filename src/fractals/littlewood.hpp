@@ -1,21 +1,23 @@
 #pragma once
 
-#include "pickers/picker_impl.hpp"
-#include "space_fractal.hpp"
+#include "../gl/framebuffer.hpp"
 #include "../gl/program.hpp"
 #include "../gl/texture.hpp"
-#include "../gl/framebuffer.hpp"
+#include "pickers/picker_impl.hpp"
+#include "space_fractal.hpp"
 
 namespace fio::fractals {
-    
+
 class Littlewood : public SpaceFractal<gl::Program, double> {
 public:
-    Littlewood(std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient);
-    
+    Littlewood(
+        std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
+    );
+
     std::string describe() override;
-    
+
     void draw(double) override;
-    
+
     USE_PICKER(_picker);
 
 protected:
@@ -27,7 +29,7 @@ private:
     };
 
     gl::Texture &_gradient;
-    
+
     gl::Program _make_histogram;
     gl::Framebuffer _fbuf;
     gl::Texture _histogram;
@@ -38,11 +40,16 @@ private:
     GLint _loc_store;
     GLint _loc_h_aspect;
     GLint _loc_aspect;
-    
+
     pickers::PickerImpl _picker;
-    
-    Littlewood(std::tuple<gl::Program, gl::Program, SpaceLocations<GLint>> prog, std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient);
-    static std::tuple<gl::Program, gl::Program, SpaceLocations<GLint>> make_programs();
+
+    Littlewood(
+        std::tuple<gl::Program, gl::Program, SpaceLocations<GLint>> prog,
+        std::function<glm::mat3x2(glm::vec2)> s_fun,
+        gl::Texture &gradient
+    );
+    static std::tuple<gl::Program, gl::Program, SpaceLocations<GLint>>
+    make_programs();
 };
-    
-}
+
+} // namespace fio::fractals
