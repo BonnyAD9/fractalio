@@ -7,7 +7,7 @@
 
 namespace fio::glsl {
 
-void DFShaderProgram::compile(
+void DFShaderProgram::compile_link(
     const char *vert_src, std::string_view frag_src
 ) {
     gl::Shader vert(GL_VERTEX_SHADER);

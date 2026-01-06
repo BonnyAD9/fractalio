@@ -54,7 +54,7 @@ private:
 
         P program;
         auto frag = glsl::preprocess_mylib(frag_src);
-        program.compile(VERTEX_SHADER, frag);
+        program.compile_link(VERTEX_SHADER, frag);
 
         const SpaceLocations<typename P::Location> loc{
             .proj = program.uniform_location("proj"),

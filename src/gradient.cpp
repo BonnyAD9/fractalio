@@ -104,4 +104,24 @@ void monokai(std::span<glm::u8vec3> dst) {
     linear_gradient(pts, dst);
 }
 
+void rgb(std::span<glm::u8vec3> dst) {
+    std::array<std::pair<float, glm::u8vec3>, 3> pts{ {
+        { 0, { 255, 0, 0 } },
+        { 0.33, { 0, 255, 0 } },
+        { 0.67, { 0, 0, 255 } },
+    } };
+
+    linear_gradient(pts, dst);
+}
+
+void cmy(std::span<glm::u8vec3> dst) {
+    std::array<std::pair<float, glm::u8vec3>, 3> pts{ {
+        { 0, { 0, 255, 255 } },
+        { 0.33, { 255, 0, 255 } },
+        { 0.67, { 255, 255, 0 } },
+    } };
+
+    linear_gradient(pts, dst);
+}
+
 } // namespace fio::gradient

@@ -26,17 +26,25 @@ public:
 
     Program() : _id(glCreateProgram()) { }
 
-    void compile(std::string_view vert_src, std::string_view frag_src) const {
+    void compile_link(std::string_view vert_src, std::string_view frag_src) const {
         Shader vert(GL_VERTEX_SHADER);
         Shader frag(GL_FRAGMENT_SHADER);
         vert.compile(vert_src);
         frag.compile(frag_src);
         link(vert, frag);
     }
+    
+    void attach(Shader &sh) const {
+        glAttachShader(_id, sh.get());
+    }
 
     void link(Shader &vert, Shader &frag) const {
-        glAttachShader(_id, vert.get());
-        glAttachShader(_id, frag.get());
+        attach(vert);
+        attach(frag);
+        link();
+    }
+    
+    void link() const {
         glLinkProgram(_id);
 
         GLint success;

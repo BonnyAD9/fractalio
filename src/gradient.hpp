@@ -23,4 +23,8 @@ void burn(std::span<glm::u8vec3> dst);
 
 void monokai(std::span<glm::u8vec3> dst);
 
+void rgb(std::span<glm::u8vec3> dst);
+
+void cmy(std::span<glm::u8vec3> dst);
+
 } // namespace fio::gradient

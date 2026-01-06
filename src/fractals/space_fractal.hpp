@@ -32,12 +32,14 @@ public:
         P program,
         SpaceLocations<typename P::Location> loc,
         glm::vec4 space,
-        std::function<glm::mat3x2(glm::vec2)> s_fun
+        std::function<glm::mat3x2(glm::vec2)> s_fun,
+        bool aspect_correction = true
     ) :
         _program(std::move(program)),
         _s_fun(std::move(s_fun)),
         _space(space),
-        _loc(loc) {
+        _loc(loc),
+        _aspect_correction(aspect_correction) {
         _vao.bind();
         _vbo.bind(GL_ARRAY_BUFFER);
         gl::buffer_data(GL_ARRAY_BUFFER, _vertices);
@@ -176,7 +178,9 @@ protected:
     [[nodiscard]]
     constexpr glm::dvec4 space_rect() const {
         const auto sh = _space.w - _space.y;
-        const auto h_offset = (sh - sh * _size.y / _size.x) / 2;
+        const auto h_offset = _aspect_correction ?
+            (sh - sh * _size.y / _size.x) / 2
+            : 0;
 
         return {
             _space.x, _space.y + h_offset, _space.z, _space.w - h_offset
@@ -235,6 +239,20 @@ protected:
     P::Location loc_proj() const {
         return _loc.proj;
     }
+    
+    [[nodiscard]]
+    const SpaceLocations<typename P::Location> &loc() const {
+        return _loc;
+    }
+    
+    gl::Buffer &vbo() {
+        return _vbo;
+    }
+    
+    [[nodiscard]]
+    std::span<const float> vertices() const {
+        return _vertices;
+    }
 
 private:
     P _program;
@@ -254,6 +272,8 @@ private:
     GLuint _flags = 0;
 
     int _draw_flags = ~0;
+    
+    bool _aspect_correction;
 
     std::array<float, 16> _vertices{
         0,   600, /* */ -1, -1, // BL

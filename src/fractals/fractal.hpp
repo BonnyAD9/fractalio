@@ -30,6 +30,7 @@ public:
         DOUBLE_PENDULUM,
         THREE_BODY,
         GRAVITY_BASINS,
+        LITTLEWOOD,
     };
 
     virtual void resize(glm::vec2 size) = 0;

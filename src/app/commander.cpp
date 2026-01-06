@@ -194,6 +194,10 @@ void Commander::long_command(std::string_view cmd) {
             gradient::burn(grad);
         } else if (v == "monokai") {
             gradient::monokai(grad);
+        } else if (v == "rgb") {
+            gradient::rgb(grad);
+        } else if (v == "cmy") {
+            gradient::cmy(grad);
         } else {
             auto siz = args.cur<std::size_t>();
             grad.resize(siz);

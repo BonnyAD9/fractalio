@@ -22,6 +22,7 @@
 #include "../fractals/newton.hpp"
 #include "../fractals/powerbrot.hpp"
 #include "../fractals/three_body.hpp"
+#include "../fractals/littlewood.hpp"
 #include "../ft/font.hpp"
 #include "../gl/gl.hpp"
 #include "../gradient.hpp"
@@ -189,6 +190,8 @@ void Fractalio::init_fractals() {
         std::make_unique<fractals::ThreeBody>(s_fun);
     _fractals[fractals::Fractal::Type::GRAVITY_BASINS] =
         std::make_unique<fractals::GravityBasins>(s_fun, _gradient_1d);
+    _fractals[fractals::Fractal::Type::LITTLEWOOD] =
+        std::make_unique<fractals::Littlewood>(s_fun, _gradient_1d);
 
     _active = _fractals[fractals::Fractal::Type::MANDELBROT].get();
     _focus = _active;

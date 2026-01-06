@@ -13,7 +13,7 @@ class DFShaderProgram {
 public:
     using Location = glm::ivec2;
 
-    void compile(const char *vert_src, std::string_view frag_src);
+    void compile_link(const char *vert_src, std::string_view frag_src);
 
     glm::ivec2 uniform_location(const char *name) const {
         return { _float.uniform_location(name),
