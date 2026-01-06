@@ -36,7 +36,7 @@ static constexpr char GEOMETRY_SHADER[]{
 
 Littlewood::Littlewood(std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient)
     : Littlewood(make_programs(), std::move(s_fun), gradient) {
-    _loc_coef_cnt = _make_histogram.uniform_location("coef_cnt");
+    _loc_degree = _make_histogram.uniform_location("degree");
     _loc_store_cnt = _make_histogram.uniform_location("store_cnt");
     _loc_store = _make_histogram.uniform_location("store");
     _loc_h_aspect = _make_histogram.uniform_location("aspect");
@@ -58,7 +58,7 @@ Littlewood::Littlewood(std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture 
 
 std::string Littlewood::describe() {
     auto res = describe_part("Littlewood");
-    res += std::format("  degree: {}", _coef_cnt);
+    res += std::format("  degree: {}", _degree);
     res += "\n  coefitients:\n";
     for (auto &r : _picker.dpars()) {
         res += std::format("    {:.6} + {:.6}i\n", r.x, r.y);
@@ -89,7 +89,7 @@ void Littlewood::draw(double) {
         glBlendFunc(GL_ONE, GL_ONE);
         
         auto pars = _picker.pars();
-        _make_histogram.uniform(_loc_coef_cnt, _coef_cnt);
+        _make_histogram.uniform(_loc_degree, _degree);
         _make_histogram.uniform(_loc_store_cnt, GLuint(pars.size()));
         _make_histogram.uniform(_loc_store, pars);
         _make_histogram.uniform(_loc_h_aspect, fsize.y / fsize.x);
@@ -106,7 +106,7 @@ void Littlewood::draw(double) {
         }
         gl::clear_color(glm::vec4(0, 0, 0, 1));
         glClear(GL_COLOR_BUFFER_BIT);
-        gl::draw_arrays(GL_POINTS, 0, 1 << _coef_cnt);
+        gl::draw_arrays(GL_POINTS, 0, 1 << _degree);
         
         glm::vec<2, GLsizei> wisize = wsize();
         

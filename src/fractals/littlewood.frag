@@ -30,6 +30,7 @@ uniform sampler1D gradient;
 
 void main() {
     frag_color = texture(gradient, cor);
+    //frag_color = vec4(1, 1, 1, 1); //texture(gradient, cor);
 }
 
 #endif

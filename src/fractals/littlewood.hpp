@@ -32,8 +32,8 @@ private:
     gl::Framebuffer _fbuf;
     gl::Texture _histogram;
 
-    GLuint _coef_cnt = 18;
-    GLint _loc_coef_cnt;
+    GLuint _degree = 18;
+    GLint _loc_degree;
     GLint _loc_store_cnt;
     GLint _loc_store;
     GLint _loc_h_aspect;
