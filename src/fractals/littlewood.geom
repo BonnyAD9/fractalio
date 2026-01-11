@@ -164,6 +164,10 @@ void fill_coefs() {
         coefs[i] = store[ix % store_cnt];
         ix /= store_cnt;
     }
+    /*for (int i = int(degree) - 1; i >= 0; --i) {
+        coefs[i] = store[ix % store_cnt];
+        ix /= store_cnt;
+    }*/
 }
 
 vec2 cmul(vec2 a, vec2 b) {
