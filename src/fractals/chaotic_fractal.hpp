@@ -69,12 +69,16 @@ public:
         SpaceFractal<P, F>::vao().bind();
 
         auto dflags = SpaceFractal<P, F>::draw_flags();
-        const bool force = dflags & SpaceFractal<P, F>::NEW_USE_DOUBLE;
-        const bool reset = dflags & (SpaceFractal<P, F>::NEW_VERTICES |
-                                     SpaceFractal<P, F>::NEW_CENTER |
-                                     SpaceFractal<P, F>::NEW_SCALE | NEW_TIME);
+        bool force = dflags & SpaceFractal<P, F>::NEW_USE_DOUBLE;
 
         update_parameters(force);
+
+        dflags = SpaceFractal<P, F>::draw_flags();
+        force = dflags & SpaceFractal<P, F>::NEW_USE_DOUBLE;
+        const bool reset =
+            force || dflags & (SpaceFractal<P, F>::NEW_VERTICES |
+                               SpaceFractal<P, F>::NEW_CENTER |
+                               SpaceFractal<P, F>::NEW_SCALE | NEW_TIME);
 
         const glm::vec2 fsize{ SpaceFractal<P, F>::size() };
         const glm::vec<2, GLsizei> isize{ fsize };

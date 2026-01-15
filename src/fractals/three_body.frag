@@ -45,6 +45,8 @@ uniform float m1 = 100;
 uniform float m2 = 100;
 uniform float sscale = 0.001;
 uniform float stabilization = 0.00000001;
+uniform vec2 init1 = vec2(-0.5, 0);
+uniform vec2 init2 = vec2(0.5, 0);
 
 const float PI = 3.14159265359;
 
@@ -52,14 +54,31 @@ void main() {
     switch (action) {
     case 0:
         set_state(stepn(init()));
-        break;
+        return;
     case 1:
         set_state(stepn(get_state()));
-        break;
+        return;
     default:
-        frag_color = close_col(to_color(get_state()));
         break;
     }
+    
+    vec4 col = close_col(to_color(get_state()));
+    
+    if ((flags & 0x200u) == 0) {
+        vec2 pv = (init1 - vec2(center)) / float(scale) - cor;
+        pv *= pv;
+        float d1 = pv.x + pv.y;
+        
+        pv = (init2 - vec2(center)) / float(scale) - cor;
+        pv *= pv;
+        float d2 = pv.x + pv.y;
+        
+        if ((d1 < 0.002 && d1 > 0.00075) || (d2 < 0.002 && d2 > 0.00075)) {
+            col = vec4(1, 1, 1, 2) - col;
+        }
+    }
+    
+    frag_color = col;
 }
 
 mat3x4 get_state() {
@@ -80,8 +99,8 @@ void set_state(mat3x4 s) {
 mat3x4 init() {
     mat3x4 s = mat3x4(
         vec4(cor * scale + center, 0, 0),
-        vec4(-0.5, 0, 0, 0),
-        vec4(0.5, 0, 0, 0)
+        vec4(init1, 0, 0),
+        vec4(init2, 0, 0)
     );
     s[0].zw = normalize(s[1].xy - s[2].xy) * 0.1;
     s[1].zw = normalize(s[2].xy - s[0].xy) * 0.1;

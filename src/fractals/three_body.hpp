@@ -2,6 +2,7 @@
 
 #include "../gl/program.hpp"
 #include "chaotic_fractal.hpp"
+#include "pickers/picker_impl.hpp"
 
 namespace fio::fractals {
 
@@ -23,34 +24,36 @@ public:
     void drag(glm::dvec2 pos, glm::dvec2 delta) override {
         _hover = pos / size();
         _hover.y = 1 - _hover.y;
-        ChaoticFractal::drag(pos, delta);
+        _picker.drag(pos, delta, *this);
     }
 
     void set(std::string_view param, std::optional<float> value) override;
 
-protected:
-    void update_parameters(bool force) override {
-        ChaoticFractal::update_parameters(force);
-
-        auto &prog = program();
-        auto dflags = draw_flags();
-
-        prog.uniform(_loc_hover, _hover);
-
-        if (dflags & NEW_SPECIAL) {
-            prog.uniform(_loc_g, _g);
-            prog.uniform(_loc_m0, _m0);
-            prog.uniform(_loc_m1, _m1);
-            prog.uniform(_loc_m2, _m2);
-            prog.uniform(_loc_sscale, _sscale);
-            prog.uniform(_loc_stabilization, _stabilization);
-        }
+    void drag_start(int button, int mod, glm::dvec2 pos) override {
+        _picker.drag_start(button, mod, pos, *this);
     }
+
+    void map_parameter_x(
+        std::size_t idx, const std::function<double(double)> &map
+    ) override {
+        _picker.map_parameter_x(idx, map);
+    }
+
+    void map_parameter_y(
+        std::size_t idx, const std::function<double(double)> &map
+    ) override {
+        _picker.map_parameter_y(idx, map);
+    }
+
+protected:
+    void update_parameters(bool force) override;
 
 private:
     enum DrawFlags {
         NEW_SPECIAL = NEXT_DRAW_FLAG,
     };
+
+    pickers::PickerImpl _picker;
 
     GLint _loc_hover;
     glm::vec2 _hover;
@@ -67,6 +70,8 @@ private:
     GLint _loc_sscale;
     float _stabilization = 0.00000001;
     GLint _loc_stabilization;
+    GLint _loc_init1;
+    GLint _loc_init2;
 };
 
 } // namespace fio::fractals
