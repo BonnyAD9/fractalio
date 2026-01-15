@@ -1,7 +1,9 @@
 #include "littlewood.hpp"
 
+#include <format>
 #include <iostream>
 #include <print>
+#include <unordered_map>
 
 #include "../gl/shader.hpp"
 #include "../glsl/preprocess.hpp"
@@ -38,9 +40,17 @@ static constexpr char GEOMETRY_SHADER[]{
 };
 
 Littlewood::Littlewood(
-    std::function<glm::mat3x2(glm::vec2)> s_fun, gl::Texture &gradient
+    std::function<glm::mat3x2(glm::vec2)> s_fun,
+    gl::Texture &gradient,
+    std::size_t max_strs,
+    std::size_t max_degree
 ) :
-    Littlewood(make_programs(), std::move(s_fun), gradient) {
+    Littlewood(
+        make_programs(max_strs, max_degree),
+        std::move(s_fun),
+        gradient,
+        max_strs
+    ) {
     _loc_degree = _make_histogram.uniform_location("degree");
     _loc_store_cnt = _make_histogram.uniform_location("store_cnt");
     _loc_store = _make_histogram.uniform_location("store");
@@ -48,6 +58,8 @@ Littlewood::Littlewood(
 
     auto &prog = program();
     _loc_aspect = prog.uniform_location("aspect");
+    _loc_draw_store = prog.uniform_location("store");
+    _loc_draw_store_cnt = prog.uniform_location("store_cnt");
 
     _fbuf.bind();
     gl::draw_buffer(GL_COLOR_ATTACHMENT0);
@@ -114,7 +126,7 @@ void Littlewood::draw(double) {
         }
         gl::clear_color(glm::vec4(0, 0, 0, 1));
         glClear(GL_COLOR_BUFFER_BIT);
-        gl::draw_arrays(GL_POINTS, 0, 1 << _degree);
+        gl::draw_arrays(GL_POINTS, 0, GLsizei(std::pow(pars.size(), _degree)));
 
         const glm::vec<2, GLsizei> wisize = wsize();
 
@@ -152,12 +164,28 @@ void Littlewood::update_parameters(bool force) {
         );
         prog.uniform(_loc_aspect, float(size().y / size().x));
     }
+
+    if (dflags & NEW_FLAGS) {
+        prog.uniform(loc().flags, flags());
+    }
+
+    if (_picker.new_par() || dflags & NEW_SCALE || dflags & NEW_CENTER) {
+        auto dstore = _picker.dpars();
+        prog.uniform(_loc_draw_store_cnt, GLuint(dstore.size()));
+
+        std::vector<glm::vec2> store(dstore.size());
+        for (std::size_t i = 0; i < dstore.size(); ++i) {
+            store[i] = glm::vec2((dstore[i] - center()) / scale());
+        }
+        prog.uniform(_loc_draw_store, store);
+    }
 }
 
 Littlewood::Littlewood(
     std::tuple<gl::Program, gl::Program, SpaceLocations<GLint>> prog,
     std::function<glm::mat3x2(glm::vec2)> s_fun,
-    gl::Texture &gradient
+    gl::Texture &gradient,
+    std::size_t max_strs
 ) :
     SpaceFractal(
         std::move(std::get<0>(prog)),
@@ -167,32 +195,42 @@ Littlewood::Littlewood(
     ),
     _gradient(gradient),
     _make_histogram(std::move(std::get<1>(prog))),
-    _picker({ { -1, 0 }, { 1, 0 } }) { }
+    _picker({ { -1, 0 }, { 1, 0 } }, max_strs) { }
 
 std::tuple<gl::Program, gl::Program, SpaceLocations<GLint>>
-Littlewood::make_programs() {
+Littlewood::make_programs(std::size_t max_strs, std::size_t max_degree) {
     gl::Program program;
 
-    std::string frag;
-    glsl::preprocess_defines(frag, FRAGMENT_SHADER, { { "MODE", "1" } });
-    frag = glsl::preprocess_mylib(frag);
+    std::string smax_store = std::format("{}", max_strs);
+    std::string smax_degree = std::format("{}", max_degree);
 
-    program.compile_link(VERTEX_SHADER, frag);
+    std::string shader;
+    glsl::preprocess_defines(
+        shader,
+        FRAGMENT_SHADER,
+        { { "MODE", "1" }, { "MAX_STORE", smax_store } }
+    );
+
+    program.compile_link(VERTEX_SHADER, glsl::preprocess_mylib(shader));
 
     gl::Program make_histogram;
-
-    frag.clear();
-    glsl::preprocess_defines(frag, FRAGMENT_SHADER, { { "MODE", "0" } });
-    frag = glsl::preprocess_mylib(frag);
 
     gl::Shader hvert(GL_VERTEX_SHADER);
     hvert.compile(VERTEX_SHADER_HISTOGRAM);
 
     gl::Shader hgeom(GL_GEOMETRY_SHADER);
-    hgeom.compile(glsl::preprocess_mylib(GEOMETRY_SHADER));
+    shader.clear();
+    glsl::preprocess_defines(
+        shader,
+        GEOMETRY_SHADER,
+        { { "MAX_STORE", smax_store }, { "MAX_DEGREE", smax_degree } }
+    );
+    hgeom.compile(glsl::preprocess_mylib(shader));
 
+    shader.clear();
+    glsl::preprocess_defines(shader, FRAGMENT_SHADER, { { "MODE", "0" } });
     gl::Shader hfrag(GL_FRAGMENT_SHADER);
-    hfrag.compile(frag);
+    hfrag.compile(glsl::preprocess_mylib(shader));
 
     make_histogram.attach(hvert);
     make_histogram.attach(hgeom);
@@ -203,7 +241,7 @@ Littlewood::make_programs() {
         .proj = program.uniform_location("proj"),
         .center = make_histogram.uniform_location("center"),
         .scale = make_histogram.uniform_location("scale"),
-        .flags = 0,
+        .flags = program.uniform_location("flags"),
     };
 
     return { std::move(program), std::move(make_histogram), loc };

@@ -251,6 +251,11 @@ protected:
         return _vertices;
     }
 
+    [[nodiscard]]
+    GLuint flags() const {
+        return _flags;
+    }
+
 private:
     P _program;
     gl::VertexArray _vao;

@@ -47,7 +47,7 @@ void main() {
     abeth2(EPS, MAX_ITERATIONS);
     //durnad_kerner2(EPS, MAX_ITERATIONS);
     
-    cor = float(double(idx[0]) / double(uint(1) << degree));
+    cor = float(idx[0]) / pow(store_cnt, degree);
     for (int i = 0; i < degree; ++i) {
         /*float rp = length(roots[i]);
         if (rp < 1.3 && rp > 0.8) {
