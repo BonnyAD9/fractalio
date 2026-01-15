@@ -91,6 +91,16 @@ public:
     virtual void scale(double delta) { (void)delta; }
     virtual double scale() { return 1; }
 
+    virtual void set(std::string_view param, std::optional<float> value) {
+        (void)param;
+        (void)value;
+    }
+
+    virtual void set(std::string_view param, std::optional<glm::vec2> value) {
+        (void)param;
+        (void)value;
+    }
+
     virtual void map_iterations(const std::function<float(float)> &map) {
         (void)map;
     };

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <exception>
 #include <iostream>
+#include <optional>
 #include <print>
 #include <ranges>
 
@@ -15,6 +16,7 @@
 #include "maps.hpp"
 
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/fwd.hpp>
 
 namespace fio::app {
 
@@ -208,6 +210,21 @@ void Commander::long_command(std::string_view cmd) {
         }
         _app._gradient_1d.bind(GL_TEXTURE_1D);
         gl::tex_image_1d(grad);
+    } else if (cmd == ":set") {
+        auto par = args.next_arg<std::string_view>();
+        if (args.empty()) {
+            _app._focus->set(par, std::optional<float>(std::nullopt));
+            _app._focus->set(par, std::optional<glm::vec2>(std::nullopt));
+        } else {
+            auto v1 = args.next_arg<float>();
+            if (args.empty()) {
+                _app._focus->set(par, v1);
+            } else {
+                auto v2 = args.next_arg<float>();
+                _app._focus->set(par, { { v1, v2 } });
+            }
+        }
+        _app._new_info = true;
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
         return;

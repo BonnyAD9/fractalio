@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "../gl/framebuffer.hpp"
 #include "../gl/program.hpp"
 #include "../gl/texture.hpp"
@@ -21,6 +23,8 @@ public:
 
     void draw(double) override;
 
+    void set(std::string_view parameter, std::optional<float> value) override;
+
     USE_PICKER(_picker);
 
 protected:
@@ -28,7 +32,7 @@ protected:
 
 private:
     enum DrawFlags {
-        NEW_COEF_CNT = NEXT_DRAW_FLAG,
+        NEW_DEGREE = NEXT_DRAW_FLAG,
     };
 
     gl::Texture &_gradient;

@@ -86,8 +86,7 @@ std::string Littlewood::describe() {
 void Littlewood::draw(double) {
     auto dflags = draw_flags();
     const bool force = dflags & NEW_USE_DOUBLE;
-    bool reset =
-        dflags & (NEW_VERTICES | NEW_CENTER | NEW_SCALE | NEW_COEF_CNT);
+    bool reset = dflags & (NEW_VERTICES | NEW_CENTER | NEW_SCALE | NEW_DEGREE);
     reset |= _picker.new_par();
 
     const glm::vec2 fsize = size();
@@ -145,6 +144,13 @@ void Littlewood::draw(double) {
     set_draw_flags(0);
     _picker.reset_flags();
     gl::draw_arrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void Littlewood::set(std::string_view parameter, std::optional<float> value) {
+    if (parameter == "degree") {
+        _degree = GLuint(value.value_or(10));
+        add_draw_flag(NEW_DEGREE);
+    }
 }
 
 void Littlewood::update_parameters(bool force) {

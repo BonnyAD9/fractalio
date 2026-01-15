@@ -39,12 +39,13 @@ vec4 close_col(vec4 def);
 mat3x2 get_acceleration(mat3x4 s);
 mat3x4 derive(mat3x4 s, float h);
 
-const float G = 6.67430e-11; //0.00001; //6.67430e-11;
-const float M0 = 100;
-const float M1 = 100;
-const float M2 = 100;
-const float SCALE = 0.001;
-const float STABILIZATION = 0.00000001;
+uniform float g = 6.67430e-11;
+uniform float m0 = 100;
+uniform float m1 = 100;
+uniform float m2 = 100;
+uniform float sscale = 0.001;
+uniform float stabilization = 0.00000001;
+
 const float PI = 3.14159265359;
 
 void main() {
@@ -184,13 +185,13 @@ mat3x4 stepn(mat3x4 s) {
 }
 
 mat3x2 get_acceleration(mat3x4 s) {
-    vec2 fab = force(s[0].xy, M0, s[1].xy, M1);
-    vec2 fbc = force(s[1].xy, M1, s[2].xy, M2);
-    vec2 fca = force(s[2].xy, M2, s[0].xy, M0);
+    vec2 fab = force(s[0].xy, m0, s[1].xy, m1);
+    vec2 fbc = force(s[1].xy, m1, s[2].xy, m2);
+    vec2 fca = force(s[2].xy, m2, s[0].xy, m0);
     return mat3x2(
-        (fab - fca) / M0,
-        (fbc - fab) / M1,
-        (fca - fbc) / M2
+        (fab - fca) / m0,
+        (fbc - fab) / m1,
+        (fca - fbc) / m2
     );
 }
 
@@ -223,8 +224,8 @@ mat3x4 step_rk4(mat3x4 x, float h) {
 
 vec2 force(vec2 a, float ma, vec2 b, float mb) {
     vec2 diff = b.xy - a.xy;
-    float dist = length(diff) * SCALE;
-    return normalize(diff) * ma * mb / (dist * dist + STABILIZATION) * G;
+    float dist = length(diff) * sscale;
+    return normalize(diff) * ma * mb / (dist * dist + stabilization) * g;
 }
 
 bool close(vec2 a, vec2 b, float scl) {
