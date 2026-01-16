@@ -9,7 +9,6 @@
 #include "glad.hpp"
 #include "glfw/runner.hpp"
 #include "glfw/window.hpp"
-#include "glsl/mylib.hpp"
 #include "log_err.hpp"
 
 namespace fio {

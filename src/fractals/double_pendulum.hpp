@@ -19,7 +19,7 @@ public:
         return res;
     }
 
-    void set(std::string_view param, std::optional<float> value) override;
+    void set(std::string_view param, std::optional<double> value) override;
 
 protected:
     void update_parameters(bool force) override;

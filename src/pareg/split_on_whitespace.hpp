@@ -3,7 +3,8 @@
 #include <cctype>
 #include <optional>
 #include <string_view>
-namespace mdt::pareg {
+
+namespace fio::pareg {
 
 class SplitWhitespaceIterator {
 public:
@@ -59,4 +60,4 @@ private:
     std::string_view _data;
 };
 
-} // namespace mdt::pareg
+} // namespace fio::pareg

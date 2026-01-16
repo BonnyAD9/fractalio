@@ -27,7 +27,7 @@ public:
         _picker.drag(pos, delta, *this);
     }
 
-    void set(std::string_view param, std::optional<float> value) override;
+    void set(std::string_view param, std::optional<double> value) override;
 
     void drag_start(int button, int mod, glm::dvec2 pos) override {
         _picker.drag_start(button, mod, pos, *this);

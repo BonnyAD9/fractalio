@@ -7,12 +7,13 @@
 #include <ranges>
 #include <stdexcept>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <glm/glm.hpp>
 
-namespace mdt::pareg {
+namespace fio::pareg {
 
 template<typename T, typename... TArgs> struct Parse {
     T parse(std::string_view) {
@@ -40,13 +41,46 @@ T from_arg(std::string_view arg) {
     return T(arg);
 }
 
+static inline char *float_from_chars(const char *s, float &f) {
+    char *e;
+    f = std::strtof(s, &e);
+    return e;
+}
+
+static inline char *float_from_chars(const char *s, double &f) {
+    char *e;
+    f = std::strtod(s, &e);
+    return e;
+}
+
+static inline char *float_from_chars(const char *s, long double &f) {
+    char *e;
+    f = std::strtold(s, &e);
+    return e;
+}
+
+template<std::floating_point T> T from_arg(std::string_view arg) {
+    std::string sarg{ arg };
+    if (sarg.starts_with("0x-") || sarg.starts_with("0X-")) {
+        sarg[2] = sarg[1];
+        sarg[0] = '-';
+        sarg[1] = '0';
+    }
+    T value;
+    auto res = float_from_chars(sarg.c_str(), value);
+    if (*res) {
+        throw std::runtime_error("Failed to parse float with from_chars.");
+    }
+    return value;
+}
+
 template<typename T>
 concept FromChars = requires(std::string_view arg, T &v) {
     T();
     {
         std::from_chars(arg.begin(), arg.end(), v)
     } -> std::same_as<std::from_chars_result>;
-};
+} && !std::floating_point<T>;
 
 template<FromChars T> T from_arg(std::string_view arg) {
     T value;
@@ -174,4 +208,4 @@ from_arg<std::vector<std::pair<float, glm::u8vec3>>>(std::string_view arg) {
     return res;
 }
 
-} // namespace mdt::pareg
+} // namespace fio::pareg

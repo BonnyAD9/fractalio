@@ -25,22 +25,22 @@ ThreeBody::ThreeBody(std::function<glm::mat3x2(glm::vec2)> s_fun) :
     _loc_init2 = prog.uniform_location("init2");
 }
 
-void ThreeBody::set(std::string_view param, std::optional<float> value) {
+void ThreeBody::set(std::string_view param, std::optional<double> value) {
     if (param == "g" || param == "gravity") {
-        _g = value.value_or(6.67430e-11);
+        _g = float(value.value_or(6.67430e-11));
     } else if (param == "m0" || param == "mass0" || param == "mr" ||
                param == "mass-red") {
-        _m0 = value.value_or(100);
+        _m0 = float(value.value_or(100));
     } else if (param == "m1" || param == "mass1" || param == "mg" ||
                param == "mass-green") {
-        _m1 = value.value_or(100);
+        _m1 = float(value.value_or(100));
     } else if (param == "m2" || param == "mass2" || param == "mb" ||
                param == "mass-blue") {
-        _m2 = value.value_or(100);
+        _m2 = float(value.value_or(100));
     } else if (param == "sscale" || param == "space-scale") {
-        _sscale = value.value_or(0.001);
+        _sscale = float(value.value_or(0.001));
     } else if (param == "stabilization") {
-        _stabilization = value.value_or(0.00000001);
+        _stabilization = float(value.value_or(0.00000001));
     } else {
         return;
     }

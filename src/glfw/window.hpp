@@ -72,6 +72,14 @@ public:
         glfwSetWindowShouldClose(get(), value ? GLFW_TRUE : GLFW_FALSE);
     }
 
+    void set_clipboard_string(const char *str) {
+        glfwSetClipboardString(get(), str);
+    }
+
+    const char *get_clipboard_string() {
+        return glfwGetClipboardString(get());
+    }
+
     bool should_close() { return glfwWindowShouldClose(get()); }
 
     void swap_buffers() { glfwSwapBuffers(get()); }

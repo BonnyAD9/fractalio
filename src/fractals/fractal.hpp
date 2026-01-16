@@ -91,12 +91,12 @@ public:
     virtual void scale(double delta) { (void)delta; }
     virtual double scale() { return 1; }
 
-    virtual void set(std::string_view param, std::optional<float> value) {
+    virtual void set(std::string_view param, std::optional<double> value) {
         (void)param;
         (void)value;
     }
 
-    virtual void set(std::string_view param, std::optional<glm::vec2> value) {
+    virtual void set(std::string_view param, std::optional<glm::dvec2> value) {
         (void)param;
         (void)value;
     }
@@ -161,6 +161,14 @@ public:
         (void)mask;
         (void)value;
     }
+
+    std::string save_state() {
+        std::string res;
+        save_state(res);
+        return res;
+    }
+
+    virtual void save_state(std::string &out) = 0;
 
 protected:
     [[nodiscard]]

@@ -111,6 +111,11 @@ void Commander::resize(glm::vec2 size) {
 void Commander::char_in(char c) {
     _draw_flags |= NEW_INPUT;
 
+    if (c == '\n') {
+        consume();
+        return;
+    }
+
     if (_text.contains(':') || c == ':') {
         _text.push_back(c);
         return;
@@ -133,19 +138,22 @@ void Commander::char_in(char c) {
 
 void Commander::consume() {
     _draw_flags |= NEW_INPUT;
+    std::string text2(_text);
 
     try {
         execute_command(_text);
     } catch (std::exception &ex) {
-        std::println(std::cerr, "Failed to execute command: {}", ex.what());
+        std::println(
+            std::cerr, "Failed to execute command `{}`: {}", text2, ex.what()
+        );
     }
     _text.clear();
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void Commander::long_command(std::string_view cmd) {
-    auto arg = mdt::pareg::SplitWhitespace(cmd);
-    auto args = mdt::pareg::Pareg(arg.begin(), arg.end());
+    auto arg = pareg::SplitWhitespace(cmd);
+    auto args = pareg::Pareg(arg.begin(), arg.end());
 
     cmd = std::string_view(*args);
     if (cmd == ":x" || cmd == ":exit" || cmd == ":q" || cmd == ":quit") {
@@ -213,18 +221,35 @@ void Commander::long_command(std::string_view cmd) {
     } else if (cmd == ":set") {
         auto par = args.next_arg<std::string_view>();
         if (args.empty()) {
-            _app._focus->set(par, std::optional<float>(std::nullopt));
-            _app._focus->set(par, std::optional<glm::vec2>(std::nullopt));
+            _app._focus->set(par, std::optional<double>(std::nullopt));
+            _app._focus->set(par, std::optional<glm::dvec2>(std::nullopt));
         } else {
-            auto v1 = args.next_arg<float>();
+            auto v1 = args.next_arg<double>();
             if (args.empty()) {
                 _app._focus->set(par, v1);
             } else {
-                auto v2 = args.next_arg<float>();
+                auto v2 = args.next_arg<double>();
                 _app._focus->set(par, { { v1, v2 } });
             }
         }
         _app._new_info = true;
+    } else if (cmd == ":save") {
+        auto state = _app._active->save_state();
+        if (args.empty()) {
+            _app._window->set_clipboard_string(state.c_str());
+        }
+    } else if (cmd == ":load") {
+        std::string state;
+        if (args.empty()) {
+            state += _app._window->get_clipboard_string();
+        }
+        _text.clear();
+        for (auto c : state) {
+            char_in(c);
+        }
+        consume();
+        _last = cmd;
+        return;
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
         return;

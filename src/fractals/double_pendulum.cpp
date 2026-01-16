@@ -21,17 +21,17 @@ DoublePendulum::DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun) :
     _loc_l2 = prog.uniform_location("l2");
 }
 
-void DoublePendulum::set(std::string_view param, std::optional<float> value) {
+void DoublePendulum::set(std::string_view param, std::optional<double> value) {
     if (param == "g" || param == "gravity") {
-        _g = value.value_or(9.8);
+        _g = float(value.value_or(9.8));
     } else if (param == "m1" || param == "mass1") {
-        _m1 = value.value_or(1);
+        _m1 = float(value.value_or(1));
     } else if (param == "m2" || param == "mass2") {
-        _m2 = value.value_or(1);
+        _m2 = float(value.value_or(1));
     } else if (param == "l1" || param == "length1") {
-        _l1 = value.value_or(1);
+        _l1 = float(value.value_or(1));
     } else if (param == "l2" || param == "length2") {
-        _l2 = value.value_or(1);
+        _l2 = float(value.value_or(1));
     } else {
         return;
     }

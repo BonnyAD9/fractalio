@@ -4,7 +4,7 @@
 
 #include "parsable.hpp"
 
-namespace mdt::pareg {
+namespace fio::pareg {
 
 template<typename I, typename T>
 concept Iterator = requires(I i) {
@@ -90,4 +90,4 @@ private:
     I _end;
 };
 
-} // namespace mdt::pareg
+} // namespace fio::pareg

@@ -23,7 +23,7 @@ public:
 
     void draw(double) override;
 
-    void set(std::string_view parameter, std::optional<float> value) override;
+    void set(std::string_view parameter, std::optional<double> value) override;
 
     USE_PICKER(_picker);
 

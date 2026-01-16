@@ -46,6 +46,12 @@ public:
 
     std::string describe() override { return ""; }
 
+    void save_state(std::string &out) override {
+        out += "gh\n";
+        out +=
+            std::format(":set xy 0x{:a} 0x{:a}\n", _position.x, _position.y);
+    }
+
 private:
     gui::Text _text;
     glm::vec2 _position{ 0, 0 };

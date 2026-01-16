@@ -1,6 +1,8 @@
 #pragma once
 
 #include <format>
+#include <limits>
+#include <optional>
 
 #include "../gl/buffer.hpp"
 #include "../gl/vertex_array.hpp"
@@ -127,6 +129,34 @@ public:
         _flags &= ~mask;
         _flags |= value & mask;
         _draw_flags |= NEW_FLAGS;
+    }
+
+    void save_state(std::string &out) override {
+        out += std::format(":set xy 0x{:a} 0x{:a}\n", _center.x, _center.y);
+        out += std::format(":set s 0x{:a}\n", _scale);
+        out += std::format(
+            ":flags {} {}\n", std::numeric_limits<GLuint>::max(), _flags
+        );
+    }
+
+    void set(
+        std::string_view param, std::optional<glm::dvec2> value
+    ) override {
+        if (param == "xy" || param == "pos" || param == "center") {
+            _center = value.value_or({ 0, 0 });
+            _draw_flags |= NEW_CENTER;
+        } else {
+            Fractal::set(param, value);
+        }
+    }
+
+    void set(std::string_view param, std::optional<double> value) override {
+        if (param == "s" || param == "scale") {
+            _scale = value.value_or(1);
+            _draw_flags |= NEW_SCALE;
+        } else {
+            Fractal::set(param, value);
+        }
     }
 
 protected:
