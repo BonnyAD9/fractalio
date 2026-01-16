@@ -55,6 +55,8 @@ Littlewood::Littlewood(
     _loc_store_cnt = _make_histogram.uniform_location("store_cnt");
     _loc_store = _make_histogram.uniform_location("store");
     _loc_h_aspect = _make_histogram.uniform_location("aspect");
+    _loc_max_iterations = _make_histogram.uniform_location("max_iterations");
+    _loc_h_flags = _make_histogram.uniform_location("flags");
 
     auto &prog = program();
     _loc_aspect = prog.uniform_location("aspect");
@@ -76,6 +78,7 @@ Littlewood::Littlewood(
 std::string Littlewood::describe() {
     auto res = describe_part("Littlewood");
     res += std::format("  degree: {}", _degree);
+    res += std::format("\n  max iterations: {}", _max_iterations);
     res += "\n  coefitients:\n";
     for (auto &r : _picker.dpars()) {
         res += std::format("    {:.6} + {:.6}i\n", r.x, r.y);
@@ -86,7 +89,8 @@ std::string Littlewood::describe() {
 void Littlewood::draw(double) {
     auto dflags = draw_flags();
     const bool force = dflags & NEW_USE_DOUBLE;
-    bool reset = dflags & (NEW_VERTICES | NEW_CENTER | NEW_SCALE | NEW_DEGREE | NEW_POINT_SIZE);
+    bool reset = dflags & (NEW_VERTICES | NEW_CENTER | NEW_SCALE | NEW_DEGREE |
+                           NEW_FLAGS);
     reset |= _picker.new_par();
 
     const glm::vec2 fsize = size();
@@ -115,6 +119,8 @@ void Littlewood::draw(double) {
         //_make_histogram.uniform(loc().center, center());
         _make_histogram.uniform(loc().center, center());
         _make_histogram.uniform(loc().scale, scale());
+        _make_histogram.uniform(_loc_h_flags, flags());
+        _make_histogram.uniform(_loc_max_iterations, _max_iterations);
 
         _fbuf.bind();
         _fbuf.texture_2d(_histogram);
@@ -125,7 +131,11 @@ void Littlewood::draw(double) {
         }
         gl::clear_color(glm::vec4(0, 0, 0, 1));
         glClear(GL_COLOR_BUFFER_BIT);
-        gl::draw_arrays(GL_POINTS, 0, GLsizei(std::pow(pars.size(), _degree)));
+        auto cnt = GLsizei(std::pow(pars.size(), _degree));
+        if (flags() & 0x100) {
+            cnt *= GLsizei(_degree);
+        }
+        gl::draw_arrays(GL_POINTS, 0, cnt);
 
         const glm::vec<2, GLsizei> wisize = wsize();
 
@@ -152,7 +162,11 @@ void Littlewood::set(std::string_view parameter, std::optional<double> value) {
         add_draw_flag(NEW_DEGREE);
     } else if (parameter == "point-size" || parameter == "size") {
         _point_size = float(value.value_or(1));
-        add_draw_flag(NEW_POINT_SIZE);
+        add_draw_flag(NEW_DEGREE);
+    } else if (parameter == "i" || parameter == "max-iterations" ||
+               parameter == "iterations") {
+        _max_iterations = GLuint(value.value_or(256));
+        add_draw_flag(NEW_DEGREE);
     } else {
         SpaceFractal::set(parameter, value);
     }

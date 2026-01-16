@@ -9,6 +9,8 @@ layout (points, max_vertices = MAX_DEGREE + 1) out;
 in uint idx[];
 out flat float cor;
 
+uniform uint flags;
+
 uniform double scale;
 uniform dvec2 center;
 uniform float aspect;
@@ -31,28 +33,38 @@ float get_lim();
 void to_monic();
 float sq_len(vec2 v);
 void fill_coefs();
+void fill_coefs2();
 vec2 cmul(vec2 a, vec2 b);
 vec2 cdiv(vec2 a, vec2 b);
 vec2 fun(vec2 z);
 vec2 deriv(vec2 z);
 
 const float EPS = 0.001 * 0.001;
-const uint MAX_ITERATIONS = 256;
+uniform uint max_iterations = 256;
 
 void main() {
-    fill_coefs();
+    switch (flags & 0xFu) {
+    default:
+        fill_coefs();
+        break;
+    case 1:
+        fill_coefs2();
+        break;
+    }
+
     to_monic();
     init_roots2();
-    //init_roots(get_lim());
-    abeth2(EPS, MAX_ITERATIONS);
-    //durnad_kerner2(EPS, MAX_ITERATIONS);
+    switch ((flags >> 4) & 0xFu) {
+    default:
+        abeth2(EPS, max_iterations);
+        break;
+    case 1:
+        durnad_kerner2(EPS, max_iterations);
+        break;
+    }
     
     cor = float(idx[0]) / pow(store_cnt, degree);
     for (int i = 0; i < degree; ++i) {
-        /*float rp = length(roots[i]);
-        if (rp < 1.3 && rp > 0.8) {
-            continue;
-        }*/
         gl_Position = vec4((roots[i] - center) / (dvec2(1, aspect) * scale), 0, 1);
         EmitVertex();
     }
@@ -159,15 +171,28 @@ float sq_len(vec2 v) {
 
 void fill_coefs() {
     uint ix = idx[0];
-    coefs[degree] = vec2(1, 0);
-    for (uint i = 0; i <= degree; ++i) {
+    uint end = degree + 1;
+    if ((flags & 0x100u) == 0) {
+        end -= 1;
+        coefs[degree] = vec2(1, 0);
+    }
+    for (uint i = 0; i < end; ++i) {
         coefs[i] = store[ix % store_cnt];
         ix /= store_cnt;
     }
-    /*for (int i = int(degree) - 1; i >= 0; --i) {
+}
+
+void fill_coefs2() {
+    uint ix = idx[0];
+    int end = 0;
+    if ((flags & 0x100u) == 0) {
+        end += 1;
+        coefs[0] = vec2(1, 0);
+    }
+    for (int i = int(degree); i >= end; --i) {
         coefs[i] = store[ix % store_cnt];
         ix /= store_cnt;
-    }*/
+    }
 }
 
 vec2 cmul(vec2 a, vec2 b) {

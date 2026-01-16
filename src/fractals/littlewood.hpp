@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <optional>
 
 #include "../gl/framebuffer.hpp"
@@ -25,12 +26,26 @@ public:
 
     void set(std::string_view parameter, std::optional<double> value) override;
 
+    void map_iterations(const std::function<float(float)> &map) override {
+        auto it = map(float(_max_iterations));
+        _max_iterations =
+            std::isnan(it)
+                ? 256
+                : GLuint(
+                      std::clamp(
+                          it, 0.F, float(std::numeric_limits<GLuint>::max())
+                      )
+                  );
+        add_draw_flag(NEW_DEGREE);
+    }
+
     USE_PICKER(_picker);
 
     void save_state(std::string &out) override {
         out += std::format("{}G\n", std::size_t(Fractal::Type::LITTLEWOOD));
         out += std::format(":set degree {}\n", _degree);
         out += std::format(":set size 0x{:a}\n", _point_size);
+        out += std::format(":set i {}\n", _max_iterations);
         _picker.save_state(out);
         SpaceFractal::save_state(out);
     }
@@ -41,7 +56,6 @@ protected:
 private:
     enum DrawFlags {
         NEW_DEGREE = NEXT_DRAW_FLAG,
-        NEW_POINT_SIZE = NEW_DEGREE << 1,
     };
 
     gl::Texture &_gradient;
@@ -57,6 +71,9 @@ private:
     GLint _loc_store;
     GLint _loc_h_aspect;
     GLint _loc_aspect;
+    GLuint _max_iterations = 256;
+    GLint _loc_max_iterations;
+    GLint _loc_h_flags;
 
     GLint _loc_draw_store;
     GLint _loc_draw_store_cnt;

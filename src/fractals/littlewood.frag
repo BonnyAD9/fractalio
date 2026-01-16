@@ -29,7 +29,7 @@ void main() {
         vec2 pv = store[i] - cor;
         pv *= pv;
         float pd = pv.x + pv.y;
-        if ((flags & 0x20u) == 0 && pd < 0.002 && pd > 0.00075) {
+        if ((flags & 0x200u) == 0 && pd < 0.002 && pd > 0.00075) {
             col = vec4(1, 1, 1, 2) - col;
             break;
         }
