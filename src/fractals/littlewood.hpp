@@ -27,6 +27,13 @@ public:
 
     USE_PICKER(_picker);
 
+    void save_state(std::string &out) override {
+        out += std::format("{}G\n", std::size_t(Fractal::Type::LITTLEWOOD));
+        out += std::format(":set degree {}\n", _degree);
+        _picker.save_state(out);
+        SpaceFractal::save_state(out);
+    }
+
 protected:
     void update_parameters(bool force) override;
 

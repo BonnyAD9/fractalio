@@ -1,6 +1,8 @@
 #pragma once
 
+#include <format>
 #include <iostream>
+#include <optional>
 #include <print>
 #include <ranges>
 
@@ -178,6 +180,26 @@ public:
         if (std::isnan(_speed)) {
             _speed = 1;
         }
+    }
+
+    void set(std::string_view param, std::optional<double> value) override {
+        if (param == "t" || param == "time") {
+            _time = value.value_or(0);
+            SpaceFractal<P, F>::add_draw_flag(NEW_TIME);
+        } else if (param == "s" || param == "max-step" || param == "step") {
+            _max_step = value.value_or(0.005);
+        } else if (param == "v" || param == "velocity" || param == "speed") {
+            _speed = value.value_or(1);
+        } else {
+            SpaceFractal<P, F>::set(param, value);
+        }
+    }
+
+    void save_state(std::string &out) override {
+        out += std::format(":set t 0x{:a}\n", _time);
+        out += std::format(":set s 0x{:a}\n", _max_step);
+        out += std::format(":set v 0x{:a}\n", _speed);
+        SpaceFractal<P, F>::save_state(out);
     }
 
 protected:

@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <format>
+#include <stdexcept>
 
 #include "../fractal.hpp"
 #include "../space_fractal.hpp"
@@ -70,6 +71,13 @@ public:
             res.emplace_back(to_space(a, frac));
         }
         return res;
+    }
+
+    void save_state(std::string &out) {
+        for (std::size_t i = 0; i < _pars.size(); ++i) {
+            auto &par = _pars[i];
+            out += std::format(":par {} 0x{:a} 0x{:a}\n", i, par.x, par.y);
+        }
     }
 
     template<typename P, typename F>
@@ -155,7 +163,20 @@ public:
     void map_parameter_x(
         std::size_t idx, const std::function<double(double)> &map
     ) {
-        auto nx = map(_pars[idx].x);
+        if (idx >= _pars.size()) {
+            if (idx >= _max_size) {
+                throw std::runtime_error(
+                    std::format(
+                        "Cannot add parameter `{}`. Maximum number of "
+                        "parameters is `{}`.",
+                        idx,
+                        std::max(_max_size, _pars.size())
+                    )
+                );
+            }
+            _pars.resize(idx + 1);
+        }
+        auto nx = map(_pars.at(idx).x);
         if (std::isnan(nx)) {
             _pars[idx].x = 0;
         } else {
@@ -264,6 +285,10 @@ protected:                                                                    \
                                                                               \
     std::vector<glm::vec2> pars() override {                                  \
         return (picker).pars();                                               \
+    }                                                                         \
+                                                                              \
+    void save_state(std::string &out) override {                              \
+        (picker).save_state(out);                                             \
     }
 
 } // namespace fio::fractals::pickers

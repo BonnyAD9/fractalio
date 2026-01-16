@@ -150,6 +150,8 @@ void Littlewood::set(std::string_view parameter, std::optional<double> value) {
     if (parameter == "degree") {
         _degree = GLuint(value.value_or(10));
         add_draw_flag(NEW_DEGREE);
+    } else {
+        SpaceFractal::set(parameter, value);
     }
 }
 

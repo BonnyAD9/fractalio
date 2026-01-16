@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "../glsl/df_shader_program.hpp"
+#include "fractal.hpp"
 #include "iterative_fractal.hpp"
 #include "pickers/picker.hpp"
 
@@ -34,6 +35,11 @@ public:
     }
 
     Fractal *picker() override { return &_picker->as_fractal(); }
+
+    void save_state(std::string &out) override {
+        out += std::format("{}G\n", std::size_t(Fractal::Type::JULIA));
+        IterativeFractal::save_state(out);
+    }
 
 protected:
     void update_parameters(bool force) override {

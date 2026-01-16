@@ -79,12 +79,6 @@ public:
         return ++c2 == _end;
     }
 
-    [[nodiscard]]
-    std::size_t next_rem() const {
-        auto c2 = _cur;
-        return _end - ++c2;
-    }
-
 private:
     I _cur;
     I _end;

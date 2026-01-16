@@ -50,6 +50,24 @@ public:
         ComplexFractal<P, F>::add_draw_flag(NEW_COLOR_COUNT);
     }
 
+    void set(std::string_view param, std::optional<double> value) override {
+        if (param == "i" || param == "iterations") {
+            _iterations = GLuint(value.value_or(DEFAULT_ITERATIONS));
+            ComplexFractal<P, F>::add_draw_flag(NEW_ITERATIONS);
+        } else if (param == "c" || param == "color-count") {
+            _color_count = float(value.value_or(DEFAULT_COLOR_COUNT));
+            ComplexFractal<P, F>::add_draw_flag(NEW_COLOR_COUNT);
+        } else {
+            ComplexFractal<P, F>::set(param, value);
+        }
+    }
+
+    void save_state(std::string &out) override {
+        out += std::format(":set i {}\n", _iterations);
+        out += std::format(":set c 0x{:a}\n", _color_count);
+        ComplexFractal<P, F>::save_state(out);
+    }
+
 protected:
     enum DrawFlags {
         NEW_ITERATIONS = ComplexFractal<P, F>::NEXT_DRAW_FLAG << 1,

@@ -12,6 +12,11 @@ public:
     );
 
     std::string describe() override { return describe_part("Mandelbrot set"); }
+
+    void save_state(std::string &out) override {
+        out += std::format("{}G\n", std::size_t(Fractal::Type::MANDELBROT));
+        IterativeFractal::save_state(out);
+    }
 };
 
 } // namespace fio::fractals

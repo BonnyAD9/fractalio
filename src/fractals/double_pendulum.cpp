@@ -33,6 +33,7 @@ void DoublePendulum::set(std::string_view param, std::optional<double> value) {
     } else if (param == "l2" || param == "length2") {
         _l2 = float(value.value_or(1));
     } else {
+        ChaoticFractal::set(param, value);
         return;
     }
     add_draw_flag(NEW_SPECIAL);

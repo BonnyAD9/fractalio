@@ -2,10 +2,12 @@
 
 #include <algorithm>
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <optional>
 #include <print>
 #include <ranges>
+#include <sstream>
 
 #include <GLFW/glfw3.h>
 
@@ -190,8 +192,14 @@ void Commander::long_command(std::string_view cmd) {
     } else if (cmd == ":par" || cmd == ":parameter") {
         auto x = args.next_arg<double>();
         auto y = args.next_arg<double>();
-        _app._focus->map_parameter_x(0, maps::value(x));
-        _app._focus->map_parameter_y(0, maps::value(y));
+        std::size_t par = 0;
+        if (!args.empty()) {
+            par = std::size_t(x);
+            x = y;
+            y = args.next_arg<double>();
+        }
+        _app._focus->map_parameter_x(par, maps::value(x));
+        _app._focus->map_parameter_y(par, maps::value(y));
         _app._new_info = true;
     } else if (cmd == ":grad1" || cmd == ":gradient1") {
         auto v = args.next_arg<std::string_view>();
@@ -234,14 +242,34 @@ void Commander::long_command(std::string_view cmd) {
         }
         _app._new_info = true;
     } else if (cmd == ":save") {
-        auto state = _app._active->save_state();
+        std::string state(":fractal\n");
+        _app._active->save_state(state);
+        auto picker = _app._active->picker();
+        if (picker) {
+            state += ":picker\n";
+            picker->save_state(state);
+            state += ":fractal\n";
+        }
         if (args.empty()) {
             _app._window->set_clipboard_string(state.c_str());
+        } else {
+            auto f = args.next_arg<std::string>();
+            std::ofstream file;
+            file.open(f);
+            file << state;
+            file.close();
         }
     } else if (cmd == ":load") {
         std::string state;
         if (args.empty()) {
             state += _app._window->get_clipboard_string();
+        } else {
+            auto f = args.next_arg<std::string>();
+            std::ifstream file;
+            file.open(f);
+            std::ostringstream os;
+            os << file.rdbuf();
+            state = os.str();
         }
         _text.clear();
         for (auto c : state) {
@@ -250,6 +278,24 @@ void Commander::long_command(std::string_view cmd) {
         consume();
         _last = cmd;
         return;
+    } else if (cmd == ":picker") {
+        _app._focus = _app._active->picker();
+        if (!_app._focus) {
+            _app._focus = _app._active;
+        }
+        _app._new_info = true;
+    } else if (cmd == ":fractal") {
+        _app._focus = _app._active;
+        _app._new_info = true;
+    } else if (cmd == ":precision") {
+        auto p = args.next_arg<std::size_t>();
+        if (p == 1) {
+            _app._focus->map_use_double(maps::value(false));
+            _app._new_info = true;
+        } else if (p == 2) {
+            _app._focus->map_use_double(maps::value(true));
+            _app._new_info = true;
+        }
     } else {
         std::println(std::cerr, "Unknown command: {}", cmd);
         return;

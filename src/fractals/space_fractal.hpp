@@ -133,10 +133,11 @@ public:
 
     void save_state(std::string &out) override {
         out += std::format(":set xy 0x{:a} 0x{:a}\n", _center.x, _center.y);
-        out += std::format(":set s 0x{:a}\n", _scale);
+        out += std::format(":set z 0x{:a}\n", _scale);
         out += std::format(
             ":flags {} {}\n", std::numeric_limits<GLuint>::max(), _flags
         );
+        out += std::format(":precision {}", _program.use_double() + 1);
     }
 
     void set(
@@ -151,7 +152,7 @@ public:
     }
 
     void set(std::string_view param, std::optional<double> value) override {
-        if (param == "s" || param == "scale") {
+        if (param == "z" || param == "scale" || param == "zoom") {
             _scale = value.value_or(1);
             _draw_flags |= NEW_SCALE;
         } else {

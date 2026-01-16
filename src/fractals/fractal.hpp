@@ -1,6 +1,8 @@
 #pragma once
 
+#include <format>
 #include <functional>
+#include <stdexcept>
 #include <string>
 
 #include "../gl/gl.hpp"
@@ -92,13 +94,13 @@ public:
     virtual double scale() { return 1; }
 
     virtual void set(std::string_view param, std::optional<double> value) {
-        (void)param;
         (void)value;
+        throw std::runtime_error(std::format("Unknown parameter `{}`", param));
     }
 
     virtual void set(std::string_view param, std::optional<glm::dvec2> value) {
-        (void)param;
         (void)value;
+        throw std::runtime_error(std::format("Unknown parameter `{}`", param));
     }
 
     virtual void map_iterations(const std::function<float(float)> &map) {

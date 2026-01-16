@@ -24,6 +24,12 @@ public:
 
     USE_PICKER(_picker)
 
+    void save_state(std::string &out) override {
+        out += std::format("{}G\n", std::size_t(Fractal::Type::NEWTON));
+        _picker.save_state(out);
+        IterativeFractal::save_state(out);
+    }
+
 protected:
     void update_parameters(bool force) override;
 

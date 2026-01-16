@@ -36,6 +36,13 @@ public:
         ComplexFractal::add_draw_flag(NEW_STEP_SIZE);
     }
 
+    void save_state(std::string &out) override {
+        out +=
+            std::format("{}G\n", std::size_t(Fractal::Type::GRAVITY_BASINS));
+        _picker.save_state(out);
+        ComplexFractal::save_state(out);
+    }
+
 protected:
     void update_parameters(bool force) override;
 

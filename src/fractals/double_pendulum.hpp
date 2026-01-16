@@ -21,6 +21,17 @@ public:
 
     void set(std::string_view param, std::optional<double> value) override;
 
+    void save_state(std::string &out) override {
+        out +=
+            std::format("{}G\n", std::size_t(Fractal::Type::DOUBLE_PENDULUM));
+        out += std::format(":set g 0x{:a}", _g);
+        out += std::format(":set m1 0x{:a}", _m1);
+        out += std::format(":set m2 0x{:a}", _m2);
+        out += std::format(":set l1 0x{:a}", _l1);
+        out += std::format(":set l2 0x{:a}", _l2);
+        ChaoticFractal::save_state(out);
+    }
+
 protected:
     void update_parameters(bool force) override;
 

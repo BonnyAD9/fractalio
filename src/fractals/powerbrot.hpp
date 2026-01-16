@@ -35,6 +35,11 @@ public:
 
     Fractal *picker() override { return &_picker->as_fractal(); }
 
+    void save_state(std::string &out) override {
+        out += std::format("{}G\n", std::size_t(Fractal::Type::POWERBROT));
+        IterativeFractal::save_state(out);
+    }
+
 protected:
     void update_parameters(bool force) override {
         IterativeFractal::update_parameters(force);

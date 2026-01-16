@@ -45,6 +45,18 @@ public:
         _picker.map_parameter_y(idx, map);
     }
 
+    void save_state(std::string &out) override {
+        out += std::format("{}G\n", std::size_t(Fractal::Type::THREE_BODY));
+        out += std::format(":set g 0x{:a}\n", _g);
+        out += std::format(":set m0 0x{:a}\n", _m0);
+        out += std::format(":set m1 0x{:a}\n", _m1);
+        out += std::format(":set m2 0x{:a}\n", _m2);
+        out += std::format(":set sscale 0x{:a}\n", _sscale);
+        out += std::format(":set stabilization 0x{:a}\n", _stabilization);
+        _picker.save_state(out);
+        ChaoticFractal::save_state(out);
+    }
+
 protected:
     void update_parameters(bool force) override;
 

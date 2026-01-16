@@ -1,5 +1,7 @@
 #include "three_body.hpp"
 
+#include "chaotic_fractal.hpp"
+
 namespace fio::fractals {
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
@@ -42,6 +44,7 @@ void ThreeBody::set(std::string_view param, std::optional<double> value) {
     } else if (param == "stabilization") {
         _stabilization = float(value.value_or(0.00000001));
     } else {
+        ChaoticFractal::set(param, value);
         return;
     }
     add_draw_flag(NEW_SPECIAL);
