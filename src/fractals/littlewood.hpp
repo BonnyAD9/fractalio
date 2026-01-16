@@ -30,6 +30,7 @@ public:
     void save_state(std::string &out) override {
         out += std::format("{}G\n", std::size_t(Fractal::Type::LITTLEWOOD));
         out += std::format(":set degree {}\n", _degree);
+        out += std::format(":set size 0x{:a}\n", _point_size);
         _picker.save_state(out);
         SpaceFractal::save_state(out);
     }
@@ -40,6 +41,7 @@ protected:
 private:
     enum DrawFlags {
         NEW_DEGREE = NEXT_DRAW_FLAG,
+        NEW_POINT_SIZE = NEW_DEGREE << 1,
     };
 
     gl::Texture &_gradient;
@@ -48,6 +50,7 @@ private:
     gl::Framebuffer _fbuf;
     gl::Texture _histogram;
 
+    float _point_size = 1;
     GLuint _degree = 10;
     GLint _loc_degree;
     GLint _loc_store_cnt;

@@ -86,7 +86,7 @@ std::string Littlewood::describe() {
 void Littlewood::draw(double) {
     auto dflags = draw_flags();
     const bool force = dflags & NEW_USE_DOUBLE;
-    bool reset = dflags & (NEW_VERTICES | NEW_CENTER | NEW_SCALE | NEW_DEGREE);
+    bool reset = dflags & (NEW_VERTICES | NEW_CENTER | NEW_SCALE | NEW_DEGREE | NEW_POINT_SIZE);
     reset |= _picker.new_par();
 
     const glm::vec2 fsize = size();
@@ -100,7 +100,7 @@ void Littlewood::draw(double) {
     }
 
     if (reset) {
-        glPointSize(1);
+        glPointSize(_point_size);
         _make_histogram.use();
         _gradient.bind(GL_TEXTURE_1D);
         vao().bind();
@@ -150,6 +150,9 @@ void Littlewood::set(std::string_view parameter, std::optional<double> value) {
     if (parameter == "degree") {
         _degree = GLuint(value.value_or(10));
         add_draw_flag(NEW_DEGREE);
+    } else if (parameter == "point-size" || parameter == "size") {
+        _point_size = float(value.value_or(1));
+        add_draw_flag(NEW_POINT_SIZE);
     } else {
         SpaceFractal::set(parameter, value);
     }

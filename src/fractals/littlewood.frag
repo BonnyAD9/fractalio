@@ -45,8 +45,14 @@ in float cor;
 uniform sampler1D gradient;
 
 void main() {
-    frag_color = texture(gradient, cor);
-    //frag_color = vec4(1, 1, 1, 1); //texture(gradient, cor);
+    vec2 pc = gl_PointCoord * 2 - 1;
+    pc *= pc;
+    float opacity = pc.x + pc.y;
+    if (opacity < 1) {
+        frag_color = texture(gradient, cor);
+    } else {
+        frag_color = vec4(0, 0, 0, 0);
+    }
 }
 
 #endif
