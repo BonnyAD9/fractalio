@@ -43,6 +43,18 @@ public:
         ComplexFractal::save_state(out);
     }
 
+    void flag(std::string_view name) override {
+        if (name == "par" || name == "overlay") {
+            set_flags(~0, flags() ^ 0x200);
+        } else if (name == "euler") {
+            set_flags(0xF0, 0);
+        } else if (name == "rk1" || name == "runge-kutta4") {
+            set_flags(0xF0, 0x10);
+        } else {
+            ComplexFractal::flag(name);
+        }
+    }
+
 protected:
     void update_parameters(bool force) override;
 

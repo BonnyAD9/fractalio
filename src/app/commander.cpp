@@ -189,6 +189,9 @@ void Commander::long_command(std::string_view cmd) {
         auto value = args.next_arg<GLuint>();
         _app._focus->set_flags(mask, value);
         _app._new_info = true;
+    } else if (cmd == ":flag") {
+        _app._focus->flag(args.next_arg<std::string_view>());
+        _app._new_info = true;
     } else if (cmd == ":par" || cmd == ":parameter") {
         auto x = args.next_arg<double>();
         auto y = args.next_arg<double>();

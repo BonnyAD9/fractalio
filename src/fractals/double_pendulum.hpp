@@ -32,6 +32,22 @@ public:
         ChaoticFractal::save_state(out);
     }
 
+    void flag(std::string_view name) override {
+        if (name == "vp" || name == "velocity-position") {
+            set_flags(~0, flags() ^ 0x100);
+        } else if (name == "vel" || name == "velocity") {
+            set_flags(0x100, 0x100);
+        } else if (name == "pos" || name == "position") {
+            set_flags(0x100, 0);
+        } else if (name == "euler") {
+            set_flags(0xF0, 0);
+        } else if (name == "rk1" || name == "runge-kutta4") {
+            set_flags(0xF0, 0x10);
+        } else {
+            ChaoticFractal::flag(name);
+        }
+    }
+
 protected:
     void update_parameters(bool force) override;
 

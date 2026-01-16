@@ -68,7 +68,7 @@ void main() {
     vec2 pv = (bodies[close] - vec2(center)) / float(scale) - cor;
     pv *= pv;
     float pd = pv.x + pv.y;
-    if ((flags & 0x20u) == 0 && pd < 0.004 && pd > 0.0015) {
+    if ((flags & 0x200u) == 0 && pd < 0.004 && pd > 0.0015) {
         col = vec3(1, 1, 1) - col;
     }
     

@@ -57,6 +57,32 @@ public:
         ChaoticFractal::save_state(out);
     }
 
+    void flag(std::string_view name) override {
+        if (name == "par" || name == "overlay") {
+            set_flags(~0, flags() ^ 0x200);
+        } else if (name == "relative-distance" || name == "rel-dist") {
+            set_flags(0xF, 0);
+        } else if (name == "dist" || name == "distance") {
+            set_flags(0xF, 1);
+        } else if (name == "vel" || name == "velocity" || name == "speed") {
+            set_flags(0xF, 2);
+        } else if (name == "angle") {
+            set_flags(0xF, 3);
+        } else if (name == "relative-angle" || name == "rel-angle") {
+            set_flags(0xF, 4);
+        } else if (name == "closest-angle") {
+            set_flags(0xF, 5);
+        } else if (name == "euler") {
+            set_flags(0xF0, 0);
+        } else if (name == "rk4" || name == "runge-kutta4") {
+            set_flags(0xF0, 1);
+        } else if (name == "relative" || name == "rel") {
+            set_flags(~0, flags() ^ 0x100);
+        } else {
+            ChaoticFractal::flag(name);
+        }
+    }
+
 protected:
     void update_parameters(bool force) override;
 

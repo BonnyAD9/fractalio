@@ -30,6 +30,24 @@ public:
         IterativeFractal::save_state(out);
     }
 
+    void flag(std::string_view name) override {
+        if (name == "smooth") {
+            set_flags(~0, flags() ^ 0x10);
+        } else if (name == "flat") {
+            set_flags(0xF, 0);
+        } else if (name == "bright") {
+            set_flags(0xF, 1);
+        } else if (name == "dark") {
+            set_flags(0xF, 2);
+        } else if (name == "iteration" || name == "iter") {
+            set_flags(0xF, 3);
+        } else if (name == "log-iteration" || name == "log-iter") {
+            set_flags(0xF, 4);
+        } else {
+            throw std::runtime_error(std::format("Unknown flag `{}`", name));
+        }
+    }
+
 protected:
     void update_parameters(bool force) override;
 

@@ -103,6 +103,10 @@ public:
         throw std::runtime_error(std::format("Unknown parameter `{}`", param));
     }
 
+    virtual void flag(std::string_view name) {
+        throw std::runtime_error(std::format("Unknown flag name `{}`", name));
+    }
+
     virtual void map_iterations(const std::function<float(float)> &map) {
         (void)map;
     };
@@ -179,6 +183,25 @@ protected:
     }
 
     constexpr void drag_mode(DragMode mode) { _drag_mode = mode; }
+
+    static bool mb_color_flag_name(std::string_view name, GLuint &flags) {
+        if (name == "basic") {
+            flags = (flags & ~0xF);
+        } else if (name == "smooth") {
+            flags = (flags & ~0xF) | 1;
+        } else if (name == "shade-step") {
+            flags = (flags & ~0xF) | 2;
+        } else if (name == "log-smooth") {
+            flags = (flags & ~0xF) | 3;
+        } else if (name == "color-step") {
+            flags = (flags & ~0xF) | 4;
+        } else if (name == "log-shade-step") {
+            flags = (flags & ~0xF) | 5;
+        } else {
+            return false;
+        }
+        return true;
+    }
 
 private:
     DragMode _drag_mode = DragMode::NONE;

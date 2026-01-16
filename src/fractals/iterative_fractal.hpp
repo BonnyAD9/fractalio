@@ -68,6 +68,15 @@ public:
         ComplexFractal<P, F>::save_state(out);
     }
 
+    void flag(std::string_view name) override {
+        auto flg = ComplexFractal<P, F>::flags();
+        if (Fractal::mb_color_flag_name(name, flg)) {
+            ComplexFractal<P, F>::set_flags(~0, flg);
+        } else {
+            ComplexFractal<P, F>::flag(name);
+        }
+    }
+
 protected:
     enum DrawFlags {
         NEW_ITERATIONS = ComplexFractal<P, F>::NEXT_DRAW_FLAG << 1,

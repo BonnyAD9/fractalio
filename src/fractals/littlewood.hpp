@@ -50,6 +50,24 @@ public:
         SpaceFractal::save_state(out);
     }
 
+    void flag(std::string_view name) override {
+        if (name == "overlay" || name == "par") {
+            set_flags(~0, flags() ^ 0x200);
+        } else if (name == "forward") {
+            set_flags(0xF, 0);
+        } else if (name == "backward") {
+            set_flags(0xF, 1);
+        } else if (name == "abeth") {
+            set_flags(0xF0, 0);
+        } else if (name == "dk" || name == "durnad-kerner") {
+            set_flags(0xF0, 0x10);
+        } else if (name == "const" || name == "constant") {
+            set_flags(~0, flags() ^ 0x100);
+        } else {
+            SpaceFractal::flag(name);
+        }
+    }
+
 protected:
     void update_parameters(bool force) override;
 
