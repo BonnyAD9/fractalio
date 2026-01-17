@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include "app/fractalio.hpp"
+#include "cli/args.hpp"
 #include "gl/gl.hpp"
 #include "glad.hpp"
 #include "glfw/runner.hpp"
@@ -12,11 +13,13 @@
 #include "log_err.hpp"
 
 namespace fio {
-static void main();
+static void main(cli::Args args);
 }
 
-int main() {
-    if (!fio::log_err(fio::main)) {
+int main(int argc, char **argv) {
+    if (!fio::log_err([=]() {
+            fio::main(fio::cli::Args({ argv, std::size_t(argc) }));
+        })) {
         return EXIT_FAILURE;
     }
 }
@@ -26,7 +29,7 @@ namespace fio {
 constexpr int DEFAULT_WINDOW_WIDTH = 900;
 constexpr int DEFAULT_WINDOW_HEIGHT = 600;
 
-static void run();
+static void run(const cli::Args &args);
 static void err_callback(
     GLenum source,
     GLenum type,
@@ -37,11 +40,14 @@ static void err_callback(
     const void *
 );
 
-static void main() {
-    glfw::run(run);
+static void main(cli::Args args) {
+    if (args.commands.empty() && args.should_exit) {
+        return;
+    }
+    glfw::run([&]() { run(args); });
 }
 
-static void run() {
+static void run(const cli::Args &args) {
     auto window = std::make_unique<glfw::Window>(
         DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "fractal-io"
     );
@@ -52,6 +58,9 @@ static void run() {
     glDebugMessageCallback(err_callback, nullptr);
 
     app::Fractalio app(std::move(window));
+    for (auto &cmd : args.commands) {
+        app.run_script(cmd);
+    }
     app.mainloop();
 }
 

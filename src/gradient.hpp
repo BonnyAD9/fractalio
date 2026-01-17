@@ -1,6 +1,7 @@
 #pragma once
 
 #include <span>
+#include <string_view>
 #include <utility>
 
 #include <glm/glm.hpp>
@@ -14,6 +15,8 @@ void linear_gradient(
 void linear_gradient(
     std::span<std::pair<float, glm::u8vec3>> pts, std::span<glm::u8vec3> dst
 );
+
+std::vector<glm::u8vec3> from_string(std::string_view gradient);
 
 void ultra_fractal(std::span<glm::u8vec3> dst);
 

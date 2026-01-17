@@ -22,7 +22,9 @@ constexpr std::string_view HELP_TEXT = R".(HELP
            Show this help.
     <esc>  Cancel currently typed command. If there is no such command, make
            the base fractal focused.
-    <space>
+    :fractal
+           Give command focus to the base fractal.
+    <space>  :picker
            Give command focus to the picker (if present).
     <tab>  Toggle single/double precision.
     `r`<char>
@@ -56,6 +58,7 @@ constexpr std::string_view HELP_TEXT = R".(HELP
              `s`: Burning ship
              `n`: Newton fractal
              `p`: Double pendulum
+             `l`: Littlewood
     <number>`G`
            Go to fractal/page identified by number:
              0: Help
@@ -67,19 +70,48 @@ constexpr std::string_view HELP_TEXT = R".(HELP
              6: Burning julia
              7: Double pendulum
              8: Three body
+             9: Gravity basins
+             10: Littlewood
     :flags <mask> <value>
            Set flags of the current fractal. Mask is bit mask of bits that will
            be set, value is the value of the bits. The meaning of the bits is
            dependant on the fractal, but usually the lowest 4 bits are coloring
            type.
-    :gradient1 <gradient-name>
-           Select gradient.
-    :gradient1 <size> <color-points>
-           Define gradient.
+    :flag <name>
+           Named equivalient of :flags. Names are defined per fractal.
+    :grad1  :gradient1 <gradient-name>|[<size>@]<color-points>
+           Select/define gradient. Selectible gradients:
+             `ultra-fractal`  blue - white - yellow - black - blue (default)
+             `grayscale`      black - white - black
+             `burn`           red - yellow - white - black - red
+             `monokai`        pink - yellow - green - blue - pink
+             `rgb`            red - green - blue - red
+             `cmy`            cyan - magenta - yellow - cyan
+           Color points format: comma separated pairs of index:#rrggbb. Index
+           is value from 0 to 1. Size is the resolution, default is 256.
+    :par  :parameter [index] <x> <y>
+           Set value of a parameter. The default index is 0. Using idex larger
+           than the current number of parameters will add new parameters up to
+           that index.
+    :set <name> [<x> [<y>]]
+           Set attribute given by name. If there is no value, it will reset the
+           value to default.
+    :save [filename]
+           Save the current configuration to a file. `-` is stdout. If file is
+           not present, save to clipboard.
+    :load [filename]
+           Load configuration from file. `-` is stdin. If file is not present,
+           load from clipboard.
+    :precision 1|2
+           Set precision to single or double.
 ).";
 
 Help::Help(const gui::Text &text_cfg) : _text(text_cfg) {
     _text.add_text(HELP_TEXT, { 10, 20 });
+}
+
+std::string_view help_text() {
+    return HELP_TEXT;
 }
 
 } // namespace fio::fractals

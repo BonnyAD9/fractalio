@@ -40,7 +40,8 @@ Fractalio::Fractalio(std::unique_ptr<glfw::Window> window, const char *font) :
     _font(font, FONT_SIZE),
     _info(_font, std::size_t(FONT_SIZE * 5 / 4)),
     _fps_text(_info),
-    _commander(*this, _info) {
+    _commander(*this, _info),
+    _cur_gradient1("ultra-fractal") {
 
     auto size = _window->get_size();
     _wsize = size;
@@ -156,6 +157,19 @@ void Fractalio::mainloop() {
         _window->swap_buffers();
         glfwPollEvents();
     }
+}
+
+std::string Fractalio::save_state() {
+    std::string state(":fractal\n");
+    _active->save_state(state);
+    auto picker = _active->picker();
+    if (picker) {
+        state += ":picker\n";
+        picker->save_state(state);
+        state += ":fractal\n";
+    }
+    state += std::format(":gradient1 {}", _cur_gradient1);
+    return state;
 }
 
 void Fractalio::init_fractals() {

@@ -57,4 +57,6 @@ private:
     glm::vec2 _position{ 0, 0 };
 };
 
+std::string_view help_text();
+
 } // namespace fio::fractals

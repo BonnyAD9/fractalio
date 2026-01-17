@@ -84,4 +84,9 @@ private:
     I _end;
 };
 
+template<Iterator<std::string_view> I>
+static inline Pareg<I> create(I b, I e) {
+    return { b, e };
+}
+
 } // namespace fio::pareg

@@ -4,6 +4,8 @@
 #include <array>
 #include <cassert>
 
+#include "pareg/parsable.hpp"
+
 namespace fio::gradient {
 
 void linear_gradient(
@@ -57,6 +59,35 @@ void linear_gradient(
             boundary, pts[0].second, dst.subspan(0, std::size_t(to_first))
         );
     }
+}
+
+std::vector<glm::u8vec3> from_string(std::string_view gradient) {
+    std::vector<glm::u8vec3> grad(256);
+    if (gradient == "ultra-fractal") {
+        gradient::ultra_fractal(grad);
+    } else if (gradient == "grayscale") {
+        gradient::grayscale(grad);
+    } else if (gradient == "burn") {
+        gradient::burn(grad);
+    } else if (gradient == "monokai") {
+        gradient::monokai(grad);
+    } else if (gradient == "rgb") {
+        gradient::rgb(grad);
+    } else if (gradient == "cmy") {
+        gradient::cmy(grad);
+    } else {
+        auto sep = gradient.find('@');
+        if (sep != std::string_view::npos) {
+            auto siz = pareg::from_arg<std::size_t>({ gradient.begin(), sep });
+            grad.resize(siz);
+            gradient = gradient.substr(sep + 1);
+        }
+        auto pts = pareg::from_arg<std::vector<std::pair<float, glm::u8vec3>>>(
+            gradient
+        );
+        gradient::linear_gradient(pts, grad);
+    }
+    return grad;
 }
 
 void ultra_fractal(std::span<glm::u8vec3> dst) {

@@ -222,9 +222,11 @@ private:
     std::optional<std::size_t> par_below(
         glm::dvec2 pos, SpaceFractal<P, F> &frac
     ) {
+        auto sr = frac.space_rect();
+        auto tresh = std::abs(sr.x - sr.z) * 0.001;
         for (std::size_t i = 0; i < _pars.size(); ++i) {
             auto d = pos - frac.to_space(_pars[i]);
-            if (d.x * d.x + d.y * d.y < 0.004) {
+            if (d.x * d.x + d.y * d.y < tresh) {
                 return i;
             }
         }

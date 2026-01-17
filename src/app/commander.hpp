@@ -27,6 +27,8 @@ public:
         }
     }
 
+    void run_script(std::string_view script);
+
 private:
     enum DrawFlags {
         NEW_INPUT = 1,

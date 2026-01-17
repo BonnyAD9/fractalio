@@ -152,6 +152,14 @@ void Commander::consume() {
     _text.clear();
 }
 
+void Commander::run_script(std::string_view script) {
+    _text.clear();
+    for (auto c : script) {
+        char_in(c);
+    }
+    consume();
+}
+
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void Commander::long_command(std::string_view cmd) {
     auto arg = pareg::SplitWhitespace(cmd);
@@ -205,28 +213,9 @@ void Commander::long_command(std::string_view cmd) {
         _app._focus->map_parameter_y(par, maps::value(y));
         _app._new_info = true;
     } else if (cmd == ":grad1" || cmd == ":gradient1") {
-        auto v = args.next_arg<std::string_view>();
-        std::vector<glm::u8vec3> grad(256);
-        if (v == "ultra-fractal") {
-            gradient::ultra_fractal(grad);
-        } else if (v == "grayscale") {
-            gradient::grayscale(grad);
-        } else if (v == "burn") {
-            gradient::burn(grad);
-        } else if (v == "monokai") {
-            gradient::monokai(grad);
-        } else if (v == "rgb") {
-            gradient::rgb(grad);
-        } else if (v == "cmy") {
-            gradient::cmy(grad);
-        } else {
-            auto siz = args.cur<std::size_t>();
-            grad.resize(siz);
-            auto pts = args.next_arg<
-                std::vector<std::pair<float, glm::u8vec3>>,
-                float>();
-            gradient::linear_gradient(pts, grad);
-        }
+        auto name = args.next_arg<std::string>();
+        auto grad = gradient::from_string(name);
+        _app._cur_gradient1 = std::move(name);
         _app._gradient_1d.bind(GL_TEXTURE_1D);
         gl::tex_image_1d(grad);
     } else if (cmd == ":set") {
@@ -245,22 +234,19 @@ void Commander::long_command(std::string_view cmd) {
         }
         _app._new_info = true;
     } else if (cmd == ":save") {
-        std::string state(":fractal\n");
-        _app._active->save_state(state);
-        auto picker = _app._active->picker();
-        if (picker) {
-            state += ":picker\n";
-            picker->save_state(state);
-            state += ":fractal\n";
-        }
+        auto state = _app.save_state();
         if (args.empty()) {
             _app._window->set_clipboard_string(state.c_str());
         } else {
             auto f = args.next_arg<std::string>();
-            std::ofstream file;
-            file.open(f);
-            file << state;
-            file.close();
+            if (f == "-") {
+                std::cout << state;
+            } else {
+                std::ofstream file;
+                file.open(f);
+                file << state;
+                file.close();
+            }
         }
     } else if (cmd == ":load") {
         std::string state;
@@ -268,17 +254,17 @@ void Commander::long_command(std::string_view cmd) {
             state += _app._window->get_clipboard_string();
         } else {
             auto f = args.next_arg<std::string>();
-            std::ifstream file;
-            file.open(f);
             std::ostringstream os;
-            os << file.rdbuf();
+            if (f == "-") {
+                os << std::cin.rdbuf();
+            } else {
+                std::ifstream file;
+                file.open(f);
+                os << file.rdbuf();
+            }
             state = os.str();
         }
-        _text.clear();
-        for (auto c : state) {
-            char_in(c);
-        }
-        consume();
+        run_script(state);
         _last = cmd;
         return;
     } else if (cmd == ":picker") {
@@ -336,6 +322,8 @@ void Commander::execute_command(std::string_view whole_cmd) {
         _app.activate(fractals::Fractal::Type::NEWTON);
     } else if (cmd == "gp") {
         _app.activate(fractals::Fractal::Type::DOUBLE_PENDULUM);
+    } else if (cmd == "gl") {
+        _app.activate(fractals::Fractal::Type::LITTLEWOOD);
     } else if (cmd == "G") {
         _app.activate(fractals::Fractal::Type(std::size_t(num.value_or(0))));
     } else if (cmd == " ") {

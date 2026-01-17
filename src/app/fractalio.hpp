@@ -24,6 +24,10 @@ public:
 
     void mainloop();
 
+    std::string save_state();
+
+    void run_script(std::string_view cmd) { _commander.run_script(cmd); }
+
 private:
     static constexpr std::size_t FONT_SIZE = 16;
     static constexpr std::size_t SIDE_WIDTH = 300;
@@ -45,6 +49,7 @@ private:
     gui::Text _fps_text;
     Commander _commander;
     double _min_interval = 0;
+    std::string _cur_gradient1;
 
     glm::vec2 _wsize;
 
