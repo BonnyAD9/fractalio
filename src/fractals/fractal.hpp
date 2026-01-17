@@ -205,6 +205,23 @@ protected:
         return true;
     }
 
+    static std::string_view mb_color_flag_name(GLuint flags) {
+        switch (flags & 0xF) {
+        default:
+            return "basic";
+        case 1:
+            return "smooth";
+        case 2:
+            return "shade step";
+        case 3:
+            return "log smooth";
+        case 4:
+            return "color step";
+        case 5:
+            return "log shade step";
+        }
+    }
+
 private:
     DragMode _drag_mode = DragMode::NONE;
 };

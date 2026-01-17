@@ -45,12 +45,17 @@ GravityBasins::GravityBasins(
 
 std::string GravityBasins::describe() {
     auto desc = describe_part("Gravity basins");
-    desc += std::format("  time: {}\n", int(_time));
-    desc += std::format("  step size: {:f}\n", _step_size);
-    desc += "\n  bodies:\n";
+    desc += std::format("\n  time: {}", int(_time));
+    desc += std::format("\n  step size: {:f}", _step_size);
+    desc += "\n  bodies:";
     for (auto &r : _picker.dpars()) {
-        desc += std::format("    [{:.6}, {:.6}]\n", r.x, r.y);
+        desc += std::format("\n    [{:.6}, {:.6}]", r.x, r.y);
     }
+    desc += std::format("\n  flags: {:x}", flags());
+    desc += std::format(
+        "\n    method: ", (flags() & 0xF0) == 0 ? "euler" : "runge kutta 4"
+    );
+    desc += std::format("\n    overlay: ", !(flags() & 0x200));
     return desc;
 }
 

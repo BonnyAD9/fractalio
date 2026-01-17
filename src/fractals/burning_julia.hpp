@@ -25,11 +25,12 @@ public:
         desc += std::format(
             R".(
   parameter:
-    {:.6} + {:.6}i
-).",
+    {:.6} + {:.6}i).",
             par.x,
             par.y
         );
+        desc += std::format("\n  flags: {:x}", flags());
+        desc += std::format("\n    coloring: {}", mb_color_flag_name(flags()));
         return desc;
     }
 

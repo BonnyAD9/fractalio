@@ -1,0 +1,13 @@
+:fractal
+10G
+:set degree 9
+:set size 0x1.8p+0
+:set i 256
+:par 0 0x-1.e33dbde38abep-1 0x-1.dc637346e7df4p-7
+:par 1 0x-1.05c1211ebceb9p+0 0x-1.06ba3014330a4p-3
+:par 2 0x-1.16f2840993e1ep+0 0x-1.ad0fa58f9c65p-7
+:set xy 0x1.f1f37da96eb14p+0 0x1.9f3f239ffbdccp-5
+:set z 0x1.4a0ea528c549ep-3
+:flags 4294967295 1
+:precision 1
+:gradient1 cmy

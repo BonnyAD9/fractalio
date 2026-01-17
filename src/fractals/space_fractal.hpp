@@ -176,14 +176,11 @@ protected:
             R".(
 {}
   precision: {}
-  flags: {:X}
   center:
     {:.6} + {:.6}i
-  scale: {:.10}
-).",
+  scale: {:.10}).",
             name,
             _program.use_double() ? "double" : "single",
-            _flags,
             _center.x,
             _center.y,
             1 / _scale

@@ -9,15 +9,7 @@ class DoublePendulum : public ChaoticFractal<gl::Program, double> {
 public:
     DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun);
 
-    std::string describe() override {
-        auto res = describe_part("Double pendulum");
-        res += std::format("\n  gravity: {}", _g);
-        res += std::format("\n  mass 1: {}", _m1);
-        res += std::format("\n  mass 2: {}", _m2);
-        res += std::format("\n  length 1: {}", _l1);
-        res += std::format("\n  length 2: {}", _l2);
-        return res;
-    }
+    std::string describe() override;
 
     void set(std::string_view param, std::optional<double> value) override;
 
@@ -33,12 +25,14 @@ public:
     }
 
     void flag(std::string_view name) override {
-        if (name == "vp" || name == "velocity-position") {
+        if (name == "init-position") {
             set_flags(~0, flags() ^ 0x100);
-        } else if (name == "vel" || name == "velocity") {
-            set_flags(0x100, 0x100);
         } else if (name == "pos" || name == "position") {
-            set_flags(0x100, 0);
+            set_flags(0xF, 0);
+        } else if (name == "speed" || name == "velocity" || name == "vel") {
+            set_flags(0xF, 1);
+        } else if (name == "acc" || name == "acceleration") {
+            set_flags(0xF, 2);
         } else if (name == "euler") {
             set_flags(0xF0, 0);
         } else if (name == "rk1" || name == "runge-kutta4") {

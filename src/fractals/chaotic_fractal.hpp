@@ -59,9 +59,9 @@ public:
 
     std::string describe_part(std::string_view name) override {
         auto res = SpaceFractal<P, F>::describe_part(name);
-        res += std::format("  time: {}s\n", int(_time));
-        res += std::format("  step: {:f}s\n", _max_step);
-        res += std::format("  speed: {:.2f}s\n", _speed);
+        res += std::format("\n  time: {}s", int(_time));
+        res += std::format("\n  step: {:f}s", _max_step);
+        res += std::format("\n  speed: {:.2f}s", _speed);
         return res;
     }
 

@@ -77,12 +77,20 @@ Littlewood::Littlewood(
 
 std::string Littlewood::describe() {
     auto res = describe_part("Littlewood");
-    res += std::format("  degree: {}", _degree);
+    res += std::format("\n  degree: {}", _degree);
     res += std::format("\n  max iterations: {}", _max_iterations);
-    res += "\n  coefitients:\n";
+    res += "\n  coefitients:";
     for (auto &r : _picker.dpars()) {
-        res += std::format("    {:.6} + {:.6}i\n", r.x, r.y);
+        res += std::format("\n    {:.6} + {:.6}i", r.x, r.y);
     }
+    res += std::format("\n  flags: {:x}", flags());
+    res += std::format(
+        "\n    coloring: {}", (flags() & 0xF) == 0 ? "forward" : "backward"
+    );
+    res += std::format(
+        "\n    method: {}", (flags() & 0xF0) == 0 ? "abeth" : "durnad kerner"
+    );
+    res += std::format("\n    constant: {}", !(flags() & 0x100));
     return res;
 }
 

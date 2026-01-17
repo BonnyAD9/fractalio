@@ -10,16 +10,7 @@ class ThreeBody : public ChaoticFractal<gl::Program, double> {
 public:
     ThreeBody(std::function<glm::mat3x2(glm::vec2)> s_fun);
 
-    std::string describe() override {
-        auto res = describe_part("Three body");
-        res += std::format("\n gravity: {}", _g);
-        res += std::format("\n mass red: {}", _m0);
-        res += std::format("\n mass green: {}", _m1);
-        res += std::format("\n mass blue: {}", _m2);
-        res += std::format("\n space scale: {}", _sscale);
-        res += std::format("\n stabilization: {}", _stabilization);
-        return res;
-    }
+    std::string describe() override;
 
     void drag(glm::dvec2 pos, glm::dvec2 delta) override {
         _hover = pos / size();

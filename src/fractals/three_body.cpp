@@ -27,6 +27,47 @@ ThreeBody::ThreeBody(std::function<glm::mat3x2(glm::vec2)> s_fun) :
     _loc_init2 = prog.uniform_location("init2");
 }
 
+std::string ThreeBody::describe() {
+    auto res = describe_part("Three body");
+    res += std::format("\n gravity: {}", _g);
+    res += std::format("\n mass red: {}", _m0);
+    res += std::format("\n mass green: {}", _m1);
+    res += std::format("\n mass blue: {}", _m2);
+    res += std::format("\n space scale: {}", _sscale);
+    res += std::format("\n stabilization: {}", _stabilization);
+    res += std::format("\n flags: {:x}", flags());
+
+    std::string_view coloring;
+    switch (flags() & 0xF) {
+    default:
+        coloring = "relative distance";
+        break;
+    case 1:
+        coloring = "distance";
+        break;
+    case 2:
+        coloring = "velocity";
+        break;
+    case 3:
+        coloring = "angle";
+        break;
+    case 4:
+        coloring = "relative angle";
+        break;
+    case 5:
+        coloring = "closest angle";
+        break;
+    }
+
+    res += std::format("\n    coloring: {}", coloring);
+    res += std::format(
+        "\n    method: {}", (flags() & 0xF0) == 0 ? "euler" : "runge kutta 4"
+    );
+    res += std::format("\n    relative: {}", !(flags() & 0x100));
+    res += std::format("\n    overlay: {}", !(flags() & 0x200));
+    return res;
+}
+
 void ThreeBody::set(std::string_view param, std::optional<double> value) {
     if (param == "g" || param == "gravity") {
         _g = float(value.value_or(6.67430e-11));

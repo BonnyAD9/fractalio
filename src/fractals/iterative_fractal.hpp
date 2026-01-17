@@ -85,9 +85,9 @@ protected:
 
     std::string describe_part(std::string_view name) override {
         return std::format(
-            R".({}  iterations: {}
-  color count: {}
-).",
+            R".({}
+  iterations: {}
+  color count: {}).",
             ComplexFractal<P, F>::describe_part(name),
             _iterations,
             _color_count

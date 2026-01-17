@@ -33,6 +33,9 @@ public:
     void flag(std::string_view name) override {
         if (name == "smooth") {
             set_flags(~0, flags() ^ 0x10);
+        } else if (name == "overlay" || name == "par" ||
+                   name == "parameters") {
+            set_flags(~0, flags() ^ 0x20);
         } else if (name == "flat") {
             set_flags(0xF, 0);
         } else if (name == "bright") {

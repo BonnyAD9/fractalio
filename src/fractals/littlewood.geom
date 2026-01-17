@@ -43,13 +43,10 @@ const float EPS = 0.001 * 0.001;
 uniform uint max_iterations = 256;
 
 void main() {
-    switch (flags & 0xFu) {
-    default:
+    if ((flags & 0xFu) == 0) {
         fill_coefs();
-        break;
-    case 1:
+    } else {
         fill_coefs2();
-        break;
     }
 
     to_monic();

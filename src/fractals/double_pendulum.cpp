@@ -21,6 +21,37 @@ DoublePendulum::DoublePendulum(std::function<glm::mat3x2(glm::vec2)> s_fun) :
     _loc_l2 = prog.uniform_location("l2");
 }
 
+std::string DoublePendulum::describe() {
+    auto res = describe_part("Double pendulum");
+    res += std::format("\n  gravity: {}", _g);
+    res += std::format("\n  mass 1: {}", _m1);
+    res += std::format("\n  mass 2: {}", _m2);
+    res += std::format("\n  length 1: {}", _l1);
+    res += std::format("\n  length 2: {}", _l2);
+    res += std::format("\n  flags: {:x}", flags());
+
+    std::string_view coloring;
+    switch (flags() & 0xF) {
+    default:
+        coloring = "position";
+        break;
+    case 1:
+        coloring = "velocity";
+        break;
+    case 2:
+        coloring = "acceleration";
+        break;
+    }
+
+    res += std::format("\n    coloring: {}", coloring);
+    res += std::format(
+        "\n    method: {}", (flags() & 0xF0) == 0 ? "euler" : "runge kutta 4"
+    );
+    res += std::format("\n    init position: {}", (bool)(flags() & 0x100));
+
+    return res;
+}
+
 void DoublePendulum::set(std::string_view param, std::optional<double> value) {
     if (param == "g" || param == "gravity") {
         _g = float(value.value_or(9.8));

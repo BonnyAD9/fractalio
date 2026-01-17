@@ -44,10 +44,34 @@ Newton::Newton(
 
 std::string Newton::describe() {
     auto desc = describe_part("Newton fractal");
-    desc += "\n  roots:\n";
+    desc += "\n  roots:";
     for (auto &r : _picker.dpars()) {
-        desc += std::format("    {:.6} + {:.6}i\n", r.x, r.y);
+        desc += std::format("\n    {:.6} + {:.6}i", r.x, r.y);
     }
+    desc += std::format("\n  flags: {:x}", flags());
+
+    std::string_view coloring;
+    switch (flags() & 0xF) {
+    default:
+        coloring = "flat";
+        break;
+    case 1:
+        coloring = "bright";
+        break;
+    case 2:
+        coloring = "dark";
+        break;
+    case 3:
+        coloring = "iteration";
+        break;
+    case 4:
+        coloring = "log-iteration";
+        break;
+    }
+
+    desc += std::format("\n    coloring: {}", coloring);
+    desc += std::format("\n    smooth: {}", !(flags() & 0x10));
+    desc += std::format("\n    overlay: {}", !(flags() & 0x20));
     return desc;
 }
 
