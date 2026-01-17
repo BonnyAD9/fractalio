@@ -137,7 +137,7 @@ public:
         out += std::format(
             ":flags {} {}\n", std::numeric_limits<GLuint>::max(), _flags
         );
-        out += std::format(":precision {}", _program.use_double() + 1);
+        out += std::format(":precision {}\n", _program.use_double() + 1);
     }
 
     void set(

@@ -68,6 +68,8 @@ public:
         }
     }
 
+    void new_gradient1() override { add_draw_flag(NEW_DEGREE); }
+
 protected:
     void update_parameters(bool force) override;
 

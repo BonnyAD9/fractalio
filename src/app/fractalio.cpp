@@ -168,7 +168,7 @@ std::string Fractalio::save_state() {
         picker->save_state(state);
         state += ":fractal\n";
     }
-    state += std::format(":gradient1 {}", _cur_gradient1);
+    state += std::format(":gradient1 {}\n", _cur_gradient1);
     return state;
 }
 

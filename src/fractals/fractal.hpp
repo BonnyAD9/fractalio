@@ -86,6 +86,8 @@ public:
         }
     }
 
+    virtual void new_gradient1() { }
+
     void scroll(glm::dvec2, glm::dvec2 delta) override { scale(8 * delta.y); }
 
     virtual void move(glm::dvec2 delta) { (void)delta; }

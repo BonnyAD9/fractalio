@@ -218,6 +218,10 @@ void Commander::long_command(std::string_view cmd) {
         _app._cur_gradient1 = std::move(name);
         _app._gradient_1d.bind(GL_TEXTURE_1D);
         gl::tex_image_1d(grad);
+        _app._active->new_gradient1();
+        if (_app._active->picker()) {
+            _app._active->picker()->new_gradient1();
+        }
     } else if (cmd == ":set") {
         auto par = args.next_arg<std::string_view>();
         if (args.empty()) {

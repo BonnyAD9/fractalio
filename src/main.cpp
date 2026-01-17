@@ -54,8 +54,10 @@ static void run(const cli::Args &args) {
     window->make_context_current();
     glad::load_gl();
 
+#ifndef NDEBUG
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(err_callback, nullptr);
+#endif
 
     app::Fractalio app(std::move(window));
     for (auto &cmd : args.commands) {

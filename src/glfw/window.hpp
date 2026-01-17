@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 
 #include "../gl/gl.hpp"
 #include "../log_err.hpp"
@@ -77,7 +78,11 @@ public:
     }
 
     const char *get_clipboard_string() {
-        return glfwGetClipboardString(get());
+        auto str = glfwGetClipboardString(get());
+        if (!str) {
+            throw std::runtime_error("Failed to get string from clipboard.");
+        }
+        return str;
     }
 
     bool should_close() { return glfwWindowShouldClose(get()); }
