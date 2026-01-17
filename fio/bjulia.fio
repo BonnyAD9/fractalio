@@ -1,0 +1,12 @@
+:fractal
+6G
+:set i 256
+:set c 0x1p+8
+:set xy 0x0p+0 0x0p+0
+:set z 0x1.58b3f5d5e878dp+0
+:flags 4294967295 0
+:precision 2
+:picker
+:par 0 0x1.e463cd2bacdd3p-2 0x1.750131eefe861p-1
+:fractal
+:gradient1 burn

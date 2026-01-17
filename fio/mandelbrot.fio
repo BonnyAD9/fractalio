@@ -1,0 +1,9 @@
+:fractal
+1G
+:set i 4096
+:set c 0x1p+8
+:set xy 0x-1.2832ac1476989p+0 0x1.24fe475b4c025p-2
+:set z 0x1.368561e5a27ffp-43
+:flags 4294967295 1
+:precision 2
+:gradient1 ultra-fractal

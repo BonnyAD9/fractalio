@@ -20,3 +20,22 @@ parameter.
 === Commands
 
 `:`
+
+$
+    x_(i+1)&=f(x_i, p, theta) \
+    
+    x_0 &= 0 \
+    x_(i+1) &= x_i^2+p \
+    
+    x_0 &= p \
+    x_(i+1) &= x_i^2 + theta \
+    
+    x_0 &= 0 \
+    x_(i+1) &= x^theta + p \
+    
+    x_0 &= 0 \
+    x_(i+1) &= |Re(x_i^2 + p)| + j|Im(x_i^2 + p)| \
+    
+    x_0 &= p \
+    x_(i+1) &= |Re(x_i^2 + theta)| + j|Im(x_i^2 + theta)|
+$
