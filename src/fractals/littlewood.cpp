@@ -141,7 +141,7 @@ void Littlewood::draw(double) {
         glClear(GL_COLOR_BUFFER_BIT);
         auto cnt = GLsizei(std::pow(pars.size(), _degree));
         if (flags() & 0x100) {
-            cnt *= GLsizei(_degree);
+            cnt *= GLsizei(pars.size());
         }
         gl::draw_arrays(GL_POINTS, 0, cnt);
 

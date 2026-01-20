@@ -1,0 +1,5 @@
+Dobrý den, prezentace obsahuje videa a obrázky a tak se nevejde do limitu 5 MB.
+
+Zde je odkaz na online prezentaci: https://vutbr-my.sharepoint.com/:p:/r/personal/xstigl00_vutbr_cz/Documents/pgr-fractalio-final.pptx?d=w1fc78ce1b993441f8c7f4c81df0bd2ca&csf=1&web=1&e=Nbi7pQ
+
+Zde je odkaz na github repozitář: https://github.com/BonnyAD9/fractalio
