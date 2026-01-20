@@ -1,3 +1,3 @@
 # Fractalio
 
-Project to the subject POV - rendering fractals.
+Project to the subject PGR - rendering fractals.
