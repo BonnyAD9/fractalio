@@ -3,3 +3,5 @@ build/
 .zed/
 tmp/
 .cache/
+*.zip
+*.pdf
