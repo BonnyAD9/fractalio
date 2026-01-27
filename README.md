@@ -2,6 +2,20 @@
 
 Project to the subject PGR - rendering fractals.
 
+- [Controls](#controls)
+- [Fractals](#fractals)
+    - [Set fractals](#set-fractals)
+        - [Mandelbrot set](#mandelbrot-set)
+        - [Julia set](#julia-set)
+        - [Powerbrot](#powerbrot)
+        - [Burning ship](#burning-ship)
+        - [Burning julia](#burning-julia)
+    - [Newton](#newton)
+    - [Double pendulum](#double-pendulum)
+    - [Three body](#three-body)
+    - [Gravity basins](#gravity-basins)
+    - [Littlewood](#littlewood)
+
 ## Controls
 
 ```
@@ -146,11 +160,9 @@ Flags availeble for set fractals (showcased on mandelbrot set):
 
 #### Mandelbrot set
 
-$
-x_0 = 0 \\
-x_{n+1} = x_n^2+p \\
-B = 2
-$
+$$x_0 = 0$$
+$$x_{n+1} = x_n^2+p$$
+$$B = 2$$
 
 Overall fractal:
 
@@ -166,11 +178,9 @@ Zoom process:
 
 #### Julia set
 
-$
-x_0 = p \\
-x_{n+1} = x_n^2 + \theta \\
-B = 2
-$
+$$x_0 = p$$
+$$x_{n+1} = x_n^2 + \theta$$
+$$B = 2$$
 
 Transofrmation of the set with change of the parameter $\theta$
 
@@ -182,11 +192,9 @@ Julia for one of the parameters:
 
 #### Powerbrot
 
-$
-x_0 = 0 \\
-x_{n+1} = x_n^\theta + p \\
-B = max(|\theta|, 2)
-$
+$$x_0 = 0$$
+$$x_{n+1} = x_n^\theta + p$$
+$$B = max(|\theta|, 2)$$
 
 Note that the value of $B$ is not correct from the view of derermining the set
 of numbers because for some values of $\theta$ the set contains all the complex
@@ -204,11 +212,9 @@ positive values and than in complex values:
 
 #### Burning ship
 
-$
-x_0 = 0 \\
-x_{n+1} = |\Re(x_n^2 + p)| + i|\Im(x_n^2 + p)| \\
-B = 2
-$
+$$x_0 = 0$$
+$$x_{n+1} = |\Re(x_n^2 + p)| + i|\Im(x_n^2 + p)|$$
+$$B = 2$$
 
 Overall fractal:
 
@@ -220,11 +226,9 @@ Zoomed portion:
 
 #### Burning julia
 
-$
-x_0 = p \\
-x_{n+1} = |\Re(x_n^2 + \theta)| + i|\Im(x_n^2 + \theta)| \\
-B = 2
-$
+$$x_0 = p $$
+$$x_{n+1} = |\Re(x_n^2 + \theta)| + i|\Im(x_n^2 + \theta)| $$
+$$B = 2 $$
 
 Showcase of how the fractal changes with change of the parameter $\theta$:
 
@@ -252,9 +256,7 @@ root wich is found and how fast is the root found.
 The newton's method for finding root of a polynomial with initial estimate
 $x_0$ is:
 
-$
-x_{m+1}=x_m- \frac{f(x_m)}{f'(x_m)}
-$
+$$x_{m+1}=x_m- \frac{f(x_m)}{f'(x_m)}$$
 
 Flags available for newton's fractal:
 - `0xF`: coloring method:
