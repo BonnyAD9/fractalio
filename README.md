@@ -11,9 +11,10 @@ Project to the subject PGR - rendering fractals.
         - [Burning ship](#burning-ship)
         - [Burning julia](#burning-julia)
     - [Newton](#newton)
-    - [Double pendulum](#double-pendulum)
-    - [Three body](#three-body)
-    - [Gravity basins](#gravity-basins)
+    - [Chaotic fractals](#chaotic-fractals)
+        - [Double pendulum](#double-pendulum)
+        - [Three body](#three-body)
+        - [Gravity basins](#gravity-basins)
     - [Littlewood](#littlewood)
 
 ## Controls
@@ -285,18 +286,204 @@ adding more roots:
 
 ![](assets/newton.gif)
 
-### Double pendulum
+### Chaotic fractals
 
-TODO
+Chaotic fractals simulate some systems using a simulation method. The
+simulation method uses state update function $f(S_t) \rightarrow S_\Delta$
+that approximates the state change $S_\Delta$ at the current time $t$ with
+state $S$. Implemented methods are eulers method:
 
-### Three body
+$$S_{t+h}=S_t + h f(S_t)$$
 
-TODO
+and runge-kutta 4:
 
-### Gravity basins
+$$S_{t+h} = S_t + \frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4)$$
 
-TODO
+where
+
+$$k_1 = f(S_t)$$
+$$k_2 = f(S_t + \frac{h}{2}k_1)$$
+$$k_3 = f(S_t + \frac{h}{2}k_2)$$
+$$k_4 = f(s_t + h * k_3)$$
+
+Flags available for the chaotic fractals:
+- `0xF0`: simulation method
+  - `0x0`, `euler`: euler method
+  - `0x10`, `rk4`, `runge-kutta4`: runge-kutta 4 method
+
+#### Double pendulum
+
+The double pendulum fractal shows configuration plane of double pendulum. Each
+pixel represents double pendulum system configured based on the pixel location.
+Color of the pixel depends on the configuration. Each system is than simulated
+and the fractal forms from how different confiugrations of double pendulums
+behave.
+
+The double pendulum is simulated using the following definition of
+$f([\theta_1, \theta_2, \theta'_1, \theta'_2], h) \rightarrow [\theta_{1\Delta}, \theta_{2\Delta}, \theta'_{1\Delta}, \theta'_{2\Delta}]$:
+
+$$\theta_{1\Delta} = \theta'_1$$
+$$\theta_{2\Delta} = \theta'_2$$
+$$\theta'_{1\Delta} = \theta''_1$$
+$$\theta'_{2\Delta} = \theta''_2$$
+
+where
+
+$$\theta''_1 =\frac{-g(2m_1 + m_2)sin(\theta_1) - m_2g sin(\theta_1-2\theta_2) - 2sin(\theta_1-\theta_2)m_2(L_2\theta'^2_2+L_1\theta'^2_1cos(\theta_1-\theta_2))}{L_1(2m_1+m_2(1-cos(2(\theta_1-\theta_2))))}$$
+$$\theta''_2 = \frac{2sin(\theta_1-\theta_2)(L_1\theta'^2_1(m_1+m_2) + cos(\theta_1)g(m_1+m_2) + L_2m_2\theta'^2_2cos(\theta_1+\theta_2))}{L_2(2m_1+m_2(1-cos(2(\theta_1-\theta_2))))}$$
+
+where $\theta_1$ and $\theta_2$ are the angles of the pendulums, $\theta'_1$
+and $\theta'_2$ are the angular velocities of the pendulums, $\theta''_1$ and
+$\theta''_2$ are the angular accelerations of the pendulums, $m_1$ and $m_2$
+are the masses of the points at the end of the pendulums, $L_1$ and $L_2$ are
+the lengths of the pendulums and $g$ is the gravitational constant.
+
+Flags available for double pendulum fractal:
+- `0xF`: coloring
+  - `0x0`, `pos`, `position`: The angles are used as coordinates to a 2D
+    texture.
+  - ![](assets/double-pendulum-pos.png)
+  - `0x1`, `speed`, `velocity`, `vel`: The velocities are used as coordinates
+    to a 2D texture (edges clamp to black).
+  - ![](assets/double-pendulum-vel.png)
+  - `0x2`, `acc`, `acceleration`: The accelerations are used as coordinates to
+    a 2D texture (edges clamp to black).
+  - ![](assets/double-pendulum-acc.png)
+- `0x100`, `init-position`: toggle between init position and init velocity
+  - position
+  - ![](assets/double-pendulum-pos.png)
+  - velocity
+  - ![](assets/double-pendulum-init-position.png)
+
+How the fractal evolves with position initialization:
+
+![](assets/double-pendulum-pos.gif)
+
+How it evloves with velocity initialization:
+
+![](assets/double-pendulum-vel.gif)
+
+#### Three body
+
+The three body fractal shows configuration plane for three body system. Each
+pixel represents different configuration. Two bodies have fixed position given
+by parameters. The third body position is the same as the pixel position. Each
+body also has small initial velocity in direction given by the vector of
+position difference of the other two bodies.
+
+Three body is simulated using the following definition of
+$f([[x_1, x'_1], ..., [x_n, x'_n]]) \rightarrow [[x_{1\Delta}, x'_{1\Delta}], ...]$
+where $n=3$:
+
+$$x_{b\Delta} = x'_b$$
+$$x'_{b\Delta} = x''_b$$
+
+where
+
+$$x''_b = \sum_i^{n; i \ne b}(x_i-x_b)\frac{g m_i}{|x_i-x_b|^2+\epsilon}$$
+
+where $x_b$ is vector with position of the bth body, $x'_b$ is velocity of the
+bth body, $x''_b$ is acceleration of the bth body, $m_b$ is mass of the bth
+body, $g$ is gravitational constant and $\epsilon$ is a small value sabilizing
+the simulation.
+
+Flags available for three body fractal:
+- `0xF`: coloring
+  - `0x0`, `relative-distance`, `rel-dist`: color components are relative
+    distances of the bodies.
+  - ![](assets/three-body-rel-dist.png)
+  - `0x1`, `dist`, `distance`: color components are distances from the origin
+  - ![](assets/three-body-dist.png)
+  - `0x2`, `vel`, `velocity`, `speed`: color components are velocities
+  - ![](assets/three-body-vel.png)
+  - `0x3`, `angle`: color components are angles around the origin
+  - ![](assets/three-body-angle.png)
+  - `0x4`, `relative-angle`, `rel-angle`: color components are angle around the
+    average position
+  - ![](assets/three-body-rel-angle.png)
+  - `0x5`, `closest-angle`: color components are angles to the closest body
+  - ![](assets/three-body-closest-angle.png)
+- `0x100`, `relative`, `rel`: toggle relative body positiononing
+- `0x200`, `par`, `overlay`: toggle initial body positoin overlay
+- ![](assets/three-body-par.png)
+
+Showcase of how the fractal evolves with time and than moving initial
+positions:
+
+![](assets/three-body.gif)
+
+#### Gravity basins
+
+The gravity basins fractal shows system with $N$ fixed bodies and one movable.
+Each pixel represents system where the starting position of the movable body is
+at the pixel position. The color is determined by the closest body after given
+time.
+
+Gravity basins is simulated using the following definition of
+$f([x, x']) \rightarrow [x_\Delta, x'_\Delta]$:
+
+$$x_\Delta = x'$$
+$$x'_\Delta = x''$$
+
+where
+
+$$x'' = \sum_i^N(x_i-x)\frac{g m_i}{|x_i-x|^2+\epsilon}$$
+
+where $x_i$ is vector with position of the ith body, $x'$ is velocity of the
+ith body, $x''$ is acceleration of the ith body, $m$ is mass of the ith body,
+$g$ is gravitational constant and $\epsilon$ is a small value sabilizing the
+simulation.
+
+Showcase of how gravity basins evolves over time and than moving and adding
+the fixed bodies:
+
+![](assets/gravity-basins.gif)
 
 ### Littlewood
 
-TODO
+The littlewood fractal is histogram of roots of nth degree polynomials of the
+form $f(x)=c_0+c_1x^1+...+c_nx^n$ where the coefitients $c$ can take any
+complex number from given list of numbers. Plotting all the roots of all
+possible polynomials of degree $n$ with the given coefitient list forms the
+littlewood fractal.
+
+The polynomials are generated in order and the color of the roots they give is
+given by position within this ordered sequence.
+
+I implemented two methods for finding all the roots $r$ of given polynomial
+$f$. They are the Arbeth method:
+
+$$r_{k,i+1} = r_{k,i} - \frac{\frac{f(r_{k,i})}{f'(r_{k,i})}}{1-\frac{f(r_{k,i})}{f'(r_{k,i})}\sum_j^{N;j \ne k}\frac{1}{r_{k,i}-r_{j,i}}}$$
+
+and Durnad-Kerner method:
+
+$$r_{k,i+1} = r_{k,i} - \frac{f(r_{k,i})}{\prod_j^{N;j \ne i}(r_{k,i}-r_{k,j})}$$
+
+The Arbeth method is overall better because its convergence speed to
+computation complexity ratio is larger.
+
+Flags available for littlewood fractal:
+- `0xF`: coloring
+  - `0x0`, `forward`: order the normal way
+  - ![](assets/littlewood-forward.png)
+  - `0x1`, `backward`: inverse the order
+  - ![](assets/littlewood-backward.png)
+- `0xF0`: root finding method
+  - `0x0`, `abeth`: arbeth method
+  - `0x1`, `dk`, `durnard-kerner`: durnard-kerner method
+- `0x100`, `const`: enable/disable fixing c0 to 1
+- ![](assets/littlewood-const.png)
+- `0x200`, `par`, `overlay`: enable/disable coefitient list overlay
+- ![](assets/littlewood-par.png)
+
+The overall fractal with coefitients 1 and -1:
+
+![](assets/littlewood.png)
+
+Serpinski triangle within littlewood fractal when using 4 coefitients:
+
+![](assets/littlewood-serpinski.png)
+
+And zoomed out version over the whole fractal with serpinski triangle:
+
+![](assets/littlewood-serpinski2.png)

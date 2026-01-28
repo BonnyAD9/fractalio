@@ -35,7 +35,7 @@ public:
             set_flags(0xF, 2);
         } else if (name == "euler") {
             set_flags(0xF0, 0);
-        } else if (name == "rk1" || name == "runge-kutta4") {
+        } else if (name == "rk4" || name == "runge-kutta4") {
             set_flags(0xF0, 0x10);
         } else {
             ChaoticFractal::flag(name);

@@ -216,9 +216,6 @@ mat3x2 get_acceleration(mat3x4 s) {
 
 mat3x4 derive(mat3x4 s, float h) {
     mat3x2 acc = get_acceleration(s);
-    s[0].zw += acc[0] * h;
-    s[1].zw += acc[1] * h;
-    s[2].zw += acc[2] * h;
     return mat3x4(
         vec4(s[0].zw, acc[0]),
         vec4(s[1].zw, acc[1]),

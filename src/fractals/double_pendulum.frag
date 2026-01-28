@@ -131,7 +131,6 @@ vec2 get_acceleration(vec4 s) {
 
 vec4 derive(vec4 s, float t) {
     vec2 acc = get_acceleration(s);
-    s.zw += acc * t;
     return vec4(s.zw, acc);
 }
 
